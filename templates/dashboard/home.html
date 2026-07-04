@@ -6,46 +6,65 @@ Dashboard
 
 {% block content %}
 
-<h1>Welcome to PharmaCare</h1>
+<div class="py-4">
+    <h1 class="dashboard-title">Welcome to PharmaCare</h1>
+    <p class="lead mb-5">
+        A modern, comprehensive Pharmacy Inventory & Sales Management System
+    </p>
 
-<p class="lead">
-Pharmacy Inventory Management System
-</p>
+    <div class="row g-4">
+        <!-- Medicines Card -->
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="dashboard-card-icon">💊</div>
+                    <h3 class="dashboard-card-title">Medicines</h3>
+                    <p class="dashboard-card-description">
+                        Manage medicine catalog, categories, dosage units, and formulation details.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-<div class="row">
+        <!-- Inventory Card -->
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="dashboard-card-icon">📦</div>
+                    <h3 class="dashboard-card-title">Inventory</h3>
+                    <p class="dashboard-card-description">
+                        Track stock levels, shelf locations, batches, and receive automated low stock alerts.
+                    </p>
+                </div>
+            </div>
+        </div>
 
-    <div class="col-md-3">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                Medicines
+        <!-- Suppliers Card -->
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="dashboard-card-icon">🤝</div>
+                    <h3 class="dashboard-card-title">Suppliers</h3>
+                    <p class="dashboard-card-description">
+                        Maintain supplier contact records, details, and purchase ordering histories.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Card -->
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="dashboard-card-icon">📈</div>
+                    <h3 class="dashboard-card-title">Sales</h3>
+                    <p class="dashboard-card-description">
+                        Process new transactions, generate customer invoices, and view receipts.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                Inventory
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card bg-warning">
-            <div class="card-body">
-                Suppliers
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card bg-danger text-white">
-            <div class="card-body">
-                Sales
-            </div>
-        </div>
-    </div>
-
 </div>
 
 {% endblock %}

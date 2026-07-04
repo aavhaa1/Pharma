@@ -1,0 +1,279 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+/* CSS Variables for Premium Monochrome/Neutral Palette */
+:root {
+    --bg-main: #09090b; /* Pitch Black */
+    --bg-card: rgba(24, 24, 27, 0.75); /* Dark Charcoal */
+    --bg-card-hover: rgba(39, 39, 42, 0.85); /* Slightly lighter Charcoal */
+    --border-color: rgba(255, 255, 255, 0.08); /* Subtle Silver border */
+    --border-focus: rgba(255, 255, 255, 0.45); /* Silver white highlight */
+    --text-primary: #fafafa; /* Off-white */
+    --text-secondary: #a1a1aa; /* Neutral Grey */
+    --primary-gradient: linear-gradient(135deg, #ffffff 0%, #d4d4d8 100%); /* Silver gradient */
+    --accent-gradient: linear-gradient(135deg, #e4e4e7 0%, #71717a 100%); /* Darker Steel gradient */
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --shadow-premium: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+    --shadow-glow: 0 0 12px rgba(255, 255, 255, 0.12);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Body Styles */
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background Ambient Glows */
+body::before, body::after {
+    content: '';
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    filter: blur(140px);
+    z-index: -1;
+    opacity: 0.03;
+}
+body::before {
+    top: 5%;
+    left: 10%;
+    background: #ffffff;
+}
+body::after {
+    bottom: 10%;
+    right: 10%;
+    background: #a1a1aa;
+}
+
+/* Typography Overrides */
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.lead {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Glassmorphism Navigation Bar */
+.navbar {
+    background: rgba(9, 9, 11, 0.8) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.8rem 0;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+/* Glassmorphism Cards */
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: var(--shadow-premium);
+    transition: var(--transition-smooth);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--bg-card-hover);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.7);
+}
+
+.card-header {
+    background: rgba(255, 255, 255, 0.01);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Premium Form Elements */
+label {
+    font-family: var(--font-heading);
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    background-color: rgba(9, 9, 11, 0.6) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    border-radius: 8px !important;
+    padding: 0.65rem 0.9rem !important;
+    transition: var(--transition-smooth) !important;
+    font-size: 0.95rem;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--border-focus) !important;
+    box-shadow: var(--shadow-glow) !important;
+    background-color: rgba(9, 9, 11, 0.9) !important;
+}
+
+/* Clean Custom Form Help Text */
+.form-text, .helptext {
+    color: var(--text-secondary) !important;
+    font-size: 0.8rem;
+    margin-top: 0.4rem;
+}
+
+/* Buttons with Gradient and Micro-animations */
+.btn {
+    border-radius: 8px;
+    padding: 0.55rem 1.2rem;
+    font-weight: 600;
+    font-family: var(--font-heading);
+    transition: var(--transition-smooth);
+    border: none;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: #09090b !important;
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.08);
+}
+
+.btn-primary:hover {
+    background: var(--primary-gradient);
+    opacity: 0.92;
+    transform: scale(1.01);
+    box-shadow: 0 6px 18px rgba(255, 255, 255, 0.15);
+}
+
+.btn-light {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-light:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    transform: scale(1.01);
+}
+
+.btn-warning {
+    background: var(--accent-gradient);
+    color: #09090b !important;
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.05);
+}
+
+.btn-warning:hover {
+    background: var(--accent-gradient);
+    opacity: 0.92;
+    transform: scale(1.01);
+    box-shadow: 0 6px 18px rgba(255, 255, 255, 0.12);
+}
+
+.btn-danger {
+    background: #27272a;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.btn-danger:hover {
+    background: #ef4444;
+    color: #fff !important;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* Navigation Items styling */
+.nav-link {
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: var(--transition-smooth);
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--text-primary);
+}
+
+.badge {
+    padding: 0.4em 0.7em;
+    font-weight: 600;
+    border-radius: 5px;
+    font-family: var(--font-heading);
+}
+
+.bg-warning {
+    background-color: #27272a !important;
+    color: #e4e4e7 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Dashboard Control Cards Specific Styling */
+.dashboard-title {
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+    font-size: 2.3rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.03em;
+}
+
+.dashboard-card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+    filter: grayscale(100%);
+    display: inline-block;
+}
+
+.dashboard-card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    color: var(--text-primary);
+}
+
+.dashboard-card-description {
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+/* Custom form wrapper for standard Django template forms (.as_p) */
+form p {
+    margin-bottom: 1.15rem;
+    display: flex;
+    flex-direction: column;
+}
+
+form p input {
+    width: 100%;
+}
