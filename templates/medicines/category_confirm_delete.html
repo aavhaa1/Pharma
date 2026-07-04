@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Deactivate Category | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        
+        <div class="mb-3">
+            <a href="{% url 'category_list' %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
+                &larr; Back to Categories
+            </a>
+        </div>
+
+        <div class="card border-danger-subtle" style="border: 1px solid rgba(220, 53, 69, 0.3);">
+            <div class="card-header" style="background: rgba(220, 53, 69, 0.03); border-bottom: 1px solid rgba(220, 53, 69, 0.2);">
+                <h3 class="mb-0 text-danger">Deactivate Category</h3>
+            </div>
+            <div class="card-body">
+                <p>Are you sure you want to deactivate the category "<strong>{{ object.name }}</strong>"?</p>
+                
+                <div class="alert alert-warning" style="background: rgba(255, 193, 7, 0.05); border: 1px solid rgba(255, 193, 7, 0.15); color: #ffca2c; font-size: 0.9rem;">
+                    <strong>Notice:</strong> Medicines assigned to this category will not be deleted, but they will be categorized under an inactive category. You can reactivate this category at any time by editing it.
+                </div>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'category_list' %}" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Yes, Deactivate</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

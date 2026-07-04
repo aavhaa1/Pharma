@@ -38,11 +38,12 @@
                 {% for group in user.groups.all %}
 
                     {% if group.name == "Admin" %}
+                        <a href="{% url 'medicine_list' %}" class="btn btn-light btn-sm me-2">Medicines</a>
                         <a href="#" class="btn btn-light btn-sm me-2">Users</a>
                     {% endif %}
 
                     {% if group.name == "Pharmacist" %}
-                        <a href="#" class="btn btn-light btn-sm me-2">Inventory</a>
+                        <a href="{% url 'medicine_list' %}" class="btn btn-light btn-sm me-2">Inventory</a>
                     {% endif %}
 
                     {% if group.name == "Cashier" %}
@@ -76,6 +77,26 @@
 </nav>
 
 <div class="container mt-4">
+    {% if messages %}
+        <div class="messages-container mb-4">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert" style="background: rgba(24, 24, 27, 0.9); border: 1px solid rgba(255,255,255,0.1); color: #fafafa;">
+                    {% if message.tags == 'success' %}
+                        <span class="text-success me-2">●</span>
+                    {% elif message.tags == 'error' or message.tags == 'danger' %}
+                        <span class="text-danger me-2">●</span>
+                    {% elif message.tags == 'warning' %}
+                        <span class="text-warning me-2">●</span>
+                    {% else %}
+                        <span class="text-info me-2">●</span>
+                    {% endif %}
+                    {{ message }}
+                    <button type="submit" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
 </div>

@@ -15,15 +15,17 @@ Dashboard
     <div class="row g-4">
         <!-- Medicines Card -->
         <div class="col-md-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="dashboard-card-icon">💊</div>
-                    <h3 class="dashboard-card-title">Medicines</h3>
-                    <p class="dashboard-card-description">
-                        Manage medicine catalog, categories, dosage units, and formulation details.
-                    </p>
+            <a href="{% url 'medicine_list' %}" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="dashboard-card-icon">💊</div>
+                        <h3 class="dashboard-card-title">Medicines</h3>
+                        <p class="dashboard-card-description">
+                            Manage medicine catalog, categories, dosage units, and formulation details.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         <!-- Inventory Card -->

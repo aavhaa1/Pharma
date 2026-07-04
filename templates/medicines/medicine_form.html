@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.instance.pk %}Edit Medicine{% else %}Add Medicine{% endif %} | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        
+        <div class="mb-3">
+            <a href="{% url 'medicine_list' %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
+                &larr; Back to Medicines
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">{% if form.instance.pk %}Edit Medicine{% else %}Add Medicine{% endif %}</h3>
+                <p class="text-secondary mb-0 small">{% if form.instance.pk %}Modify specifications for this catalog item.{% else %}Define a new pharmaceutical product in the main catalog.{% endif %}</p>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.2); color: #ea868f;">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Row 1: Name and Brand -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+                            {{ form.name }}
+                            {% if form.name.help_text %}
+                                <div class="form-text text-secondary">{{ form.name.help_text }}</div>
+                            {% endif %}
+                            {% if form.name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.name.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.brand.id_for_label }}">{{ form.brand.label }}</label>
+                            {{ form.brand }}
+                            {% if form.brand.help_text %}
+                                <div class="form-text text-secondary">{{ form.brand.help_text }}</div>
+                            {% endif %}
+                            {% if form.brand.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.brand.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Category and Unit -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>
+                            {{ form.category }}
+                            {% if form.category.help_text %}
+                                <div class="form-text text-secondary">{{ form.category.help_text }}</div>
+                            {% endif %}
+                            {% if form.category.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.category.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.unit.id_for_label }}">{{ form.unit.label }}</label>
+                            {{ form.unit }}
+                            {% if form.unit.help_text %}
+                                <div class="form-text text-secondary">{{ form.unit.help_text }}</div>
+                            {% endif %}
+                            {% if form.unit.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.unit.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Pricing -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="{{ form.purchase_price.id_for_label }}">{{ form.purchase_price.label }}</label>
+                            {{ form.purchase_price }}
+                            {% if form.purchase_price.help_text %}
+                                <div class="form-text text-secondary">{{ form.purchase_price.help_text }}</div>
+                            {% endif %}
+                            {% if form.purchase_price.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.purchase_price.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.selling_price.id_for_label }}">{{ form.selling_price.label }}</label>
+                            {{ form.selling_price }}
+                            {% if form.selling_price.help_text %}
+                                <div class="form-text text-secondary">{{ form.selling_price.help_text }}</div>
+                            {% endif %}
+                            {% if form.selling_price.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.selling_price.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Description -->
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+                        {{ form.description }}
+                        {% if form.description.help_text %}
+                            <div class="form-text text-secondary">{{ form.description.help_text }}</div>
+                        {% endif %}
+                        {% if form.description.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.description.errors %}
+                                    ● {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Row 5: Switches / Checkboxes -->
+                    <div class="row mb-4 pt-2">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="form-check form-switch">
+                                {{ form.requires_prescription }}
+                                <label class="form-check-label ms-2" for="{{ form.requires_prescription.id_for_label }}">
+                                    {{ form.requires_prescription.label }}
+                                </label>
+                            </div>
+                            {% if form.requires_prescription.help_text %}
+                                <div class="form-text text-secondary">{{ form.requires_prescription.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label ms-2" for="{{ form.is_active.id_for_label }}">
+                                    {{ form.is_active.label }}
+                                </label>
+                            </div>
+                            {% if form.is_active.help_text %}
+                                <div class="form-text text-secondary">{{ form.is_active.help_text }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'medicine_list' %}" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}Save Changes{% else %}Create Medicine{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
