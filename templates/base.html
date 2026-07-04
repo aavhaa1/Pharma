@@ -22,18 +22,38 @@
             {% if user.is_authenticated %}
 
                 <span class="text-white me-3">
-                    Welcome, {{ user.username }}
+                    Welcome {% if user.groups.all %}
+    {% for group in user.groups.all %}
+        <span class="badge bg-warning text-dark">
+            {{ group.name }}
+        </span>
+    {% endfor %}
+{% endif %}, {{ user.username }}
                 </span>
 
-                <a href="{% url 'change_password' %}" class="btn btn-warning btn-sm">
-                    Change Password
-                </a>
 
-                <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">
-                    Logout
-                </a>
+                {% for group in user.groups.all %}
 
-            {% else %}
+    {% if group.name == "Admin" %}
+        <a href="#" class="btn btn-light btn-sm me-2">Users</a>
+    {% endif %}
+
+    {% if group.name == "Pharmacist" %}
+        <a href="#" class="btn btn-light btn-sm me-2">Inventory</a>
+    {% endif %}
+
+    {% if group.name == "Cashier" %}
+        <a href="#" class="btn btn-light btn-sm me-2">Sales</a>
+    {% endif %}
+
+{% endfor %}
+
+               <form action="{% url 'logout' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger btn-sm">
+        Logout
+    </button>
+</form>
 
                 <a href="{% url 'login' %}" class="btn btn-light btn-sm">
                     Login
