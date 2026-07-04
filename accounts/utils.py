@@ -8,3 +8,4 @@ def is_pharmacist(user):
 
 def is_cashier(user):
     return user.groups.filter(name="Cashier").exists()
+
