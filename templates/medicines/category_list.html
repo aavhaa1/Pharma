@@ -58,7 +58,6 @@
                                         <a href="{% url 'category_delete' category.pk %}" class="btn btn-danger btn-sm">Deactivate</a>
                                     {% endif %}
                                 {% else %}
-                                    {% setvar_assigned = False %}
                                     {% for group in user.groups.all %}
                                         {% if group.name == "Admin" or group.name == "Pharmacist" %}
                                             <a href="{% url 'category_edit' category.pk %}" class="btn btn-light btn-sm me-1">Edit</a>

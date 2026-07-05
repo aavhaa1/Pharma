@@ -292,3 +292,18 @@ span.text-secondary,
     color: #ffffff !important;
 }
 
+/* Force all input placeholders to white */
+::placeholder {
+    color: #ffffff !important;
+    opacity: 0.65 !important;
+}
+:-ms-input-placeholder {
+    color: #ffffff !important;
+    opacity: 0.65 !important;
+}
+::-ms-input-placeholder {
+    color: #ffffff !important;
+    opacity: 0.65 !important;
+}
+
+

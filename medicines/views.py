@@ -37,10 +37,10 @@ class AdminOrPharmacistRequiredMixin(UserPassesTestMixin):
 # 📂 CATEGORY VIEWS
 # ─────────────────────────────────────────────────────────────────────────────
 
-class CategoryListView(LoginRequiredMixin, ListView):
+class CategoryListView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, ListView):
     """
     Lists all medicine categories.
-    Accessible by: Admin, Pharmacist, Cashier (read-only).
+    Accessible by: Admin, Pharmacist. (Blocked for Cashiers).
     """
     model = Category
     template_name = "medicines/category_list.html"
