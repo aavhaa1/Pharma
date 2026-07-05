@@ -9,7 +9,7 @@
     --border-color: rgba(255, 255, 255, 0.08); /* Subtle Silver border */
     --border-focus: rgba(255, 255, 255, 0.45); /* Silver white highlight */
     --text-primary: #fafafa; /* Off-white */
-    --text-secondary: #a1a1aa; /* Neutral Grey */
+    --text-secondary: #ffffff; /* Pure White */
     --primary-gradient: linear-gradient(135deg, #ffffff 0%, #d4d4d8 100%); /* Silver gradient */
     --accent-gradient: linear-gradient(135deg, #e4e4e7 0%, #71717a 100%); /* Darker Steel gradient */
     --font-heading: 'Outfit', sans-serif;
@@ -277,3 +277,18 @@ form p {
 form p input {
     width: 100%;
 }
+
+/* Force all grey/muted font to white */
+.text-muted,
+.text-secondary,
+.form-text,
+.helptext,
+label,
+.dashboard-card-description,
+.card-header p,
+p.text-muted,
+span.text-secondary,
+.table-dark th {
+    color: #ffffff !important;
+}
+
