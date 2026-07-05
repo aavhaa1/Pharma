@@ -1,72 +1,165 @@
 {% extends 'base.html' %}
 
-{% block title %}
-Dashboard
-{% endblock %}
+{% block title %}Dashboard | PharmaCare{% endblock %}
 
 {% block content %}
-
 <div class="py-4">
-    <h1 class="dashboard-title">Welcome to PharmaCare</h1>
-    <p class="lead mb-5">
-        A modern, comprehensive Pharmacy Inventory & Sales Management System
-    </p>
 
+    <!-- ── Welcome Banner ───────────────────────────────────────────── -->
+    <div class="mb-5">
+        <h1 class="dashboard-title mb-1">
+            Welcome, {{ user.username }} 👋
+        </h1>
+        <p class="lead mb-0">
+            {% if user.is_superuser %}
+                You have full Superuser access to PharmaCare.
+            {% else %}
+                {% for group in user.groups.all %}
+                    You are logged in as a <strong>{{ group.name }}</strong>. Select a module below to get started.
+                {% endfor %}
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- ── Dashboard Navigation Cards ──────────────────────────────── -->
     <div class="row g-4">
-        <!-- Medicines Card -->
-        <div class="col-md-3">
+
+        {# ── Medicines: Admin, Pharmacist, Superuser ── #}
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        <div class="col-md-3 col-sm-6">
             <a href="{% url 'medicine_list' %}" class="text-decoration-none">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="dashboard-card-icon">💊</div>
                         <h3 class="dashboard-card-title">Medicines</h3>
                         <p class="dashboard-card-description">
-                            Manage medicine catalog, categories, dosage units, and formulation details.
+                            Manage the medicine catalog, categories, dosage units, and formulation details.
                         </p>
                     </div>
                 </div>
             </a>
         </div>
+        {% endif %}
 
-        <!-- Inventory Card -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="dashboard-card-icon">📦</div>
-                    <h3 class="dashboard-card-title">Inventory</h3>
-                    <p class="dashboard-card-description">
-                        Track stock levels, shelf locations, batches, and receive automated low stock alerts.
-                    </p>
+        {# ── Categories: Admin, Pharmacist, Superuser ── #}
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        <div class="col-md-3 col-sm-6">
+            <a href="{% url 'category_list' %}" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="dashboard-card-icon">🗂️</div>
+                        <h3 class="dashboard-card-title">Categories</h3>
+                        <p class="dashboard-card-description">
+                            Organize medicine groups and manage classification categories.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+        {% endif %}
 
-        <!-- Suppliers Card -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="dashboard-card-icon">🤝</div>
-                    <h3 class="dashboard-card-title">Suppliers</h3>
-                    <p class="dashboard-card-description">
-                        Maintain supplier contact records, details, and purchase ordering histories.
-                    </p>
+        {# ── Inventory: Admin, Pharmacist, Superuser ── #}
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        <div class="col-md-3 col-sm-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="dashboard-card-icon">📦</div>
+                        <h3 class="dashboard-card-title">Inventory</h3>
+                        <p class="dashboard-card-description">
+                            Track stock levels, batch numbers, expiry dates, and low-stock alerts.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+        {% endif %}
 
-        <!-- Sales Card -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="dashboard-card-icon">📈</div>
-                    <h3 class="dashboard-card-title">Sales</h3>
-                    <p class="dashboard-card-description">
-                        Process new transactions, generate customer invoices, and view receipts.
-                    </p>
+        {# ── Suppliers: Admin, Pharmacist, Superuser ── #}
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        <div class="col-md-3 col-sm-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="dashboard-card-icon">🤝</div>
+                        <h3 class="dashboard-card-title">Suppliers</h3>
+                        <p class="dashboard-card-description">
+                            Maintain supplier contact records and purchase ordering histories.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+        {% endif %}
+
+        {# ── Purchases: Admin, Pharmacist, Superuser ── #}
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        <div class="col-md-3 col-sm-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="dashboard-card-icon">🛒</div>
+                        <h3 class="dashboard-card-title">Purchases</h3>
+                        <p class="dashboard-card-description">
+                            Record supplier purchase orders and restock pharmacy inventory.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+
+        {# ── Sales: Admin, Cashier, Superuser ── #}
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Cashier" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Cashier" %}
+        <div class="col-md-3 col-sm-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="dashboard-card-icon">📈</div>
+                        <h3 class="dashboard-card-title">Sales</h3>
+                        <p class="dashboard-card-description">
+                            Process customer transactions, generate invoices, and view receipts.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+
+        {# ── Reports: Admin, Pharmacist, Superuser ── #}
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        <div class="col-md-3 col-sm-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="dashboard-card-icon">📊</div>
+                        <h3 class="dashboard-card-title">Reports</h3>
+                        <p class="dashboard-card-description">
+                            Generate sales, inventory, and purchase reports with export options.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+
+        {# ── Users: Admin, Superuser ── #}
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.1.name == "Admin" %}
+        <div class="col-md-3 col-sm-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="dashboard-card-icon">👥</div>
+                        <h3 class="dashboard-card-title">Users</h3>
+                        <p class="dashboard-card-description">
+                            Manage staff accounts, assign roles, and control system access.
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+
     </div>
 </div>
-
 {% endblock %}
