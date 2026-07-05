@@ -29,7 +29,8 @@ class AdminOrPharmacistRequiredMixin(UserPassesTestMixin):
 
     def test_func(self):
         user = self.request.user
-        return user.is_authenticated and (is_admin(user) or is_pharmacist(user))
+        return user.is_authenticated and (user.is_superuser or is_admin(user) or is_pharmacist(user))
+
 
 
 # ─────────────────────────────────────────────────────────────────────────────
