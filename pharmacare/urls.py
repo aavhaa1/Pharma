@@ -25,5 +25,5 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
 
     path("", include("medicines.urls")),
-
+    path("", include("suppliers.urls")),
 ]

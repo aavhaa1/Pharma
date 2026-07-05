@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Suppliers Directory | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="dashboard-title mb-0">Suppliers Directory</h1>
+        <p class="text-muted mb-0">View and manage the distribution contacts and vendor records.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+        <a href="{% url 'supplier_add' %}" class="btn btn-primary">+ Add Supplier</a>
+    </div>
+</div>
+
+<!-- 🔍 Search and Filters Bar -->
+<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <!-- Search Text -->
+            <div class="col-md-6">
+                <label for="search-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Search Supplier</label>
+                <input type="text" id="search-input" name="q" class="form-control form-control-sm" placeholder="Search by supplier name, contact person, phone..." value="{{ search_query }}">
+            </div>
+            
+            <!-- Status Filter -->
+            <div class="col-md-3">
+                <label for="status-select" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Status</label>
+                <select id="status-select" name="status" class="form-select form-select-sm">
+                    <option value="all" {% if selected_status == "all" %}selected{% endif %}>All Statuses</option>
+                    <option value="active" {% if selected_status == "active" %}selected{% endif %}>Active Only</option>
+                    <option value="inactive" {% if selected_status == "inactive" %}selected{% endif %}>Inactive Only</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-md-3 d-flex gap-1 mt-3 mt-md-0">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Filter</button>
+                <a href="{% url 'supplier_list' %}" class="btn btn-light btn-sm flex-grow-1 text-center">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 📋 Suppliers Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0" style="background: transparent; color: #fafafa;">
+                <thead>
+                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 60px;">SN</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Supplier Name</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Contact Person</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Phone</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Email</th>
+                        <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">Status</th>
+                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 260px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supplier in suppliers %}
+                        <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle; {% if not supplier.is_active %}opacity: 0.45; background: rgba(220, 53, 69, 0.02);{% endif %}">
+                            <td class="py-3 px-4 text-muted font-monospace">
+                                {{ page_obj.start_index|add:forloop.counter0 }}
+                            </td>
+                            <td class="py-3 px-4 fw-semibold">
+                                <a href="{% url 'supplier_detail' supplier.pk %}" class="text-white text-decoration-none hover-link" style="transition: var(--transition-smooth); {% if not supplier.is_active %}text-decoration: line-through;{% endif %}">
+                                    {{ supplier.name }}
+                                </a>
+                            </td>
+                            <td class="py-3 px-4 text-muted">
+                                {% if supplier.contact_person %}
+                                    {{ supplier.contact_person }}
+                                {% else %}
+                                    <span class="fst-italic opacity-50">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-muted font-monospace">
+                                {% if supplier.phone %}
+                                    {{ supplier.phone }}
+                                {% else %}
+                                    <span class="fst-italic opacity-50">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-muted">
+                                {% if supplier.email %}
+                                    {{ supplier.email }}
+                                {% else %}
+                                    <span class="fst-italic opacity-50">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                {% if supplier.is_active %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="background: rgba(25, 135, 84, 0.1) !important; color: #198754 !important;">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important;">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-end">
+                                <a href="{% url 'supplier_detail' supplier.pk %}" class="btn btn-light btn-sm me-1">View</a>
+                                <a href="{% url 'supplier_edit' supplier.pk %}" class="btn btn-light btn-sm me-1">Edit</a>
+                                {% if supplier.is_active %}
+                                    <a href="{% url 'supplier_toggle_status' supplier.pk %}" class="btn btn-danger btn-sm">Deactivate</a>
+                                {% else %}
+                                    <a href="{% url 'supplier_toggle_status' supplier.pk %}" class="btn btn-success btn-sm">Reactivate</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <div class="py-4">
+                                    <h4 class="text-secondary fw-normal">No suppliers found</h4>
+                                    <p class="mb-0 small text-secondary">Try broadening your search term or adjusting filters.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 📑 Pagination -->
+{% if is_paginated %}
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-secondary small">
+            Showing records {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }}
+        </div>
+        <nav aria-label="Suppliers Pagination">
+            <ul class="pagination pagination-sm mb-0">
+                <!-- Previous Button -->
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" aria-label="Previous" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" style="background: rgba(24, 24, 27, 0.3); border-color: var(--border-color); color: var(--text-secondary);">&laquo;</span>
+                    </li>
+                {% endif %}
+
+                <!-- Page Numbers -->
+                {% for page_num in paginator.page_range %}
+                    {% if page_obj.number == page_num %}
+                        <li class="page-item active">
+                            <span class="page-link" style="background: var(--primary-gradient); border-color: var(--border-color); color: #09090b; font-weight: bold;">{{ page_num }}</span>
+                        </li>
+                    {% elif page_num > page_obj.number|add:"-3" and page_num < page_obj.number|add:"3" %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">{{ page_num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Next Button -->
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" aria-label="Next" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" style="background: rgba(24, 24, 27, 0.3); border-color: var(--border-color); color: var(--text-secondary);">&raquo;</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+{% endif %}
+{% endblock %}

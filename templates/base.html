@@ -66,7 +66,7 @@
                             <a class="nav-link px-2" href="#">Inventory</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="#">Suppliers</a>
+                            <a class="nav-link px-2 {% if request.resolver_match.url_name == 'supplier_list' or request.resolver_match.url_name == 'supplier_add' or request.resolver_match.url_name == 'supplier_detail' or request.resolver_match.url_name == 'supplier_edit' %}active{% endif %}" href="{% url 'supplier_list' %}">Suppliers</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link px-2" href="#">Purchases</a>
