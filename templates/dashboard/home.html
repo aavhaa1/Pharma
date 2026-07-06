@@ -126,10 +126,10 @@
         </div>
         {% endif %}
 
-        {# ── Reports: Admin, Pharmacist, Superuser ── #}
-        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        {# ── Reports: Admin, Pharmacist, Cashier, Superuser ── #}
+        {% if user.is_authenticated %}
         <div class="col-md-3 col-sm-6">
-            <a href="#" class="text-decoration-none">
+            <a href="{% url 'reports_home' %}" class="text-decoration-none">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="dashboard-card-icon">📊</div>

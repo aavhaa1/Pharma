@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Low Stock Report | PharmaCare{% endblock %}
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-7">
+        <h1 class="dashboard-title mb-0">Low Stock Report</h1>
+        <p class="text-muted mb-0">Medicines where current stock has fallen at or below the minimum threshold level.</p>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap">
+        <a href="{% url 'reports_export_pdf' %}?report_type=low-stock" class="btn btn-danger btn-sm">PDF</a>
+        <a href="{% url 'reports_export_excel' %}?report_type=low-stock" class="btn btn-success btn-sm">Excel</a>
+        <a href="{% url 'reports_export_csv' %}?report_type=low-stock" class="btn btn-secondary btn-sm">CSV</a>
+        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+    </div>
+</div>
+
+{% if medicines %}
+<div class="alert" style="background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.4); color: #ffc107;" role="alert">
+    ⚠️ <strong>{{ page_obj.paginator.count }} medicine(s)</strong> are at or below their minimum stock levels. Immediate restocking is recommended.
+</div>
+{% endif %}
+
+<div class="card" style="background: rgba(24,24,27,0.3); border: 1px solid var(--border-color);">
+    <div class="table-responsive">
+        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-color);">
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Medicine</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Category</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Current Stock</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Min Required</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Shortage</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Last Supplier</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in medicines %}
+                {% with stock=m.total_stock|default:0 shortage=m.minimum_stock_level|add:"-"|add:stock|default:0 %}
+                <tr style="border-bottom: 1px solid var(--border-color); background: rgba(255,193,7,0.03);">
+                    <td class="py-3 px-4 text-white fw-semibold">{{ m.name }}</td>
+                    <td class="py-3 px-4 text-secondary small">{{ m.category.name|default:"N/A" }}</td>
+                    <td class="py-3 px-4 text-center fw-bold text-warning">{{ m.total_stock|default:0 }}</td>
+                    <td class="py-3 px-4 text-center text-secondary">{{ m.minimum_stock_level }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="badge bg-danger">
+                            {{ m.minimum_stock_level|add:0 }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-secondary small">{{ m.last_supplier|default:"N/A" }}</td>
+                </tr>
+                {% endwith %}
+                {% empty %}
+                    <tr><td colspan="6" class="text-center py-5 text-success fw-semibold">✅ All medicines are currently above their minimum stock levels.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if is_paginated %}
+    <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24,24,27,0.2); border-top: 1px solid var(--border-color);">
+        <span class="text-muted small">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        <nav><ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>{% endif %}
+            <li class="page-item active"><span class="page-link bg-primary border-primary">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

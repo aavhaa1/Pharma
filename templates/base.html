@@ -78,7 +78,7 @@
                     {% endif %}
                     
                     <li class="nav-item">
-                        <a class="nav-link px-2 {% if 'report' in request.resolver_match.url_name %}active{% endif %}" href="#">Reports</a>
+                        <a class="nav-link px-2 {% if 'report' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'reports_home' %}">Reports</a>
                     </li>
 
                     {# ── Sales: Admin, Pharmacist, Cashier ── #}

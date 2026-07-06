@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Reports Dashboard | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col">
+        <h1 class="dashboard-title mb-0">Reports Dashboard</h1>
+        <p class="text-muted mb-0">Business intelligence overview — sales, inventory, and operational analytics.</p>
+    </div>
+</div>
+
+<!-- 📊 Summary Cards Grid -->
+<div class="row g-3 mb-4">
+
+    <!-- Today's Sales -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_sales' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(13,110,253,0.15), rgba(13,110,253,0.05)); border: 1px solid rgba(13,110,253,0.3);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Sales Today</p>
+                            <h3 class="text-white fw-bold mb-0">${{ total_sales_today|floatformat:2 }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">💰</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Monthly Sales -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_sales' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(25,135,84,0.15), rgba(25,135,84,0.05)); border: 1px solid rgba(25,135,84,0.3);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Sales This Month</p>
+                            <h3 class="text-white fw-bold mb-0">${{ total_sales_month|floatformat:2 }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">📈</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Monthly Revenue -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_revenue' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(111,66,193,0.15), rgba(111,66,193,0.05)); border: 1px solid rgba(111,66,193,0.3);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Monthly Revenue</p>
+                            <h3 class="text-white fw-bold mb-0">${{ monthly_revenue|floatformat:2 }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">📊</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Total Purchases -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_purchases' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,193,7,0.05)); border: 1px solid rgba(255,193,7,0.3);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Total Purchases</p>
+                            <h3 class="text-white fw-bold mb-0">${{ total_purchases|floatformat:2 }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">🛒</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Total Medicines -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_medicines' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(13,202,240,0.15), rgba(13,202,240,0.05)); border: 1px solid rgba(13,202,240,0.3);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Active Medicines</p>
+                            <h3 class="text-white fw-bold mb-0">{{ total_medicines }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">💊</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Total Suppliers -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_suppliers' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(253,126,20,0.15), rgba(253,126,20,0.05)); border: 1px solid rgba(253,126,20,0.3);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Active Suppliers</p>
+                            <h3 class="text-white fw-bold mb-0">{{ total_suppliers }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">🤝</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Inventory Value -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_inventory' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(32,201,151,0.15), rgba(32,201,151,0.05)); border: 1px solid rgba(32,201,151,0.3);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Inventory Value</p>
+                            <h3 class="text-white fw-bold mb-0">${{ inventory_value|floatformat:2 }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">📦</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Low Stock Count -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_low_stock' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(255,193,7,0.2), rgba(255,193,7,0.05)); border: 1px solid rgba(255,193,7,0.5);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Low Stock Medicines</p>
+                            <h3 class="text-warning fw-bold mb-0">{{ low_stock_medicines_count }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">⚠️</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Expired Medicines -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_expiry' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(220,53,69,0.2), rgba(220,53,69,0.05)); border: 1px solid rgba(220,53,69,0.5);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Expired Batches</p>
+                            <h3 class="text-danger fw-bold mb-0">{{ expired_medicines_count }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">🚫</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Expiring Soon -->
+    <div class="col-md-3 col-sm-6">
+        <a href="{% url 'reports_expiry' %}" class="text-decoration-none">
+            <div class="card h-100" style="background: linear-gradient(135deg, rgba(253,126,20,0.2), rgba(253,126,20,0.05)); border: 1px solid rgba(253,126,20,0.5);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-secondary small fw-semibold mb-1">Expiring in 30 Days</p>
+                            <h3 class="text-warning fw-bold mb-0">{{ expiring_soon_count }}</h3>
+                        </div>
+                        <span style="font-size: 2rem;">⏰</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Quick Links -->
+<div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
+    <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+        Detailed Reports
+    </div>
+    <div class="card-body">
+        <div class="row g-2">
+            {% url 'reports_sales' as url_sales %}{% url 'reports_purchases' as url_purchases %}{% url 'reports_inventory' as url_inventory %}{% url 'reports_medicines' as url_medicines %}{% url 'reports_suppliers' as url_suppliers %}{% url 'reports_low_stock' as url_low_stock %}{% url 'reports_expiry' as url_expiry %}{% url 'reports_revenue' as url_revenue %}
+            {% for name, url, icon in reports_list %}
+            {% endfor %}
+            <div class="col-md-3"><a href="{{ url_sales }}" class="btn btn-outline-primary w-100 py-2">📈 Sales Report</a></div>
+            <div class="col-md-3"><a href="{{ url_purchases }}" class="btn btn-outline-warning w-100 py-2">🛒 Purchase Report</a></div>
+            <div class="col-md-3"><a href="{{ url_inventory }}" class="btn btn-outline-success w-100 py-2">📦 Inventory Report</a></div>
+            <div class="col-md-3"><a href="{{ url_medicines }}" class="btn btn-outline-info w-100 py-2">💊 Medicine Report</a></div>
+            <div class="col-md-3"><a href="{{ url_suppliers }}" class="btn btn-outline-secondary w-100 py-2">🤝 Supplier Report</a></div>
+            <div class="col-md-3"><a href="{{ url_low_stock }}" class="btn btn-outline-warning w-100 py-2">⚠️ Low Stock Report</a></div>
+            <div class="col-md-3"><a href="{{ url_expiry }}" class="btn btn-outline-danger w-100 py-2">⏰ Expiry Report</a></div>
+            <div class="col-md-3"><a href="{{ url_revenue }}" class="btn btn-outline-light w-100 py-2">💹 Revenue Report</a></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

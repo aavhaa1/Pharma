@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Medicine Report | PharmaCare{% endblock %}
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-7">
+        <h1 class="dashboard-title mb-0">Medicine Report</h1>
+        <p class="text-muted mb-0">Active medicine catalogue with pricing and stock level overview.</p>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap">
+        <a href="{% url 'reports_export_pdf' %}?report_type=medicines&{{ request.GET.urlencode }}" class="btn btn-danger btn-sm">PDF</a>
+        <a href="{% url 'reports_export_excel' %}?report_type=medicines&{{ request.GET.urlencode }}" class="btn btn-success btn-sm">Excel</a>
+        <a href="{% url 'reports_export_csv' %}?report_type=medicines&{{ request.GET.urlencode }}" class="btn btn-secondary btn-sm">CSV</a>
+        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center" style="background: rgba(13,202,240,0.1); border: 1px solid rgba(13,202,240,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Total Active Medicines</p>
+                <h4 class="text-white fw-bold mb-0">{{ total_medicines }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center" style="background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Total Stock Units</p>
+                <h4 class="text-white fw-bold mb-0">{{ total_stock }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center" style="background: rgba(111,66,193,0.1); border: 1px solid rgba(111,66,193,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Showing Records</p>
+                <h4 class="text-white fw-bold mb-0">{{ page_obj.paginator.count }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4" style="background: rgba(24,24,27,0.45); border: 1px solid var(--border-color);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Category</label>
+                <select name="category" class="form-select form-select-sm bg-dark text-white border-secondary">
+                    <option value="">All Categories</option>
+                    {% for c in categories %}<option value="{{ c.pk }}" {% if request.GET.category == c.pk|stringformat:"i" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Supplier</label>
+                <select name="supplier" class="form-select form-select-sm bg-dark text-white border-secondary">
+                    <option value="">All Suppliers</option>
+                    {% for s in suppliers %}<option value="{{ s.pk }}" {% if request.GET.supplier == s.pk|stringformat:"i" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 d-flex gap-2 align-items-end">
+                <button type="submit" class="btn btn-primary btn-sm px-4">Apply</button>
+                <a href="{% url 'reports_medicines' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="background: rgba(24,24,27,0.3); border: 1px solid var(--border-color);">
+    <div class="table-responsive">
+        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-color);">
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Medicine Name</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Brand/Generic</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Category</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Last Supplier</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Selling Price</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Purchase Price</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Current Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in medicines %}
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td class="py-3 px-4 text-white fw-semibold">{{ m.name }}</td>
+                    <td class="py-3 px-4 text-secondary small">{{ m.brand|default:"Generic" }}</td>
+                    <td class="py-3 px-4 text-secondary small">{{ m.category.name|default:"N/A" }}</td>
+                    <td class="py-3 px-4 text-secondary small">{{ m.last_supplier|default:"N/A" }}</td>
+                    <td class="py-3 px-4 text-end text-success fw-semibold">${{ m.selling_price }}</td>
+                    <td class="py-3 px-4 text-end text-secondary small">${{ m.purchase_price }}</td>
+                    <td class="py-3 px-4 text-end text-white">
+                        {% with stock=m.inventory_batches.all|length %}
+                        {{ m.inventory_batches.count }}
+                        {% endwith %}
+                    </td>
+                </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-center py-5 text-muted">No medicines match the selected filters.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if is_paginated %}
+    <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24,24,27,0.2); border-top: 1px solid var(--border-color);">
+        <span class="text-muted small">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        <nav><ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Prev</a></li>{% endif %}
+            <li class="page-item active"><span class="page-link bg-primary border-primary">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a></li>{% endif %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Purchase Report | PharmaCare{% endblock %}
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-7">
+        <h1 class="dashboard-title mb-0">Purchase Report</h1>
+        <p class="text-muted mb-0">All supplier purchase orders, statuses, and expenditure records.</p>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap">
+        <a href="{% url 'reports_export_pdf' %}?report_type=purchases&{{ request.GET.urlencode }}" class="btn btn-danger btn-sm">PDF</a>
+        <a href="{% url 'reports_export_excel' %}?report_type=purchases&{{ request.GET.urlencode }}" class="btn btn-success btn-sm">Excel</a>
+        <a href="{% url 'reports_export_csv' %}?report_type=purchases&{{ request.GET.urlencode }}" class="btn btn-secondary btn-sm">CSV</a>
+        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card text-center" style="background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Total Purchase Orders</p>
+                <h4 class="text-white fw-bold mb-0">{{ total_purchases }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center" style="background: rgba(13,110,253,0.1); border: 1px solid rgba(13,110,253,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Total Purchase Value</p>
+                <h4 class="text-white fw-bold mb-0">${{ total_purchase_value|floatformat:2 }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center" style="background: rgba(25,135,84,0.1); border: 1px solid rgba(25,135,84,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Shown Records</p>
+                <h4 class="text-white fw-bold mb-0">{{ page_obj.paginator.count }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4" style="background: rgba(24,24,27,0.45); border: 1px solid var(--border-color);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Supplier</label>
+                <select name="supplier" class="form-select form-select-sm bg-dark text-white border-secondary">
+                    <option value="">All Suppliers</option>
+                    {% for s in suppliers %}<option value="{{ s.pk }}" {% if request.GET.supplier == s.pk|stringformat:"i" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Start Date</label>
+                <input type="date" name="start_date" class="form-control form-control-sm bg-dark text-white border-secondary" value="{{ request.GET.start_date }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">End Date</label>
+                <input type="date" name="end_date" class="form-control form-control-sm bg-dark text-white border-secondary" value="{{ request.GET.end_date }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Status</label>
+                <select name="status" class="form-select form-select-sm bg-dark text-white border-secondary">
+                    <option value="">All</option>
+                    <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Received" {% if request.GET.status == 'Received' %}selected{% endif %}>Received</option>
+                    <option value="Cancelled" {% if request.GET.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2 align-items-end">
+                <button type="submit" class="btn btn-primary btn-sm px-4">Apply</button>
+                <a href="{% url 'reports_purchases' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="background: rgba(24,24,27,0.3); border: 1px solid var(--border-color);">
+    <div class="table-responsive">
+        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-color);">
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">PO No</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Supplier</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Invoice No</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Date</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Total Amount</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Status</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Created By</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in purchases %}
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td class="py-3 px-4 font-monospace small">PO-{{ p.id }}</td>
+                    <td class="py-3 px-4 text-white fw-semibold">{{ p.supplier.name }}</td>
+                    <td class="py-3 px-4 font-monospace small text-secondary">{{ p.invoice_number }}</td>
+                    <td class="py-3 px-4 text-center text-secondary small">{{ p.purchase_date|date:"Y-m-d" }}</td>
+                    <td class="py-3 px-4 text-end fw-bold text-success">${{ p.total_amount }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="badge {% if p.status == 'Received' %}bg-success{% elif p.status == 'Pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ p.status }}</span>
+                    </td>
+                    <td class="py-3 px-4 text-secondary small">{{ p.created_by.username }}</td>
+                    <td class="py-3 px-4 text-end"><a href="{% url 'purchase_detail' p.pk %}" class="btn btn-outline-info btn-sm py-0 px-2" style="font-size:0.75rem;">View</a></td>
+                </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="text-center py-5 text-muted">No purchase records match the selected filters.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if is_paginated %}
+    <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24,24,27,0.2); border-top: 1px solid var(--border-color);">
+        <span class="text-muted small">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        <nav><ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Prev</a></li>{% endif %}
+            <li class="page-item active"><span class="page-link bg-primary border-primary">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a></li>{% endif %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

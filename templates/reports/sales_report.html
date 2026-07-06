@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Sales Report | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-7">
+        <h1 class="dashboard-title mb-0">Sales Report</h1>
+        <p class="text-muted mb-0">Detailed breakdown of all processed transactions and billing records.</p>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap">
+        <a href="{% url 'reports_export_pdf' %}?report_type=sales&{{ request.GET.urlencode }}" class="btn btn-danger btn-sm">PDF</a>
+        <a href="{% url 'reports_export_excel' %}?report_type=sales&{{ request.GET.urlencode }}" class="btn btn-success btn-sm">Excel</a>
+        <a href="{% url 'reports_export_csv' %}?report_type=sales&{{ request.GET.urlencode }}" class="btn btn-secondary btn-sm">CSV</a>
+        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center" style="background: rgba(13,110,253,0.1); border: 1px solid rgba(13,110,253,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Total Revenue</p>
+                <h4 class="text-white fw-bold mb-0">${{ total_revenue|floatformat:2 }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center" style="background: rgba(25,135,84,0.1); border: 1px solid rgba(25,135,84,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Total Transactions</p>
+                <h4 class="text-white fw-bold mb-0">{{ num_transactions }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center" style="background: rgba(111,66,193,0.1); border: 1px solid rgba(111,66,193,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Average Sale Value</p>
+                <h4 class="text-white fw-bold mb-0">${{ avg_sale_value|floatformat:2 }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center" style="background: rgba(32,201,151,0.1); border: 1px solid rgba(32,201,151,0.3);">
+            <div class="card-body py-3">
+                <p class="text-secondary small mb-1">Total Sales</p>
+                <h4 class="text-white fw-bold mb-0">${{ total_sales|floatformat:2 }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Invoice No.</label>
+                <input type="text" name="invoice_number" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="INV-..." value="{{ request.GET.invoice_number }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Customer</label>
+                <input type="text" name="customer" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Customer name..." value="{{ request.GET.customer }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Start Date</label>
+                <input type="date" name="start_date" class="form-control form-control-sm bg-dark text-white border-secondary" value="{{ request.GET.start_date }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">End Date</label>
+                <input type="date" name="end_date" class="form-control form-control-sm bg-dark text-white border-secondary" value="{{ request.GET.end_date }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Cashier</label>
+                <select name="cashier" class="form-select form-select-sm bg-dark text-white border-secondary">
+                    <option value="">All Cashiers</option>
+                    {% for cashier in cashiers %}
+                        <option value="{{ cashier.pk }}" {% if request.GET.cashier == cashier.pk|stringformat:"i" %}selected{% endif %}>{{ cashier.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label mb-1 text-secondary small fw-semibold">Payment Method</label>
+                <select name="payment_method" class="form-select form-select-sm bg-dark text-white border-secondary">
+                    <option value="">All</option>
+                    <option value="Cash" {% if request.GET.payment_method == 'Cash' %}selected{% endif %}>Cash</option>
+                    <option value="Card" {% if request.GET.payment_method == 'Card' %}selected{% endif %}>Card</option>
+                    <option value="Mobile Payment" {% if request.GET.payment_method == 'Mobile Payment' %}selected{% endif %}>Mobile Payment</option>
+                </select>
+            </div>
+            <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm px-4">Apply Filters</button>
+                <a href="{% url 'reports_sales' %}" class="btn btn-outline-secondary btn-sm">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Table -->
+<div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
+    <div class="table-responsive">
+        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-color);">
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Invoice No</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Customer</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Cashier</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Sale Date</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Items</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Total</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Payment</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td class="py-3 px-4 font-monospace small">{{ sale.invoice_number }}</td>
+                        <td class="py-3 px-4 text-white fw-semibold">{{ sale.customer_name|default:"Walk-in" }}</td>
+                        <td class="py-3 px-4 text-secondary small">{{ sale.cashier.username }}</td>
+                        <td class="py-3 px-4 text-center text-secondary small">{{ sale.sale_date|date:"Y-m-d" }}</td>
+                        <td class="py-3 px-4 text-center">{{ sale.items.count }}</td>
+                        <td class="py-3 px-4 text-end fw-bold text-success">${{ sale.total_amount }}</td>
+                        <td class="py-3 px-4 text-center"><span class="badge bg-secondary small">{{ sale.payment_method }}</span></td>
+                        <td class="py-3 px-4 text-end"><a href="{% url 'sale_detail' sale.pk %}" class="btn btn-outline-info btn-sm py-0 px-2" style="font-size:0.75rem;">View</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="text-center py-5 text-muted">No sales records match the selected filters.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24,24,27,0.2); border-top: 1px solid var(--border-color);">
+        <span class="text-muted small">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        <nav><ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Prev</a></li>{% endif %}
+            <li class="page-item active"><span class="page-link bg-primary border-primary">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a></li>{% endif %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
