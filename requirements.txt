@@ -1,4 +1,6 @@
-﻿asgiref==3.11.1
+asgiref==3.11.1
 Django==5.2.15
 sqlparse==0.5.5
 tzdata==2026.2
+reportlab==4.2.2
+openpyxl==3.1.5

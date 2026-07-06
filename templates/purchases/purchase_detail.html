@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase Order Details | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="dashboard-title mb-0">Purchase Order #{{ purchase.pk }}</h1>
+        <p class="text-muted mb-0">Detailed view of the purchase contract and items list.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+        <a href="{% url 'purchase_list' %}" class="btn btn-outline-secondary btn-sm">Back to List</a>
+        {% if purchase.status == 'Pending' %}
+            {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+                <a href="{% url 'purchase_edit' purchase.pk %}" class="btn btn-outline-warning btn-sm">Edit PO</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Summary and Supplier Details -->
+    <div class="col-lg-4 mb-4">
+        <!-- Status Card -->
+        <div class="card mb-4" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Status</span>
+                    <span class="fs-4 fw-bold 
+                        {% if purchase.status == 'Pending' %}text-warning
+                        {% elif purchase.status == 'Received' %}text-success
+                        {% else %}text-danger{% endif %}">
+                        ● {{ purchase.status }}
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Invoice Number</span>
+                    <span class="text-white fw-medium">{{ purchase.invoice_number }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Purchase Date</span>
+                    <span class="text-white fw-medium">{{ purchase.purchase_date|date:"Y-m-d" }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Created By</span>
+                    <span class="text-white fw-medium">{{ purchase.created_by.username }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Remarks</span>
+                    <span class="text-white-50 text-wrap">{{ purchase.remarks|default:"No remarks provided." }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Supplier Information Card -->
+        <div class="card mb-4" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
+            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+                Supplier Information
+            </div>
+            <div class="card-body">
+                <h5 class="text-white fw-semibold mb-3">{{ purchase.supplier.name }}</h5>
+                <div class="mb-2">
+                    <span class="text-secondary small fw-semibold d-block">Contact Person</span>
+                    <span class="text-white-50">{{ purchase.supplier.contact_person|default:"N/A" }}</span>
+                </div>
+                <div class="mb-2">
+                    <span class="text-secondary small fw-semibold d-block">Phone</span>
+                    <span class="text-white-50">{{ purchase.supplier.phone|default:"N/A" }}</span>
+                </div>
+                <div class="mb-2">
+                    <span class="text-secondary small fw-semibold d-block">Email</span>
+                    <span class="text-white-50">{{ purchase.supplier.email|default:"N/A" }}</span>
+                </div>
+                <div>
+                    <span class="text-secondary small fw-semibold d-block">Address</span>
+                    <span class="text-white-50 text-wrap">{{ purchase.supplier.address|default:"N/A" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Panel (Receive / Cancel) -->
+        {% if purchase.status == 'Pending' %}
+            {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+                <div class="card border-warning" style="background: rgba(255, 193, 7, 0.03);">
+                    <div class="card-body d-grid gap-2">
+                        <form action="{% url 'purchase_receive' purchase.pk %}" method="post" onsubmit="return confirm('Are you sure you want to receive this purchase? This will add stock to inventory and cannot be undone.');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success w-100 py-2">Receive Stock & Complete</button>
+                        </form>
+                        <form action="{% url 'purchase_cancel' purchase.pk %}" method="post" onsubmit="return confirm('Are you sure you want to cancel this purchase order? This will mark it as Cancelled and prevent it from ever updating inventory.');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger w-100">Cancel Purchase Order</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Purchase Items Table -->
+    <div class="col-lg-8 mb-4">
+        <div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
+            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+                Purchase Items List
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine</th>
+                            <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Batch No</th>
+                            <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 130px;">Expiry Date</th>
+                            <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 100px;">Quantity</th>
+                            <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">Unit Cost</th>
+                            <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Total Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in purchase.items.all %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="py-3 px-4 fw-semibold text-white">
+                                    {{ item.medicine.name }}
+                                </td>
+                                <td class="py-3 px-4 font-monospace text-secondary" style="font-size: 0.9rem;">
+                                    {{ item.batch_no }}
+                                </td>
+                                <td class="py-3 px-4 text-center small text-secondary">
+                                    {{ item.expiry_date|date:"Y-m-d" }}
+                                </td>
+                                <td class="py-3 px-4 text-end text-white">
+                                    {{ item.quantity }}
+                                </td>
+                                <td class="py-3 px-4 text-end text-success">
+                                    ${{ item.unit_cost }}
+                                </td>
+                                <td class="py-3 px-4 text-end text-success fw-bold">
+                                    ${{ item.total_cost }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        <!-- Grand Total Summary Row -->
+                        <tr style="border-top: 2px solid var(--border-color); background: rgba(0,0,0,0.15);">
+                            <td colspan="4" class="py-3 px-4 text-end text-secondary fw-semibold">
+                                Purchase Grand Total:
+                            </td>
+                            <td colspan="2" class="py-3 px-4 text-end text-success fs-5 fw-bold">
+                                ${{ purchase.total_amount }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

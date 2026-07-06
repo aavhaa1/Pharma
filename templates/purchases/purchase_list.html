@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase Orders | PharmaCare{% endblock %}
+
+{% block content %}
+<style>
+    .po-row {
+        border-bottom: 1px solid var(--border-color);
+        transition: var(--transition-smooth);
+    }
+    .po-row:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .badge-pending {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    .badge-received {
+        background-color: rgba(40, 167, 69, 0.15);
+        color: #28a745;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    .badge-cancelled {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+</style>
+
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="dashboard-title mb-0">Purchase Management</h1>
+        <p class="text-muted mb-0">Procure stocks, track invoices, and receive incoming inventory batches.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+            <a href="{% url 'purchase_add' %}" class="btn btn-primary">+ Create Purchase</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 🔍 Search and Filters Bar -->
+<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <!-- Supplier Search -->
+            <div class="col-md-3">
+                <label for="supplier-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Supplier</label>
+                <input type="text" id="supplier-input" name="supplier" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Search supplier..." value="{{ request.GET.supplier }}">
+            </div>
+            <!-- Invoice Search -->
+            <div class="col-md-3">
+                <label for="invoice-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Invoice Number</label>
+                <input type="text" id="invoice-input" name="invoice" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Search invoice..." value="{{ request.GET.invoice }}">
+            </div>
+            <!-- Status Filter -->
+            <div class="col-md-2">
+                <label for="status-select" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Status</label>
+                <select id="status-select" name="status" class="form-select form-select-sm bg-dark text-white border-secondary">
+                    <option value="">All Statuses</option>
+                    <option value="Pending" {% if request.GET.status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Received" {% if request.GET.status == 'Received' %}selected{% endif %}>Received</option>
+                    <option value="Cancelled" {% if request.GET.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <!-- Purchase Date Filter -->
+            <div class="col-md-2">
+                <label for="date-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Purchase Date</label>
+                <input type="date" id="date-input" name="purchase_date" class="form-control form-control-sm bg-dark text-white border-secondary" value="{{ request.GET.purchase_date }}">
+            </div>
+            <!-- Action Buttons -->
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Filter</button>
+                <a href="{% url 'purchase_list' %}" class="btn btn-outline-secondary btn-sm flex-grow-1">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 📦 Purchases Data Table -->
+<div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
+    <div class="table-responsive">
+        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid var(--border-color);">
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 100px;">PO ID</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Supplier</th>
+                    <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 180px;">Invoice Number</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Purchase Date</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 130px;">Total Amount</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">Status</th>
+                    <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">Created By</th>
+                    <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 180px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for purchase in purchases %}
+                    <tr class="po-row">
+                        <td class="py-3 px-4 font-monospace" style="font-size: 0.90rem;">
+                            #{{ purchase.pk }}
+                        </td>
+                        <td class="py-3 px-4 fw-semibold">
+                            {{ purchase.supplier.name }}
+                        </td>
+                        <td class="py-3 px-4 text-white">
+                            {{ purchase.invoice_number }}
+                        </td>
+                        <td class="py-3 px-4 text-center small text-secondary">
+                            {{ purchase.purchase_date|date:"Y-m-d" }}
+                        </td>
+                        <td class="py-3 px-4 text-end fw-bold text-success" style="font-size: 0.95rem;">
+                            ${{ purchase.total_amount }}
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="badge rounded-pill px-2.5 py-1.5 
+                                {% if purchase.status == 'Pending' %}badge-pending
+                                {% elif purchase.status == 'Received' %}badge-received
+                                {% else %}badge-cancelled{% endif %}">
+                                {{ purchase.status }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center small text-secondary">
+                            {{ purchase.created_by.username }}
+                        </td>
+                        <td class="py-3 px-4 text-end">
+                            <div class="d-inline-flex gap-1">
+                                <a href="{% url 'purchase_detail' purchase.pk %}" class="btn btn-outline-info btn-xs py-1 px-2.5" style="font-size: 0.8rem;">View</a>
+                                {% if purchase.status == 'Pending' %}
+                                    {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+                                        <a href="{% url 'purchase_edit' purchase.pk %}" class="btn btn-outline-warning btn-xs py-1 px-2.5" style="font-size: 0.8rem;">Edit</a>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No purchase orders found matching your search.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+        <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24, 24, 27, 0.2); border-top: 1px solid var(--border-color);">
+            <div class="text-muted small">
+                Showing page {{ page_obj.number }} of {{ paginator.num_pages }}
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination pagination-sm mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-white border-secondary" href="?page=1{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Prev</a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link bg-primary border-primary text-white">{{ page_obj.number }}</span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link bg-dark text-white border-secondary" href="?page={{ paginator.num_pages }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Last &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

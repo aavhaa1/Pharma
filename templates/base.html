@@ -73,19 +73,18 @@
                             <a class="nav-link px-2 {% if request.resolver_match.url_name == 'supplier_list' or request.resolver_match.url_name == 'supplier_add' or request.resolver_match.url_name == 'supplier_detail' or request.resolver_match.url_name == 'supplier_edit' %}active{% endif %}" href="{% url 'supplier_list' %}">Suppliers</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="#">Purchases</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link px-2" href="#">Reports</a>
+                            <a class="nav-link px-2 {% if 'purchase' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'purchase_list' %}">Purchases</a>
                         </li>
                     {% endif %}
+                    
+                    <li class="nav-item">
+                        <a class="nav-link px-2 {% if 'report' in request.resolver_match.url_name %}active{% endif %}" href="#">Reports</a>
+                    </li>
 
-                    {# ── Sales: Admin, Cashier ── #}
-                    {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Cashier" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Cashier" %}
-                        <li class="nav-item">
-                            <a class="nav-link px-2" href="#">Sales</a>
-                        </li>
-                    {% endif %}
+                    {# ── Sales: Admin, Pharmacist, Cashier ── #}
+                    <li class="nav-item">
+                        <a class="nav-link px-2 {% if 'sale' in request.resolver_match.url_name or 'cart' in request.resolver_match.url_name or 'checkout' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'sale_list' %}">Sales</a>
+                    </li>
 
                     {# ── Users: Admin only ── #}
                     {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.1.name == "Admin" %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Sale Invoice Details | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="dashboard-title mb-0">Invoice {{ sale.invoice_number }}</h1>
+        <p class="text-muted mb-0">Detailed view of the completed sales transaction.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+        <a href="{% url 'sale_list' %}" class="btn btn-outline-secondary btn-sm">Back to History</a>
+        <a href="{% url 'invoice_view' sale.pk %}" class="btn btn-warning btn-sm">🖨️ Printable Invoice</a>
+        <a href="{% url 'invoice_view' sale.pk %}?format=pdf" class="btn btn-danger btn-sm">PDF Download</a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column: Summary Info -->
+    <div class="col-lg-4 mb-4">
+        <div class="card" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
+            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+                Billing Details
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Invoice Number</span>
+                    <span class="text-white fw-bold">{{ sale.invoice_number }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Customer</span>
+                    <span class="text-white fw-medium">{{ sale.customer_name|default:"Walk-in Customer" }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Sale Date</span>
+                    <span class="text-white fw-medium">{{ sale.sale_date|date:"Y-m-d" }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Payment Method</span>
+                    <span class="text-white fw-medium">{{ sale.payment_method }}</span>
+                </div>
+                <div class="mb-3">
+                    <span class="text-secondary small fw-semibold d-block">Cashier</span>
+                    <span class="text-white fw-medium">{{ sale.cashier.username }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Sale Items Table -->
+    <div class="col-lg-8 mb-4">
+        <div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
+            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+                Medicines Dispensed
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine</th>
+                            <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Batch</th>
+                            <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 100px;">Qty</th>
+                            <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">Unit Price</th>
+                            <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in sale.items.all %}
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td class="py-3 px-4 fw-semibold text-white">
+                                    {{ item.medicine.name }}
+                                </td>
+                                <td class="py-3 px-4 font-monospace text-secondary" style="font-size: 0.9rem;">
+                                    {{ item.inventory_batch.batch_no }}
+                                </td>
+                                <td class="py-3 px-4 text-end text-white">
+                                    {{ item.quantity }}
+                                </td>
+                                <td class="py-3 px-4 text-end text-success">
+                                    ${{ item.unit_price }}
+                                </td>
+                                <td class="py-3 px-4 text-end text-success fw-semibold">
+                                    ${{ item.total_price }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        
+                        <!-- Totals rows -->
+                        <tr style="border-top: 2px solid var(--border-color); background: rgba(0,0,0,0.1);">
+                            <td colspan="4" class="py-2 px-4 text-end text-secondary small">Subtotal:</td>
+                            <td class="py-2 px-4 text-end text-white">${{ sale.subtotal }}</td>
+                        </tr>
+                        <tr style="background: rgba(0,0,0,0.1);">
+                            <td colspan="4" class="py-2 px-4 text-end text-secondary small">Discount:</td>
+                            <td class="py-2 px-4 text-end text-danger">-${{ sale.discount }}</td>
+                        </tr>
+                        <tr style="background: rgba(0,0,0,0.1);">
+                            <td colspan="4" class="py-2 px-4 text-end text-secondary small">Tax:</td>
+                            <td class="py-2 px-4 text-end text-info">+${{ sale.tax }}</td>
+                        </tr>
+                        <tr style="background: rgba(0,0,0,0.25);">
+                            <td colspan="4" class="py-3 px-4 text-end text-secondary fw-semibold">Grand Total:</td>
+                            <td class="py-3 px-4 text-end text-success fs-5 fw-bold">${{ sale.total_amount }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

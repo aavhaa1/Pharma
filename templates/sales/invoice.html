@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ sale.invoice_number }} | PharmaCare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+            background: #fff;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            .invoice-box {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body class="py-5">
+
+<div class="container text-center mb-4 no-print">
+    <button onclick="window.print();" class="btn btn-primary me-2">Print Invoice</button>
+    <a href="{% url 'sale_detail' sale.pk %}" class="btn btn-secondary">Back to Details</a>
+</div>
+
+<div class="invoice-box">
+    <div class="row align-items-center mb-4">
+        <div class="col-sm-6">
+            <h2 class="text-primary fw-bold mb-1">PharmaCare Pharmacy</h2>
+            <p class="text-muted small mb-0">
+                123 Health Street, Clinic District<br/>
+                Phone: +1-555-0199 | Email: contact@pharmacare.com
+            </p>
+        </div>
+        <div class="col-sm-6 text-sm-end">
+            <h3 class="text-secondary fw-semibold mb-1">INVOICE</h3>
+            <span class="fs-5 fw-bold text-success">{{ sale.invoice_number }}</span>
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="row mb-4">
+        <div class="col-sm-6">
+            <h6 class="text-secondary fw-bold mb-1">Billed To:</h6>
+            <p class="mb-0 fw-semibold text-dark">{{ sale.customer_name|default:"Walk-in Customer" }}</p>
+        </div>
+        <div class="col-sm-6 text-sm-end">
+            <h6 class="text-secondary fw-bold mb-1">Invoice Info:</h6>
+            <p class="mb-0 text-muted small">
+                <b>Date:</b> {{ sale.sale_date|date:"Y-m-d" }}<br/>
+                <b>Cashier:</b> {{ sale.cashier.username }}<br/>
+                <b>Payment Method:</b> {{ sale.payment_method }}
+            </p>
+        </div>
+    </div>
+
+    <table class="table table-striped align-middle mb-4">
+        <thead class="table-primary text-white">
+            <tr>
+                <th>Medicine</th>
+                <th>Batch No</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Unit Price</th>
+                <th class="text-end">Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in sale.items.all %}
+                <tr>
+                    <td class="fw-semibold text-dark">{{ item.medicine.name }}</td>
+                    <td class="font-monospace small text-muted">{{ item.inventory_batch.batch_no }}</td>
+                    <td class="text-end">{{ item.quantity }}</td>
+                    <td class="text-end">${{ item.unit_price }}</td>
+                    <td class="text-end fw-semibold">${{ item.total_price }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="3"></td>
+                <td class="text-end text-muted small">Subtotal:</td>
+                <td class="text-end">${{ sale.subtotal }}</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td class="text-end text-muted small">Discount:</td>
+                <td class="text-end text-danger">-${{ sale.discount }}</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td class="text-end text-muted small">Tax:</td>
+                <td class="text-end text-info">+${{ sale.tax }}</td>
+            </tr>
+            <tr class="table-success fw-bold">
+                <td colspan="3"></td>
+                <td class="text-end">Grand Total:</td>
+                <td class="text-end text-success">${{ sale.total_amount }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="text-center text-muted small mt-5">
+        Thank you for choosing PharmaCare!
+    </div>
+</div>
+
+</body>
+</html>
