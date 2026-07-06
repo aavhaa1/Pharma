@@ -1,5 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from . import views
 
 urlpatterns = [
     path(
@@ -62,5 +63,37 @@ urlpatterns = [
             template_name="accounts/password_reset_complete.html"
         ),
         name="password_reset_complete",
+    ),
+
+    # User Management Module
+    path(
+        "users/",
+        views.UserListView.as_view(),
+        name="user_list",
+    ),
+    path(
+        "users/add/",
+        views.UserCreateView.as_view(),
+        name="user_add",
+    ),
+    path(
+        "users/<int:pk>/",
+        views.UserDetailView.as_view(),
+        name="user_detail",
+    ),
+    path(
+        "users/<int:pk>/edit/",
+        views.UserUpdateView.as_view(),
+        name="user_edit",
+    ),
+    path(
+        "users/<int:pk>/activate/",
+        views.UserActivateView.as_view(),
+        name="user_activate",
+    ),
+    path(
+        "users/<int:pk>/deactivate/",
+        views.UserDeactivateView.as_view(),
+        name="user_deactivate",
     ),
 ]

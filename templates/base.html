@@ -90,7 +90,7 @@
                     {# ── Users: Admin only ── #}
                     {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.1.name == "Admin" %}
                         <li class="nav-item">
-                            <a class="nav-link px-2" href="#">Users</a>
+                            <a class="nav-link px-2 {% if 'user' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'user_list' %}">Users</a>
                         </li>
                     {% endif %}
                 {% endif %}

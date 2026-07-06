@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{% if action == 'activate' %}Activate{% else %}Deactivate{% endif %} User | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        
+        <div class="mb-3">
+            <a href="{% url 'user_list' %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
+                &larr; Back to Users
+            </a>
+        </div>
+
+        <div class="card {% if action == 'deactivate' %}border-danger-subtle{% else %}border-success-subtle{% endif %}" style="border: 1px solid {% if action == 'deactivate' %}rgba(220, 53, 69, 0.3){% else %}rgba(25, 135, 84, 0.3){% endif %};">
+            <div class="card-header" style="background: {% if action == 'deactivate' %}rgba(220, 53, 69, 0.03){% else %}rgba(25, 135, 84, 0.03){% endif %}; border-bottom: 1px solid {% if action == 'deactivate' %}rgba(220, 53, 69, 0.2){% else %}rgba(25, 135, 84, 0.2){% endif %};">
+                <h3 class="mb-0 {% if action == 'deactivate' %}text-danger{% else %}text-success{% endif %}">
+                    {% if action == 'activate' %}Activate{% else %}Deactivate{% endif %} User
+                </h3>
+            </div>
+            <div class="card-body">
+                <p>Are you sure you want to {{ action }} the user "<strong>{{ target_user.username }}</strong>" ({{ target_user.get_full_name|default:"no full name" }})?</p>
+                
+                <div class="alert {% if action == 'deactivate' %}alert-warning{% else %}alert-info{% endif %}" style="background: {% if action == 'deactivate' %}rgba(255, 193, 7, 0.05){% else %}rgba(13, 110, 253, 0.05){% endif %}; border: 1px solid {% if action == 'deactivate' %}rgba(255, 193, 7, 0.15){% else %}rgba(13, 110, 253, 0.15){% endif %}; color: {% if action == 'deactivate' %}#ffca2c{% else %}#0dcaf0{% endif %}; font-size: 0.9rem;">
+                    <strong>Notice:</strong> 
+                    {% if action == 'deactivate' %}
+                        Deactivating a user blocks them from logging into the application immediately. Their existing logs, history, and metadata will be fully preserved in the database.
+                    {% else %}
+                        Activating this user restores their permission to log into the application. They can log in immediately with their existing username and password.
+                    {% endif %}
+                </div>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'user_list' %}" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn {% if action == 'deactivate' %}btn-danger{% else %}btn-success{% endif %}" {% if action == 'activate' %}style="background: rgba(25, 135, 84, 0.2); border: 1px solid rgba(25, 135, 84, 0.4); color: #198754;"{% endif %}>
+                            Yes, {% if action == 'activate' %}Activate{% else %}Deactivate{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
