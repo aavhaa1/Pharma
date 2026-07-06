@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}New Sale | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="dashboard-title mb-0">New Sale</h1>
+        <p class="text-muted mb-0">Browse and search the medicine catalogue to build a customer shopping cart.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'cart_view' %}" class="btn btn-warning position-relative">
+            🛒 View Shopping Cart
+            {% if cart %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+                    {{ cart|length }}
+                </span>
+            {% endif %}
+        </a>
+    </div>
+</div>
+
+<!-- 🔍 Catalogue Search Bar -->
+<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-10">
+                <input type="text" name="q" class="form-control bg-dark text-white border-secondary" placeholder="Search medicine by generic name, brand, etc..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 💊 Medicine Catalogue Grid -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+    {% for medicine in medicines %}
+        <div class="col">
+            <div class="card h-100 bg-dark border-secondary" style="transition: transform 0.15s ease-in-out;">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="text-white fw-bold mb-0">{{ medicine.name }}</h5>
+                            <span class="badge bg-primary-subtle text-primary border border-primary small">{{ medicine.get_unit_display }}</span>
+                        </div>
+                        <p class="text-secondary small mb-3">Brand: {{ medicine.brand|default:"Generic" }}</p>
+                    </div>
+                    
+                    <div class="pt-3 border-top border-secondary">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="text-secondary small d-block">Retail Price</span>
+                                <span class="fs-5 fw-bold text-success">${{ medicine.selling_price }}</span>
+                            </div>
+                            <div class="text-end">
+                                <span class="text-secondary small d-block">Min Stock Threshold</span>
+                                <span class="text-white fw-semibold small">{{ medicine.minimum_stock_level }} units</span>
+                            </div>
+                        </div>
+
+                        <!-- Add to Cart Form -->
+                        <form action="{% url 'cart_view' %}" method="post" class="row g-1 align-items-center">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="medicine_id" value="{{ medicine.pk }}">
+                            <div class="col-6">
+                                <input type="number" name="quantity" class="form-control form-control-sm bg-dark text-white border-secondary" value="1" min="1" required>
+                            </div>
+                            <div class="col-6 d-grid">
+                                <button type="submit" class="btn btn-success btn-sm">Add to Cart</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 w-100 text-center py-5 text-muted">
+            No active medicines found in the catalogue. Try searching for something else.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
