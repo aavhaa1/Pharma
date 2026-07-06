@@ -3,6 +3,22 @@
 {% block title %}Suppliers Directory | PharmaCare{% endblock %}
 
 {% block content %}
+<style>
+    .supplier-row {
+        border-bottom: 1px solid var(--border-color);
+    }
+    .supplier-inactive-row {
+        opacity: 0.45;
+        background-color: rgba(220, 53, 69, 0.02) !important;
+    }
+    .supplier-link {
+        transition: var(--transition-smooth);
+    }
+    .supplier-inactive-link {
+        text-decoration: line-through;
+    }
+</style>
+
 <div class="row mb-4 align-items-center">
     <div class="col-md-8">
         <h1 class="dashboard-title mb-0">Suppliers Directory</h1>
@@ -60,12 +76,12 @@
                 </thead>
                 <tbody>
                     {% for supplier in suppliers %}
-                        <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle; {% if not supplier.is_active %}opacity: 0.45; background: rgba(220, 53, 69, 0.02);{% endif %}">
+                        <tr class="align-middle supplier-row {% if not supplier.is_active %}supplier-inactive-row{% endif %}">
                             <td class="py-3 px-4 text-muted font-monospace">
                                 {{ page_obj.start_index|add:forloop.counter0 }}
                             </td>
                             <td class="py-3 px-4 fw-semibold">
-                                <a href="{% url 'supplier_detail' supplier.pk %}" class="text-white text-decoration-none hover-link" style="transition: var(--transition-smooth); {% if not supplier.is_active %}text-decoration: line-through;{% endif %}">
+                                <a href="{% url 'supplier_detail' supplier.pk %}" class="text-white text-decoration-none hover-link supplier-link {% if not supplier.is_active %}supplier-inactive-link{% endif %}">
                                     {{ supplier.name }}
                                 </a>
                             </td>

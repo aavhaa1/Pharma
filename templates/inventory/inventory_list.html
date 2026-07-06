@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Registry | PharmaCare{% endblock %}
+
+{% block content %}
+<style>
+    .batch-row {
+        border-bottom: 1px solid var(--border-color);
+    }
+    .batch-row-expired {
+        background: rgba(220, 53, 69, 0.12) !important;
+    }
+    .batch-row-expiring-soon {
+        background: rgba(253, 126, 20, 0.12) !important;
+    }
+    .batch-row-low-stock {
+        background: rgba(255, 193, 7, 0.12) !important;
+    }
+    .batch-row-normal {
+        background: rgba(40, 167, 69, 0.03) !important;
+    }
+</style>
+
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="dashboard-title mb-0">Inventory Registry</h1>
+        <p class="text-muted mb-0">Track and manage medicine batches, stock levels, and expiry statuses.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
+        <a href="{% url 'inventory_history' %}" class="btn btn-light">View History</a>
+        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+            <a href="{% url 'inventory_add' %}" class="btn btn-primary">+ Add Stock</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 🔍 Search and Filters Bar -->
+<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <!-- Search Text -->
+            <div class="col-md-4">
+                <label for="search-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Search Medicine / Batch</label>
+                <input type="text" id="search-input" name="q" class="form-control form-control-sm" placeholder="Search by medicine, batch number..." value="{{ search_query }}">
+            </div>
+            
+            <!-- Category Filter -->
+            <div class="col-md-3">
+                <label for="category-select" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Category</label>
+                <select id="category-select" name="category" class="form-select form-select-sm">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.pk }}" {% if selected_category == cat.pk|stringformat:"i" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Expiry Status Filter -->
+            <div class="col-md-3">
+                <label for="status-select" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Expiry Status</label>
+                <select id="status-select" name="status" class="form-select form-select-sm">
+                    <option value="" {% if not selected_status %}selected{% endif %}>All Batches</option>
+                    <option value="normal" {% if selected_status == "normal" %}selected{% endif %}>Normal</option>
+                    <option value="low_stock" {% if selected_status == "low_stock" %}selected{% endif %}>Low Stock</option>
+                    <option value="expiring_soon" {% if selected_status == "expiring_soon" %}selected{% endif %}>Expiring Soon</option>
+                    <option value="expired" {% if selected_status == "expired" %}selected{% endif %}>Expired</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-md-2 d-flex gap-1 mt-3 mt-md-0">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Filter</button>
+                <a href="{% url 'inventory_list' %}" class="btn btn-light btn-sm flex-grow-1 text-center">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 📋 Inventory Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0" style="background: transparent; color: #fafafa;">
+                <thead>
+                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 60px;">SN</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Category</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Batch Number</th>
+                        <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Expiry Date</th>
+                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 100px;">Quantity</th>
+                        <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 150px;">Status</th>
+                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 220px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for batch in inventory_list %}
+                        <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle;
+                            {% if batch.status == 'Expired' %}
+                                background: rgba(220, 53, 69, 0.12) !important;
+                            {% elif batch.status == 'Expiring Soon' %}
+                                background: rgba(253, 126, 20, 0.12) !important;
+                            {% elif batch.status == 'Low Stock' %}
+                                background: rgba(255, 193, 7, 0.12) !important;
+                            {% else %}
+                                background: rgba(40, 167, 69, 0.03) !important;
+                            {% endif %}">
+                            
+                            <td class="py-3 px-4 font-monospace text-secondary" style="font-size: 0.9rem;">
+                                {{ forloop.counter0|add:page_obj.start_index }}
+                            </td>
+                            
+                            <td class="py-3 px-4 fw-semibold">
+                                <a href="{% url 'inventory_detail' batch.pk %}" class="text-white text-decoration-none hover-link">
+                                    {{ batch.medicine.name }}
+                                </a>
+                            </td>
+                            
+                            <td class="py-3 px-4 text-secondary">
+                                {% if batch.medicine.category %}
+                                    {{ batch.medicine.category.name }}
+                                {% else %}
+                                    <span class="fst-italic opacity-50">Uncategorized</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="py-3 px-4 font-monospace">
+                                {{ batch.batch_no }}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-center font-monospace text-secondary" style="font-size: 0.9rem;">
+                                {{ batch.expiry_date|date:"Y-m-d" }}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-end font-monospace fw-semibold">
+                                {{ batch.quantity }}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-center">
+                                {% if batch.status == 'Expired' %}
+                                    <span class="badge border px-3 py-1.5" style="background: rgba(220, 53, 69, 0.25) !important; color: #ea868f !important; border-color: rgba(220, 53, 69, 0.4) !important;">Expired</span>
+                                {% elif batch.status == 'Expiring Soon' %}
+                                    <span class="badge border px-3 py-1.5" style="background: rgba(253, 126, 20, 0.25) !important; color: #ffc107 !important; border-color: rgba(253, 126, 20, 0.4) !important;">Expiring Soon</span>
+                                {% elif batch.status == 'Low Stock' %}
+                                    <span class="badge border px-3 py-1.5" style="background: rgba(255, 193, 7, 0.25) !important; color: #ffda6a !important; border-color: rgba(255, 193, 7, 0.4) !important;">Low Stock</span>
+                                {% else %}
+                                    <span class="badge border px-3 py-1.5" style="background: rgba(40, 167, 69, 0.25) !important; color: #75b798 !important; border-color: rgba(40, 167, 69, 0.4) !important;">Normal</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-end">
+                                <a href="{% url 'inventory_detail' batch.pk %}" class="btn btn-light btn-sm me-1" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">View</a>
+                                {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+                                    <a href="{% url 'inventory_adjust' batch.pk %}" class="btn btn-warning btn-sm" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">Adjust Stock</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-secondary">
+                                <p class="mb-0 fs-5">No inventory batches found matching the criteria.</p>
+                                <span class="small opacity-50">Create new stock records using the "Add Stock" button above.</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 📄 Pagination -->
+{% if is_paginated %}
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <span class="text-secondary small">
+        Showing Page {{ page_obj.number }} of {{ paginator.num_pages }}
+    </span>
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">&laquo; First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">Previous</a>
+                </li>
+            {% endif %}
+
+            {% for num in paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link" style="background: var(--primary-gradient); border-color: transparent; color: #09090b; font-weight: bold;">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ paginator.num_pages }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">Last &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+{% endblock %}

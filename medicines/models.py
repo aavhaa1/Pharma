@@ -113,6 +113,12 @@ class Medicine(models.Model):
         help_text="Optional notes on usage, dosage, or side effects."
     )
 
+    minimum_stock_level = models.PositiveIntegerField(
+        default=10,
+        verbose_name="Minimum Stock Level",
+        help_text="The threshold level below which stock is considered low."
+    )
+
     # --- Status & Timestamps ---
     is_active = models.BooleanField(
         default=True,

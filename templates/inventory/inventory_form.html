@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Add Stock | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        
+        <div class="mb-3">
+            <a href="{% url 'inventory_list' %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
+                &larr; Back to Inventory
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0 text-white">Add Stock Batch</h3>
+                <p class="text-secondary mb-0 small">Create a new batch record with expiry dates and physical locations.</p>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.2); color: #ea868f;">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Medicine Field -->
+                    <div class="mb-3">
+                        <label for="{{ form.medicine.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.medicine.label }} <span class="text-danger">*</span></label>
+                        {{ form.medicine }}
+                        {% if form.medicine.help_text %}
+                            <div class="form-text text-secondary">{{ form.medicine.help_text }}</div>
+                        {% endif %}
+                        {% if form.medicine.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.medicine.errors %}
+                                    ● {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Batch Number & Expiry Date -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="{{ form.batch_no.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.batch_no.label }} <span class="text-danger">*</span></label>
+                            {{ form.batch_no }}
+                            {% if form.batch_no.help_text %}
+                                <div class="form-text text-secondary">{{ form.batch_no.help_text }}</div>
+                            {% endif %}
+                            {% if form.batch_no.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.batch_no.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.expiry_date.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.expiry_date.label }} <span class="text-danger">*</span></label>
+                            {{ form.expiry_date }}
+                            {% if form.expiry_date.help_text %}
+                                <div class="form-text text-secondary">{{ form.expiry_date.help_text }}</div>
+                            {% endif %}
+                            {% if form.expiry_date.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.expiry_date.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Quantity & Location -->
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="{{ form.quantity.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.quantity.label }} <span class="text-danger">*</span></label>
+                            {{ form.quantity }}
+                            {% if form.quantity.help_text %}
+                                <div class="form-text text-secondary">{{ form.quantity.help_text }}</div>
+                            {% endif %}
+                            {% if form.quantity.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.quantity.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.location.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.location.label }}</label>
+                            {{ form.location }}
+                            {% if form.location.help_text %}
+                                <div class="form-text text-secondary">{{ form.location.help_text }}</div>
+                            {% endif %}
+                            {% if form.location.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.location.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <a href="{% url 'inventory_list' %}" class="btn btn-light me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Add Stock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

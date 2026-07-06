@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Stock Adjustment: {{ inventory.batch_no }} | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        
+        <div class="mb-3">
+            <a href="{% url 'inventory_list' %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
+                &larr; Back to Inventory
+            </a>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0 text-white">Manual Stock Adjustment</h3>
+                <p class="text-secondary mb-0 small">Adjust stock levels for specific batches. Stock level cannot become negative.</p>
+            </div>
+            <div class="card-body">
+                
+                <!-- Batch Info Banner -->
+                <div class="p-3 mb-4 rounded border" style="background: rgba(255, 255, 255, 0.03); border-color: var(--border-color);">
+                    <div class="row">
+                        <div class="col-sm-6 mb-2 mb-sm-0">
+                            <span class="text-secondary d-block small">Medicine</span>
+                            <strong class="text-white fs-5">{{ inventory.medicine.name }}</strong>
+                        </div>
+                        <div class="col-sm-3 mb-2 mb-sm-0">
+                            <span class="text-secondary d-block small">Batch No.</span>
+                            <strong class="text-white font-monospace">{{ inventory.batch_no }}</strong>
+                        </div>
+                        <div class="col-sm-3">
+                            <span class="text-secondary d-block small">Current Stock</span>
+                            <strong class="text-white font-monospace fs-5">{{ inventory.quantity }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.2); color: #ea868f;">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Inventory batch hidden/disabled select -->
+                    <div class="mb-3 d-none">
+                        <label for="{{ form.inventory.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.inventory.label }}</label>
+                        {{ form.inventory }}
+                    </div>
+
+                    <!-- Adjustment Type dropdown -->
+                    <div class="mb-3">
+                        <label for="{{ form.adjustment_type.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.adjustment_type.label }} <span class="text-danger">*</span></label>
+                        {{ form.adjustment_type }}
+                        {% if form.adjustment_type.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.adjustment_type.errors %}
+                                    ● {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Adjustment Quantity -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.quantity_changed.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.quantity_changed.label }} <span class="text-danger">*</span></label>
+                            {{ form.quantity_changed }}
+                            {% if form.quantity_changed.help_text %}
+                                <div class="form-text text-secondary">{{ form.quantity_changed.help_text }}</div>
+                            {% endif %}
+                            {% if form.quantity_changed.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.quantity_changed.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Reason field -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.reason.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.reason.label }} <span class="text-danger">*</span></label>
+                            {{ form.reason }}
+                            {% if form.reason.help_text %}
+                                <div class="form-text text-secondary">{{ form.reason.help_text }}</div>
+                            {% endif %}
+                            {% if form.reason.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.reason.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-4">
+                        <a href="{% url 'inventory_list' %}" class="btn btn-light me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Apply Adjustment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

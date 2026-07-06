@@ -62,9 +62,13 @@
                         <li class="nav-item">
                             <a class="nav-link px-2 {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}" href="{% url 'category_list' %}">Categories</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link px-2" href="#">Inventory</a>
-                        </li>
+                    {% endif %}
+                    
+                    <li class="nav-item">
+                        <a class="nav-link px-2 {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'inventory_list' %}">Inventory</a>
+                    </li>
+                    
+                    {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
                         <li class="nav-item">
                             <a class="nav-link px-2 {% if request.resolver_match.url_name == 'supplier_list' or request.resolver_match.url_name == 'supplier_add' or request.resolver_match.url_name == 'supplier_detail' or request.resolver_match.url_name == 'supplier_edit' %}active{% endif %}" href="{% url 'supplier_list' %}">Suppliers</a>
                         </li>

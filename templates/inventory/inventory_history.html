@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory History Audit Trail | PharmaCare{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="dashboard-title mb-0">Inventory History</h1>
+        <p class="text-muted mb-0">Audit log of all stock adjustments, additions, and deactivations.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a href="{% url 'inventory_list' %}" class="btn btn-light">Back to Inventory</a>
+    </div>
+</div>
+
+<!-- 🔍 Search and Filters Bar -->
+<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <!-- Search Text -->
+            <div class="col-md-9">
+                <label for="search-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Search Medicine</label>
+                <input type="text" id="search-input" name="q" class="form-control form-control-sm" placeholder="Search by medicine name..." value="{{ search_query }}">
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="col-md-3 d-flex gap-1 mt-3 mt-md-0">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Search</button>
+                <a href="{% url 'inventory_history' %}" class="btn btn-light btn-sm flex-grow-1 text-center">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 📋 History Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0" style="background: transparent; color: #fafafa;">
+                <thead>
+                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 160px;">Date & Time</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Batch</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">Action</th>
+                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 110px;">Qty Before</th>
+                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 110px;">Qty After</th>
+                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 110px;">Changed</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Reason</th>
+                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">User</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in history_list %}
+                        <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle;">
+                            <td class="py-3 px-4 font-monospace text-secondary" style="font-size: 0.9rem;">
+                                {{ log.created_at|date:"Y-m-d H:i:s" }}
+                            </td>
+                            
+                            <td class="py-3 px-4 fw-semibold">
+                                <a href="{% url 'inventory_detail' log.inventory.pk %}" class="text-white text-decoration-none hover-link">
+                                    {{ log.inventory.medicine.name }}
+                                </a>
+                            </td>
+                            
+                            <td class="py-3 px-4 font-monospace text-secondary">
+                                {{ log.inventory.batch_no }}
+                            </td>
+                            
+                            <td class="py-3 px-4">
+                                {% if log.action == 'Added' %}
+                                    <span class="badge border px-2 py-1" style="background: rgba(40, 167, 69, 0.25) !important; color: #75b798 !important; border-color: rgba(40, 167, 69, 0.4) !important;">Added</span>
+                                {% elif log.action == 'Removed' %}
+                                    <span class="badge border px-2 py-1" style="background: rgba(220, 53, 69, 0.25) !important; color: #ea868f !important; border-color: rgba(220, 53, 69, 0.4) !important;">Removed</span>
+                                {% elif log.action == 'Expired' %}
+                                    <span class="badge border px-2 py-1" style="background: rgba(220, 53, 69, 0.25) !important; color: #ea868f !important; border-color: rgba(220, 53, 69, 0.4) !important;">Expired</span>
+                                {% else %}
+                                    <span class="badge border px-2 py-1" style="background: rgba(13, 202, 240, 0.25) !important; color: #6edff6 !important; border-color: rgba(13, 202, 240, 0.4) !important;">Adjusted</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-end font-monospace text-secondary">
+                                {{ log.quantity_before }}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-end font-monospace text-secondary">
+                                {{ log.quantity_after }}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-end font-monospace fw-bold {% if log.quantity_changed > 0 %}text-success{% elif log.quantity_changed < 0 %}text-danger{% endif %}">
+                                {% if log.quantity_changed > 0 %}+{% endif %}{{ log.quantity_changed }}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-secondary">
+                                {{ log.reason }}
+                            </td>
+                            
+                            <td class="py-3 px-4 text-secondary font-monospace" style="font-size: 0.9rem;">
+                                {{ log.user.username }}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-5 text-secondary">
+                                <p class="mb-0 fs-5">No inventory history logs found.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 📄 Pagination -->
+{% if is_paginated %}
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <span class="text-secondary small">
+        Showing Page {{ page_obj.number }} of {{ paginator.num_pages }}
+    </span>
+    <nav>
+        <ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">&laquo; First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">Previous</a>
+                </li>
+            {% endif %}
+
+            {% for num in paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link" style="background: var(--primary-gradient); border-color: transparent; color: #09090b; font-weight: bold;">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ paginator.num_pages }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: var(--bg-card); border-color: var(--border-color); color: var(--text-primary);">Last &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+{% endblock %}
