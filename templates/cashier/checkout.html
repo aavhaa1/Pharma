@@ -1,0 +1,288 @@
+{% extends "cashier/base_cashier.html" %}
+
+{% block title %}Checkout | PharmaCare{% endblock %}
+{% block page_title %}Checkout{% endblock %}
+
+{% block extra_head %}
+<style>
+    .checkout-layout {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+    @media (max-width: 991.98px) {
+        .checkout-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+    .billing-card {
+        background: rgba(14,14,16,0.9);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 14px;
+        position: sticky;
+        top: 80px;
+    }
+    .billing-card .card-section-title {
+        font-family: var(--font-heading);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #52525b;
+        margin-bottom: 0.75rem;
+    }
+    .payment-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(24,24,27,0.5);
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s;
+        margin-bottom: 0.5rem;
+    }
+    .payment-option:hover {
+        border-color: rgba(34,197,94,0.3);
+        background: rgba(34,197,94,0.05);
+    }
+    .payment-option input[type="radio"]:checked + .payment-option,
+    .payment-option.selected {
+        border-color: #22c55e;
+        background: rgba(34,197,94,0.1);
+    }
+    .payment-option .pay-icon { font-size: 1.3rem; }
+    .payment-option .pay-label {
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.88rem;
+        color: #fafafa;
+    }
+    .totals-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        font-size: 0.85rem;
+    }
+    .totals-row.grand {
+        padding: 0.75rem 0 0;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        margin-top: 0.25rem;
+    }
+    .items-table th {
+        color: #71717a;
+        font-size: 0.75rem;
+        font-family: var(--font-heading);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .items-table td {
+        padding: 0.75rem 0.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+    .items-table tbody tr:last-child td { border-bottom: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="dashboard-title mb-1">Checkout</h1>
+        <p style="color: #71717a; font-size: 0.88rem;">Review your cart, fill in billing details, and complete the sale.</p>
+    </div>
+    <a href="{% url 'cashier:cashier_pos' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Back to POS
+    </a>
+</div>
+
+<form method="post" id="checkout-form">
+    {% csrf_token %}
+    <div class="checkout-layout">
+
+        <!-- ── LEFT: Billing Panel ──────────────────────────────── -->
+        <div class="billing-card p-0">
+
+            <!-- Customer + Payment -->
+            <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                <div class="card-section-title">Customer Details</div>
+
+                <div class="mb-3">
+                    <label for="customer_name" class="form-label small fw-semibold" style="color: #a1a1aa;">
+                        Customer Name <span style="color: #52525b;">(optional)</span>
+                    </label>
+                    <input type="text" id="customer_name" name="customer_name"
+                           class="form-control"
+                           style="background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.1); color: #fafafa;"
+                           placeholder="Walk-in Customer">
+                </div>
+            </div>
+
+            <!-- Payment Method -->
+            <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                <div class="card-section-title">Payment Method</div>
+
+                <label class="payment-option" id="pay-cash">
+                    <input type="radio" name="payment_method" value="Cash" checked style="display:none;" onchange="selectPayment(this)">
+                    <i class="bi bi-cash-coin pay-icon" style="color: #22c55e;"></i>
+                    <span class="pay-label">Cash</span>
+                    <i class="bi bi-check-circle-fill ms-auto text-success" id="check-cash"></i>
+                </label>
+                <label class="payment-option" id="pay-card">
+                    <input type="radio" name="payment_method" value="Card" style="display:none;" onchange="selectPayment(this)">
+                    <i class="bi bi-credit-card-2-front pay-icon" style="color: #60a5fa;"></i>
+                    <span class="pay-label">Card</span>
+                    <i class="bi bi-circle ms-auto text-secondary" id="check-card"></i>
+                </label>
+                <label class="payment-option" id="pay-mobile">
+                    <input type="radio" name="payment_method" value="Mobile Payment" style="display:none;" onchange="selectPayment(this)">
+                    <i class="bi bi-phone pay-icon" style="color: #c084fc;"></i>
+                    <span class="pay-label">Mobile Wallet</span>
+                    <i class="bi bi-circle ms-auto text-secondary" id="check-mobile"></i>
+                </label>
+            </div>
+
+            <!-- Discount / Tax -->
+            <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                <div class="card-section-title">Adjustments</div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label for="discount" class="form-label small fw-semibold" style="color: #a1a1aa;">Discount ($)</label>
+                        <input type="number" id="discount" name="discount" min="0" step="0.01" value="0.00"
+                               class="form-control"
+                               style="background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.1); color: #f87171;"
+                               oninput="recalculate()">
+                    </div>
+                    <div class="col-6">
+                        <label for="tax" class="form-label small fw-semibold" style="color: #a1a1aa;">Tax ($)</label>
+                        <input type="number" id="tax" name="tax" min="0" step="0.01" value="0.00"
+                               class="form-control"
+                               style="background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.1); color: #60a5fa;"
+                               oninput="recalculate()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Totals -->
+            <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                <div class="card-section-title">Order Summary</div>
+                <div class="totals-row">
+                    <span style="color: #a1a1aa;">Subtotal</span>
+                    <span class="fw-semibold text-white">${{ subtotal }}</span>
+                </div>
+                <div class="totals-row">
+                    <span style="color: #a1a1aa;">Discount</span>
+                    <span class="fw-semibold text-danger" id="discount-display">-$0.00</span>
+                </div>
+                <div class="totals-row">
+                    <span style="color: #a1a1aa;">Tax</span>
+                    <span class="fw-semibold text-info" id="tax-display">+$0.00</span>
+                </div>
+                <div class="totals-row grand">
+                    <span class="fw-bold text-white" style="font-family: var(--font-heading); font-size: 1rem;">Grand Total</span>
+                    <span class="fw-bold text-success" style="font-family: var(--font-heading); font-size: 1.4rem;" id="grand-total-display">${{ subtotal }}</span>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="p-4">
+                <button type="submit" class="btn btn-success w-100 py-3 fw-bold" style="font-size: 1rem; font-family: var(--font-heading);"
+                        id="complete-sale-btn"
+                        onclick="this.disabled=true; this.innerHTML='<i class=\'bi bi-hourglass-split me-2\'></i>Processing...'; this.form.submit();">
+                    <i class="bi bi-check-circle me-2"></i>Complete Sale & Generate Invoice
+                </button>
+            </div>
+        </div>
+
+        <!-- ── RIGHT: Items Table ───────────────────────────────── -->
+        <div>
+            <div class="card" style="background: rgba(14,14,16,0.7); border: 1px solid rgba(255,255,255,0.08);">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center"
+                     style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.07);">
+                    <span class="fw-bold text-white" style="font-family: var(--font-heading);">
+                        <i class="bi bi-list-check me-2"></i>Items to Checkout ({{ cart_items|length }})
+                    </span>
+                    <a href="{% url 'cashier:cashier_pos' %}" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem;">
+                        <i class="bi bi-pencil me-1"></i>Edit Cart
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-dark items-table mb-0" style="--bs-table-bg: transparent;">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3">Medicine</th>
+                                <th class="px-4 py-3 text-center" style="width: 90px;">Qty</th>
+                                <th class="px-4 py-3 text-end" style="width: 110px;">Unit Price</th>
+                                <th class="px-4 py-3 text-end" style="width: 120px;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td class="px-4 fw-semibold text-white">
+                                    {{ item.medicine.name }}
+                                    <span class="d-block" style="font-weight: 400; color: #71717a; font-size: 0.75rem;">
+                                        {{ item.medicine.get_unit_display }}
+                                        {% if item.medicine.requires_prescription %}
+                                        · <span style="color: #f87171;">Rx Required</span>
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td class="px-4 text-center" style="color: #a1a1aa;">{{ item.quantity }}</td>
+                                <td class="px-4 text-end" style="color: #a1a1aa;">${{ item.unit_price }}</td>
+                                <td class="px-4 text-end fw-bold text-success">${{ item.total_price }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const subtotal = parseFloat("{{ subtotal }}") || 0;
+
+function recalculate() {
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    const tax = parseFloat(document.getElementById('tax').value) || 0;
+    document.getElementById('discount-display').textContent = '-$' + discount.toFixed(2);
+    document.getElementById('tax-display').textContent = '+$' + tax.toFixed(2);
+    let grand = subtotal - discount + tax;
+    if (grand < 0) grand = 0;
+    document.getElementById('grand-total-display').textContent = '$' + grand.toFixed(2);
+}
+
+function selectPayment(radio) {
+    const ids = ['cash', 'card', 'mobile'];
+    const vals = ['Cash', 'Card', 'Mobile Payment'];
+    ids.forEach((id, i) => {
+        const label = document.getElementById('pay-' + id);
+        const icon = document.getElementById('check-' + id);
+        if (radio.value === vals[i]) {
+            label.style.borderColor = '#22c55e';
+            label.style.background = 'rgba(34,197,94,0.1)';
+            icon.className = 'bi bi-check-circle-fill ms-auto text-success';
+        } else {
+            label.style.borderColor = 'rgba(255,255,255,0.08)';
+            label.style.background = 'rgba(24,24,27,0.5)';
+            icon.className = 'bi bi-circle ms-auto text-secondary';
+        }
+    });
+}
+
+// Init with Cash selected
+document.getElementById('pay-cash').style.borderColor = '#22c55e';
+document.getElementById('pay-cash').style.background = 'rgba(34,197,94,0.1)';
+</script>
+{% endblock %}

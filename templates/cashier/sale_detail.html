@@ -1,0 +1,130 @@
+{% extends "cashier/base_cashier.html" %}
+
+{% block title %}Invoice {{ sale.invoice_number }} | PharmaCare{% endblock %}
+{% block page_title %}Invoice Details{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="dashboard-title mb-1">{{ sale.invoice_number }}</h1>
+        <p style="color: #71717a; font-size: 0.88rem;">Completed sale — read-only view.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'cashier:cashier_sale_history' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <a href="{% url 'cashier:cashier_invoice' sale.pk %}" class="btn btn-success btn-sm" target="_blank" id="print-invoice-btn">
+            <i class="bi bi-printer me-1"></i>Print Invoice
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Left: Billing Details -->
+    <div class="col-lg-4">
+        <div class="card h-100" style="background: rgba(14,14,16,0.8); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="card-header py-3" style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.07);">
+                <span class="fw-bold text-white" style="font-family: var(--font-heading);">
+                    <i class="bi bi-file-earmark-text me-2"></i>Billing Details
+                </span>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0" style="font-size: 0.88rem;">
+                    <dt class="col-5" style="color: #71717a; font-weight: 500;">Invoice No.</dt>
+                    <dd class="col-7 fw-bold text-white font-monospace">{{ sale.invoice_number }}</dd>
+
+                    <dt class="col-5" style="color: #71717a; font-weight: 500;">Customer</dt>
+                    <dd class="col-7 fw-medium text-white">{{ sale.customer_name|default:"Walk-in Customer" }}</dd>
+
+                    <dt class="col-5" style="color: #71717a; font-weight: 500;">Date</dt>
+                    <dd class="col-7 text-white">{{ sale.sale_date|date:"M j, Y" }}</dd>
+
+                    <dt class="col-5" style="color: #71717a; font-weight: 500;">Time</dt>
+                    <dd class="col-7 text-white">{{ sale.created_at|date:"h:i A" }}</dd>
+
+                    <dt class="col-5" style="color: #71717a; font-weight: 500;">Cashier</dt>
+                    <dd class="col-7 text-white">{{ sale.cashier.get_full_name|default:sale.cashier.username }}</dd>
+
+                    <dt class="col-5" style="color: #71717a; font-weight: 500;">Payment</dt>
+                    <dd class="col-7">
+                        {% if sale.payment_method == 'Cash' %}
+                            <span class="badge" style="background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3);">Cash</span>
+                        {% elif sale.payment_method == 'Card' %}
+                            <span class="badge" style="background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3);">Card</span>
+                        {% else %}
+                            <span class="badge" style="background: rgba(192,132,252,0.15); color: #c084fc; border: 1px solid rgba(192,132,252,0.3);">Mobile Wallet</span>
+                        {% endif %}
+                    </dd>
+
+                    <dt class="col-5" style="color: #71717a; font-weight: 500;">Status</dt>
+                    <dd class="col-7">
+                        <span class="badge" style="background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.25);">
+                            <i class="bi bi-check2 me-1"></i>Completed
+                        </span>
+                    </dd>
+                </dl>
+
+                <hr style="border-color: rgba(255,255,255,0.07);">
+
+                <!-- Totals Summary -->
+                <div style="font-size: 0.85rem;">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color: #71717a;">Subtotal</span>
+                        <span class="text-white">${{ sale.subtotal }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span style="color: #71717a;">Discount</span>
+                        <span class="text-danger">-${{ sale.discount }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span style="color: #71717a;">Tax</span>
+                        <span class="text-info">+${{ sale.tax }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between pt-2" style="border-top: 1px solid rgba(255,255,255,0.08);">
+                        <span class="fw-bold text-white" style="font-family: var(--font-heading);">Grand Total</span>
+                        <span class="fw-bold text-success" style="font-size: 1.1rem; font-family: var(--font-heading);">${{ sale.total_amount }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Medicines Dispensed -->
+    <div class="col-lg-8">
+        <div class="card" style="background: rgba(14,14,16,0.7); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="card-header py-3" style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.07);">
+                <span class="fw-bold text-white" style="font-family: var(--font-heading);">
+                    <i class="bi bi-capsule me-2"></i>Medicines Dispensed ({{ sale.items.count }} items)
+                </span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                            <th class="py-3 px-4" style="color: #52525b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--font-heading);">Medicine</th>
+                            <th class="py-3 px-4" style="color: #52525b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--font-heading);">Batch No.</th>
+                            <th class="py-3 px-4 text-center" style="color: #52525b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--font-heading); width: 80px;">Qty</th>
+                            <th class="py-3 px-4 text-end" style="color: #52525b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--font-heading); width: 110px;">Unit Price</th>
+                            <th class="py-3 px-4 text-end" style="color: #52525b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--font-heading); width: 120px;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in sale.items.all %}
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td class="py-3 px-4">
+                                <span class="fw-semibold text-white" style="font-size: 0.88rem;">{{ item.medicine.name }}</span>
+                                <span class="d-block" style="color: #71717a; font-size: 0.74rem;">{{ item.medicine.get_unit_display }}</span>
+                            </td>
+                            <td class="py-3 px-4 font-monospace" style="color: #a1a1aa; font-size: 0.82rem;">{{ item.inventory_batch.batch_no }}</td>
+                            <td class="py-3 px-4 text-center text-white">{{ item.quantity }}</td>
+                            <td class="py-3 px-4 text-end" style="color: #a1a1aa;">${{ item.unit_price }}</td>
+                            <td class="py-3 px-4 text-end fw-bold text-success">${{ item.total_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

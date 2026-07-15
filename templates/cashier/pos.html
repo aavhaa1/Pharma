@@ -1,0 +1,304 @@
+{% extends "cashier/base_cashier.html" %}
+
+{% block title %}New Sale — POS | PharmaCare{% endblock %}
+{% block page_title %}Point of Sale{% endblock %}
+
+{% block extra_head %}
+<style>
+    .pos-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 1.25rem;
+        align-items: start;
+    }
+    @media (max-width: 991.98px) {
+        .pos-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .med-card {
+        background: rgba(24,24,27,0.55);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        padding: 1.1rem;
+        transition: transform 0.18s ease, border-color 0.18s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .med-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(34,197,94,0.3);
+    }
+    .med-card .med-name {
+        font-family: var(--font-heading);
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #fafafa;
+        margin-bottom: 0.2rem;
+    }
+    .med-card .med-brand {
+        font-size: 0.75rem;
+        color: #71717a;
+    }
+    .med-card .med-price {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #22c55e;
+        font-family: var(--font-heading);
+    }
+    .med-card .stock-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.55rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    .stock-ok { background: rgba(34,197,94,0.12); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+    .stock-low { background: rgba(234,179,8,0.12); color: #facc15; border: 1px solid rgba(234,179,8,0.3); }
+    .stock-out { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+    /* Cart sidebar */
+    .cart-sidebar {
+        background: rgba(14,14,16,0.9);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 14px;
+        position: sticky;
+        top: 80px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    .cart-sidebar::-webkit-scrollbar { width: 4px; }
+    .cart-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .cart-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+    .cart-item-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.82rem;
+    }
+    .cart-item-row:last-child { border-bottom: none; }
+
+    .qty-control {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .qty-control input {
+        width: 48px !important;
+        text-align: center;
+        padding: 0.2rem 0.3rem !important;
+        font-size: 0.8rem !important;
+        background: rgba(9,9,11,0.8) !important;
+        border: 1px solid rgba(255,255,255,0.12) !important;
+        color: #fafafa !important;
+        border-radius: 6px !important;
+    }
+    .qty-btn {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #a1a1aa;
+        border-radius: 5px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: background 0.15s;
+    }
+    .qty-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="dashboard-title mb-1">New Sale</h1>
+        <p style="color: #71717a; font-size: 0.88rem;">Search medicines and add to cart. Review cart, then proceed to checkout.</p>
+    </div>
+</div>
+
+<div class="pos-layout">
+
+    <!-- ── LEFT: Medicine Catalogue ────────────────────────────── -->
+    <div>
+        <!-- Search Bar -->
+        <form method="get" class="mb-3" id="pos-search-form">
+            <div class="input-group">
+                <span class="input-group-text" style="background: rgba(9,9,11,0.8); border: 1px solid rgba(255,255,255,0.1); border-right: none; color: #71717a;">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="q" id="pos-search-input"
+                       value="{{ search_query }}"
+                       class="form-control"
+                       style="background: rgba(9,9,11,0.8); border: 1px solid rgba(255,255,255,0.1); border-left: none; color: #fafafa;"
+                       placeholder="Search by medicine name, brand, description..."
+                       autocomplete="off">
+                {% if search_query %}
+                <a href="{% url 'cashier:cashier_pos' %}" class="btn btn-outline-secondary" style="border-color: rgba(255,255,255,0.1);">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        <!-- Medicine Grid -->
+        {% if medicines %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3" id="medicine-grid">
+            {% for medicine in medicines %}
+            <div class="col">
+                <div class="med-card">
+                    <!-- Top info -->
+                    <div>
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div class="med-name">{{ medicine.name }}</div>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary" style="font-size: 0.65rem;">{{ medicine.get_unit_display }}</span>
+                        </div>
+                        <div class="med-brand mb-2">
+                            {% if medicine.brand %}Brand: {{ medicine.brand }}{% else %}Generic{% endif %}
+                            {% if medicine.category %} · {{ medicine.category.name }}{% endif %}
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            {% if medicine.available_stock == 0 %}
+                                <span class="stock-badge stock-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+                            {% elif medicine.available_stock <= medicine.minimum_stock_level %}
+                                <span class="stock-badge stock-low"><i class="bi bi-exclamation-triangle me-1"></i>Low: {{ medicine.available_stock }}</span>
+                            {% else %}
+                                <span class="stock-badge stock-ok"><i class="bi bi-check-circle me-1"></i>{{ medicine.available_stock }} avail.</span>
+                            {% endif %}
+                            {% if medicine.nearest_expiry %}
+                            <span style="font-size: 0.68rem; color: #71717a;">Exp: {{ medicine.nearest_expiry|date:"M Y" }}</span>
+                            {% endif %}
+                        </div>
+                        {% if medicine.requires_prescription %}
+                        <div class="mb-2">
+                            <span style="font-size: 0.68rem; background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); border-radius: 4px; padding: 0.1rem 0.4rem;">
+                                <i class="bi bi-clipboard2-pulse me-1"></i>Rx Required
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Price + Add to Cart -->
+                    <div class="pt-2 mt-2" style="border-top: 1px solid rgba(255,255,255,0.07);">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="med-price">${{ medicine.selling_price }}</span>
+                        </div>
+                        {% if medicine.available_stock > 0 %}
+                        <form action="{% url 'cashier:cashier_cart' %}" method="post" class="d-flex gap-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add">
+                            <input type="hidden" name="medicine_id" value="{{ medicine.pk }}">
+                            <input type="number" name="quantity" value="1" min="1" max="{{ medicine.available_stock }}"
+                                   class="form-control form-control-sm text-center"
+                                   style="width: 64px; background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.12); color: #fafafa;">
+                            <button type="submit" class="btn btn-success btn-sm flex-grow-1">
+                                <i class="bi bi-cart-plus me-1"></i>Add
+                            </button>
+                        </form>
+                        {% else %}
+                        <button class="btn btn-secondary btn-sm w-100" disabled>Out of Stock</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif search_query %}
+        <div class="text-center py-5" style="color: #52525b;">
+            <i class="bi bi-search fs-2 d-block mb-2"></i>
+            No medicines found for "<strong style="color: #a1a1aa;">{{ search_query }}</strong>".
+        </div>
+        {% else %}
+        <div class="text-center py-5" style="color: #52525b;">
+            <i class="bi bi-capsule fs-2 d-block mb-2"></i>
+            Search for a medicine above to get started.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ── RIGHT: Cart Sidebar ──────────────────────────────────── -->
+    <div class="cart-sidebar">
+        <div class="p-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+            <span class="fw-bold text-white" style="font-family: var(--font-heading);">
+                <i class="bi bi-cart3 me-2 text-success"></i>Cart
+                {% if cart_count %}
+                <span class="badge rounded-pill" style="background: #22c55e; color: #000; font-size: 0.65rem;">{{ cart_count }}</span>
+                {% endif %}
+            </span>
+            {% if cart_items %}
+            <form action="{% url 'cashier:cashier_cart' %}" method="post" onsubmit="return confirm('Clear all cart items?');">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="clear">
+                <button type="submit" class="btn btn-sm" style="background: none; border: none; color: #52525b; font-size: 0.75rem; padding: 0;">
+                    <i class="bi bi-trash me-1"></i>Clear
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        <div class="p-3">
+            {% if cart_items %}
+                {% for item in cart_items %}
+                <div class="cart-item-row">
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="fw-semibold text-white" style="font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            {{ item.medicine.name }}
+                        </div>
+                        <div style="color: #71717a; font-size: 0.72rem;">${{ item.unit_price }} each</div>
+                    </div>
+
+                    <!-- Quantity update -->
+                    <form action="{% url 'cashier:cashier_cart' %}" method="post" class="qty-control">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update">
+                        <input type="hidden" name="medicine_id" value="{{ item.medicine.pk }}">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.available_stock }}"
+                               onchange="this.form.submit()" class="qty-input">
+                    </form>
+
+                    <!-- Remove -->
+                    <form action="{% url 'cashier:cashier_cart' %}" method="post" style="margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove">
+                        <input type="hidden" name="medicine_id" value="{{ item.medicine.pk }}">
+                        <button type="submit" style="background: none; border: none; color: #52525b; padding: 0; cursor: pointer;">
+                            <i class="bi bi-x-circle-fill" style="font-size: 0.9rem;"></i>
+                        </button>
+                    </form>
+                </div>
+                <div style="text-align: right; margin-top: -0.3rem; margin-bottom: 0.3rem; font-size: 0.78rem; color: #22c55e; font-weight: 600;">${{ item.total_price }}</div>
+                {% endfor %}
+
+                <!-- Subtotal -->
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.75rem; margin-top: 0.5rem;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span style="color: #a1a1aa; font-size: 0.85rem; font-family: var(--font-heading); font-weight: 600;">Subtotal</span>
+                        <span style="color: #22c55e; font-size: 1.2rem; font-weight: 800; font-family: var(--font-heading);">${{ cart_subtotal }}</span>
+                    </div>
+                    <a href="{% url 'cashier:cashier_checkout' %}" class="btn btn-success w-100 fw-bold py-2" id="proceed-checkout-btn">
+                        <i class="bi bi-arrow-right-circle me-2"></i>Proceed to Checkout
+                    </a>
+                </div>
+            {% else %}
+                <div class="text-center py-4" style="color: #52525b;">
+                    <i class="bi bi-cart-x fs-2 d-block mb-2"></i>
+                    <span style="font-size: 0.82rem;">Cart is empty.<br>Add medicines to start a sale.</span>
+                </div>
+                <a href="{% url 'cashier:cashier_checkout' %}" class="btn btn-success w-100 fw-bold py-2 mt-2" disabled style="opacity: 0.4; pointer-events: none;">
+                    Proceed to Checkout
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

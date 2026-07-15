@@ -1,0 +1,256 @@
+{% extends "cashier/base_cashier.html" %}
+
+{% block title %}Cashier Dashboard | PharmaCare{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .stat-card {
+        background: rgba(24, 24, 27, 0.6);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        padding: 1.5rem;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255,255,255,0.18);
+    }
+    .stat-card .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+    .stat-card .stat-label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #71717a;
+        font-family: var(--font-heading);
+        margin-bottom: 0.3rem;
+    }
+    .stat-card .stat-value {
+        font-size: 1.9rem;
+        font-weight: 800;
+        font-family: var(--font-heading);
+        letter-spacing: -0.03em;
+        color: #fafafa;
+    }
+    .quick-action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1.25rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(24,24,27,0.5);
+        color: #a1a1aa;
+        text-decoration: none;
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+    }
+    .quick-action-btn:hover {
+        background: rgba(34,197,94,0.1);
+        border-color: rgba(34,197,94,0.35);
+        color: #22c55e;
+        transform: translateY(-2px);
+    }
+    .quick-action-btn .qa-icon {
+        font-size: 1.5rem;
+    }
+    .alert-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.65rem 0.9rem;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+    }
+    .alert-item-low {
+        background: rgba(234,179,8,0.08);
+        border: 1px solid rgba(234,179,8,0.2);
+    }
+    .alert-item-expiry {
+        background: rgba(249,115,22,0.08);
+        border: 1px solid rgba(249,115,22,0.2);
+    }
+    .recent-sale-row {
+        display: flex;
+        align-items: center;
+        padding: 0.65rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+    .recent-sale-row:last-child {
+        border-bottom: none;
+    }
+</style>
+
+<!-- Welcome Banner -->
+<div class="mb-4">
+    <h1 class="dashboard-title mb-1">Welcome back, {{ request.user.first_name|default:request.user.username }}! 👋</h1>
+    <p style="color: #71717a; font-size: 0.9rem;">Here's your sales summary for today.</p>
+</div>
+
+<!-- ── KPI Stats ─────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card" style="border-color: rgba(34,197,94,0.25); background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(24,24,27,0.6));">
+            <span class="stat-icon">💰</span>
+            <div class="stat-label">Today's Sales</div>
+            <div class="stat-value text-success">${{ today_total_sales|floatformat:2 }}</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card" style="border-color: rgba(59,130,246,0.25); background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(24,24,27,0.6));">
+            <span class="stat-icon">🧾</span>
+            <div class="stat-label">Today's Transactions</div>
+            <div class="stat-value" style="color: #60a5fa;">{{ today_transaction_count }}</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card" style="border-color: rgba(234,179,8,0.25); background: linear-gradient(135deg, rgba(234,179,8,0.10), rgba(24,24,27,0.6));">
+            <span class="stat-icon">⚠️</span>
+            <div class="stat-label">Low Stock Items</div>
+            <div class="stat-value" style="color: #facc15;">{{ low_stock_items|length }}</div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="stat-card" style="border-color: rgba(249,115,22,0.25); background: linear-gradient(135deg, rgba(249,115,22,0.10), rgba(24,24,27,0.6));">
+            <span class="stat-icon">⏰</span>
+            <div class="stat-label">Expiring Soon (30d)</div>
+            <div class="stat-value" style="color: #fb923c;">{{ expiring_soon_items|length }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Quick Actions ─────────────────────────────────────────── -->
+<div class="card mb-4" style="background: rgba(24,24,27,0.4); border: 1px solid rgba(255,255,255,0.07);">
+    <div class="card-body">
+        <h6 class="fw-bold text-white mb-3" style="font-family: var(--font-heading);">⚡ Quick Actions</h6>
+        <div class="row g-2">
+            <div class="col-6 col-md-3">
+                <a href="{% url 'cashier:cashier_pos' %}" class="quick-action-btn" id="qa-new-sale">
+                    <i class="bi bi-bag-plus-fill qa-icon"></i>
+                    New Sale
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'cashier:cashier_sale_history' %}" class="quick-action-btn" id="qa-history">
+                    <i class="bi bi-clock-history qa-icon"></i>
+                    Sales History
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'cashier:cashier_medicines' %}" class="quick-action-btn" id="qa-medicines">
+                    <i class="bi bi-search qa-icon"></i>
+                    Search Medicines
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'cashier:cashier_reports' %}" class="quick-action-btn" id="qa-reports">
+                    <i class="bi bi-bar-chart-line-fill qa-icon"></i>
+                    Sales Reports
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Lower Section ─────────────────────────────────────────── -->
+<div class="row g-3">
+
+    <!-- Recent Sales -->
+    <div class="col-xl-6">
+        <div class="card h-100" style="background: rgba(24,24,27,0.4); border: 1px solid rgba(255,255,255,0.07);">
+            <div class="card-header d-flex justify-content-between align-items-center py-3" style="background: rgba(0,0,0,0.15); border-bottom: 1px solid rgba(255,255,255,0.07);">
+                <span class="fw-bold text-white" style="font-family: var(--font-heading);">🧾 Recent Sales</span>
+                <a href="{% url 'cashier:cashier_sale_history' %}" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem;">View All</a>
+            </div>
+            <div class="card-body p-3">
+                {% for sale in recent_sales %}
+                <div class="recent-sale-row">
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="fw-semibold text-white font-monospace" style="font-size: 0.82rem;">{{ sale.invoice_number }}</div>
+                        <div style="color: #71717a; font-size: 0.75rem;">{{ sale.customer_name|default:"Walk-in Customer" }}</div>
+                    </div>
+                    <div class="text-center" style="width: 80px;">
+                        <div style="color: #71717a; font-size: 0.72rem;">{{ sale.sale_date|date:"M j" }}</div>
+                        <span class="badge" style="background: rgba(100,100,120,0.4); color: #a1a1aa; font-size: 0.65rem;">{{ sale.payment_method }}</span>
+                    </div>
+                    <div class="text-end" style="width: 80px;">
+                        <div class="fw-bold text-success" style="font-size: 0.9rem;">${{ sale.total_amount }}</div>
+                        <a href="{% url 'cashier:cashier_sale_detail' sale.pk %}" style="font-size: 0.7rem; color: #60a5fa; text-decoration: none;">View →</a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4" style="color: #52525b;">
+                    <i class="bi bi-receipt fs-3 d-block mb-2"></i>
+                    No sales yet today. Start a new sale!
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts Column -->
+    <div class="col-xl-6">
+        <div class="row g-3 h-100">
+            <!-- Low Stock -->
+            <div class="col-12">
+                <div class="card" style="background: rgba(24,24,27,0.4); border: 1px solid rgba(255,255,255,0.07);">
+                    <div class="card-header py-3" style="background: rgba(0,0,0,0.15); border-bottom: 1px solid rgba(255,255,255,0.07);">
+                        <span class="fw-bold" style="font-family: var(--font-heading); color: #facc15;">⚠️ Low Stock Alerts</span>
+                        <span class="text-muted small ms-2">(View Only)</span>
+                    </div>
+                    <div class="card-body p-3">
+                        {% for item in low_stock_items %}
+                        <div class="alert-item alert-item-low">
+                            <i class="bi bi-exclamation-triangle-fill" style="color: #facc15;"></i>
+                            <div style="flex: 1;">
+                                <span class="fw-semibold text-white" style="font-size: 0.83rem;">{{ item.medicine.name }}</span>
+                            </div>
+                            <span class="fw-bold" style="color: #facc15; font-size: 0.83rem;">{{ item.quantity }} left</span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted small text-center mb-0 py-2">✅ No low stock alerts.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiring Soon -->
+            <div class="col-12">
+                <div class="card" style="background: rgba(24,24,27,0.4); border: 1px solid rgba(255,255,255,0.07);">
+                    <div class="card-header py-3" style="background: rgba(0,0,0,0.15); border-bottom: 1px solid rgba(255,255,255,0.07);">
+                        <span class="fw-bold" style="font-family: var(--font-heading); color: #fb923c;">⏰ Expiring Soon</span>
+                        <span class="text-muted small ms-2">(View Only)</span>
+                    </div>
+                    <div class="card-body p-3">
+                        {% for item in expiring_soon_items %}
+                        <div class="alert-item alert-item-expiry">
+                            <i class="bi bi-clock-fill" style="color: #fb923c;"></i>
+                            <div style="flex: 1;">
+                                <span class="fw-semibold text-white" style="font-size: 0.83rem;">{{ item.medicine.name }}</span>
+                                <span style="color: #71717a; font-size: 0.72rem; display: block;">Batch {{ item.batch_no }}</span>
+                            </div>
+                            <span class="fw-bold" style="color: #fb923c; font-size: 0.83rem;">{{ item.expiry_date|date:"M j, Y" }}</span>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted small text-center mb-0 py-2">✅ No medicines expiring soon.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,431 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PharmaCare — Cashier{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Existing stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <style>
+        /* ── Cashier Sidebar Layout ─────────────────────────────── */
+        :root {
+            --sidebar-width: 240px;
+            --sidebar-bg: rgba(9, 9, 11, 0.97);
+            --sidebar-border: rgba(255, 255, 255, 0.07);
+            --sidebar-active: rgba(255, 255, 255, 0.10);
+            --sidebar-hover: rgba(255, 255, 255, 0.05);
+            --cashier-accent: #22c55e; /* emerald green for cashier role */
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Sidebar ─────────────────────────────────────────────── */
+        #cashier-sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1040;
+            transition: transform 0.3s ease;
+        }
+
+        #cashier-sidebar .sidebar-brand {
+            padding: 1.5rem 1.25rem 1rem;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        #cashier-sidebar .sidebar-brand .brand-name {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+            display: block;
+        }
+
+        #cashier-sidebar .sidebar-brand .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            color: #22c55e;
+            border-radius: 20px;
+            padding: 0.2rem 0.75rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: var(--font-heading);
+            margin-top: 0.4rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        #cashier-sidebar .sidebar-user {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        #cashier-sidebar .sidebar-user .user-name {
+            font-weight: 600;
+            color: #fafafa;
+            font-size: 0.9rem;
+            display: block;
+            font-family: var(--font-heading);
+        }
+
+        #cashier-sidebar .sidebar-user .user-email {
+            font-size: 0.75rem;
+            color: #71717a;
+            display: block;
+            margin-top: 0.1rem;
+        }
+
+        #cashier-sidebar .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        #cashier-sidebar .nav-section-label {
+            padding: 0.5rem 1.25rem 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #52525b;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-family: var(--font-heading);
+        }
+
+        #cashier-sidebar .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.65rem 1.25rem;
+            color: #a1a1aa;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            font-family: var(--font-heading);
+            border-radius: 0;
+            transition: background 0.2s ease, color 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        #cashier-sidebar .nav-item-link:hover {
+            background: var(--sidebar-hover);
+            color: #fafafa;
+        }
+
+        #cashier-sidebar .nav-item-link.active {
+            background: var(--sidebar-active);
+            color: #ffffff;
+            border-left-color: #22c55e;
+        }
+
+        #cashier-sidebar .nav-item-link .nav-icon {
+            font-size: 1.05rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        #cashier-sidebar .nav-item-link .cart-badge {
+            margin-left: auto;
+            background: #22c55e;
+            color: #000;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.1rem 0.45rem;
+        }
+
+        /* Logout form in sidebar */
+        #cashier-sidebar .sidebar-footer {
+            border-top: 1px solid var(--sidebar-border);
+            padding: 0.75rem 0;
+        }
+
+        #cashier-sidebar .sidebar-footer form button,
+        #cashier-sidebar .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.65rem 1.25rem;
+            color: #71717a;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            font-family: var(--font-heading);
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        #cashier-sidebar .sidebar-footer form button:hover {
+            color: #ef4444;
+        }
+
+        #cashier-sidebar .sidebar-footer a:hover {
+            color: #fafafa;
+        }
+
+        /* ── Main Content Area ───────────────────────────────────── */
+        #cashier-main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top bar in main area */
+        #cashier-topbar {
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--sidebar-border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        #cashier-topbar .page-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fafafa;
+            margin: 0;
+        }
+
+        #cashier-topbar .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Mobile toggle */
+        #sidebar-toggle {
+            display: none;
+        }
+
+        #cashier-content {
+            flex: 1;
+            padding: 1.75rem 1.75rem;
+        }
+
+        /* ── Responsive ──────────────────────────────────────────── */
+        @media (max-width: 991.98px) {
+            #cashier-sidebar {
+                transform: translateX(-100%);
+            }
+            #cashier-sidebar.show {
+                transform: translateX(0);
+            }
+            #cashier-main {
+                margin-left: 0;
+            }
+            #sidebar-toggle {
+                display: inline-flex;
+            }
+            #sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 1039;
+            }
+            #sidebar-overlay.show {
+                display: block;
+            }
+        }
+
+        /* ── Alerts ──────────────────────────────────────────────── */
+        .messages-container .alert {
+            background: rgba(24, 24, 27, 0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fafafa;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- Sidebar Overlay (mobile) -->
+<div id="sidebar-overlay"></div>
+
+<!-- ── CASHIER SIDEBAR ──────────────────────────────────────────── -->
+<aside id="cashier-sidebar">
+    <!-- Brand -->
+    <div class="sidebar-brand">
+        <span class="brand-name">PharmaCare</span>
+        <span class="role-badge">
+            <i class="bi bi-cash-stack"></i> Cashier
+        </span>
+    </div>
+
+    <!-- User Info -->
+    <div class="sidebar-user">
+        <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+        <span class="user-email">{{ request.user.email|default:"Cashier Account" }}</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+
+        <a href="{% url 'cashier:cashier_dashboard' %}"
+           class="nav-item-link {% if request.resolver_match.url_name == 'cashier_dashboard' %}active{% endif %}">
+            <i class="bi bi-speedometer2 nav-icon"></i>
+            Dashboard
+        </a>
+
+        <a href="{% url 'cashier:cashier_pos' %}"
+           class="nav-item-link {% if 'cashier_pos' in request.resolver_match.url_name or 'cashier_cart' in request.resolver_match.url_name or 'cashier_checkout' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-bag-plus nav-icon"></i>
+            New Sale
+            {% if cart_count %}
+                <span class="cart-badge">{{ cart_count }}</span>
+            {% endif %}
+        </a>
+
+        <a href="{% url 'cashier:cashier_sale_history' %}"
+           class="nav-item-link {% if 'cashier_sale_history' in request.resolver_match.url_name or 'cashier_sale_detail' in request.resolver_match.url_name or 'cashier_invoice' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-receipt nav-icon"></i>
+            Sales History
+        </a>
+
+        <div class="nav-section-label" style="margin-top: 0.5rem;">Catalogue</div>
+
+        <a href="{% url 'cashier:cashier_medicines' %}"
+           class="nav-item-link {% if request.resolver_match.url_name == 'cashier_medicines' %}active{% endif %}">
+            <i class="bi bi-capsule nav-icon"></i>
+            Medicines
+            <span style="margin-left: auto; font-size: 0.6rem; color: #52525b; font-family: var(--font-heading); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">View Only</span>
+        </a>
+
+        <div class="nav-section-label" style="margin-top: 0.5rem;">Analytics</div>
+
+        <a href="{% url 'cashier:cashier_reports' %}"
+           class="nav-item-link {% if 'cashier_reports' in request.resolver_match.url_name or 'cashier_sales_report' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-bar-chart-line nav-icon"></i>
+            Sales Reports
+        </a>
+
+    </nav>
+
+    <!-- Footer -->
+    <div class="sidebar-footer">
+        <a href="{% url 'change_password' %}">
+            <i class="bi bi-key nav-icon"></i>
+            Change Password
+        </a>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">
+                <i class="bi bi-box-arrow-left nav-icon"></i>
+                Logout
+            </button>
+        </form>
+    </div>
+</aside>
+
+<!-- ── MAIN CONTENT ───────────────────────────────────────────────── -->
+<div id="cashier-main">
+
+    <!-- Top Bar -->
+    <div id="cashier-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <button id="sidebar-toggle" class="btn btn-sm btn-outline-secondary p-1 lh-1">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <h6 class="page-title">{% block page_title %}Cashier Portal{% endblock %}</h6>
+        </div>
+        <div class="topbar-actions">
+            {% if cart_count %}
+            <a href="{% url 'cashier:cashier_checkout' %}" class="btn btn-sm position-relative"
+               style="background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.35); color: #22c55e;">
+                <i class="bi bi-cart3 me-1"></i> Cart
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                      style="background: #22c55e; color: #000; font-size: 0.6rem;">{{ cart_count }}</span>
+            </a>
+            {% endif %}
+            <a href="{% url 'cashier:cashier_pos' %}" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>New Sale
+            </a>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div id="cashier-content">
+
+        <!-- Django Messages -->
+        {% if messages %}
+        <div class="messages-container mb-4">
+            {% for message in messages %}
+            <div class="alert alert-dismissible fade show {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}"
+                 role="alert">
+                {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill text-success me-2"></i>
+                {% elif message.tags == 'error' %}<i class="bi bi-x-circle-fill text-danger me-2"></i>
+                {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                {% else %}<i class="bi bi-info-circle-fill text-info me-2"></i>{% endif %}
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Mobile sidebar toggle
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebar = document.getElementById('cashier-sidebar');
+const overlay = document.getElementById('sidebar-overlay');
+
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+    });
+}
+if (overlay) {
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+    });
+}
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
