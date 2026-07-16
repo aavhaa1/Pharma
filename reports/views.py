@@ -20,6 +20,14 @@ from .utils import get_filtered_data, generate_csv, generate_excel, generate_pdf
 
 User = get_user_model()
 
+class AdminOnlyMixin(UserPassesTestMixin):
+    raise_exception = True
+
+    def test_func(self):
+        user = self.request.user
+        return user.is_authenticated and (user.is_superuser or is_admin(user))
+
+
 class AdminOrPharmacistOnlyMixin(UserPassesTestMixin):
     raise_exception = True
 
@@ -70,7 +78,7 @@ class ReportsDashboardView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, Templ
         return context
 
 
-class SalesReportView(LoginRequiredMixin, ListView):
+class SalesReportView(LoginRequiredMixin, AdminOnlyMixin, ListView):
     model = Sale
     template_name = 'reports/sales_report.html'
     context_object_name = 'sales'
@@ -241,7 +249,7 @@ class ExpiryReportView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, ListView)
         return context
 
 
-class RevenueReportView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, TemplateView):
+class RevenueReportView(LoginRequiredMixin, AdminOnlyMixin, TemplateView):
     template_name = 'reports/revenue_report.html'
 
     def get_context_data(self, **kwargs):

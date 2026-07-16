@@ -14,6 +14,16 @@ def home(request):
 
     today = timezone.now().date()
     
+    # Redirect role-specific users to their dedicated dashboards
+    if request.user.groups.filter(name='Pharmacist').exists():
+        from django.shortcuts import redirect
+        return redirect('pharmacist:dashboard')
+    
+    if request.user.groups.filter(name='Cashier').exists():
+        from django.shortcuts import redirect
+        return redirect('cashier:cashier_dashboard')
+
+    
     total_inventory_quantity = Inventory.objects.aggregate(total=Sum('quantity'))['total'] or 0
     total_inventory_batches = Inventory.objects.count()
     low_stock_count = Inventory.objects.filter(quantity__lte=F('medicine__minimum_stock_level')).count()
