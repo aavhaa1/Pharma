@@ -1,0 +1,123 @@
+{% extends "cashier/base_cashier.html" %}
+
+{% block title %}Medicines Catalog | PharmaCare{% endblock %}
+{% block page_title %}Search Medicines{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="dashboard-title mb-0">Medicines Catalog</h1>
+        <p class="text-secondary mb-0" style="color: #ffffff !important;">Search and view available stock of active medicines.</p>
+    </div>
+</div>
+
+<!-- 🔍 Search Bar -->
+<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45);">
+    <div class="card-body py-3">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-10">
+                <label for="search-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500; color: #ffffff !important;">Search Medicine</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background: rgba(9,9,11,0.8); border: 1px solid rgba(255,255,255,0.1); border-right: none; color: #71717a;">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="search-input" name="q" class="form-control form-control-sm" style="border-left: none; background-color: rgba(9, 9, 11, 0.6) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #fafafa !important;" placeholder="Search by name, brand, description..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Search</button>
+                <a href="{% url 'cashier:cashier_medicines' %}" class="btn btn-light btn-sm flex-grow-1 text-center">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 📋 Medicines Table -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0" style="background: transparent; color: #fafafa;">
+                <thead>
+                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                        <th class="py-3 px-4" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine Name</th>
+                        <th class="py-3 px-4" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Brand</th>
+                        <th class="py-3 px-4" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Category</th>
+                        <th class="py-3 px-4 text-center" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 100px;">Unit</th>
+                        <th class="py-3 px-4 text-end" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Selling Price</th>
+                        <th class="py-3 px-4 text-center" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 150px;">Stock Status</th>
+                        <th class="py-3 px-4 text-center" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 150px;">Nearest Expiry</th>
+                        <th class="py-3 px-4 text-center" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 180px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medicine in medicines %}
+                        <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle;">
+                            <td class="py-3 px-4 fw-semibold">
+                                <span class="text-white">{{ medicine.name }}</span>
+                                {% if medicine.requires_prescription %}
+                                    <span class="badge bg-danger text-white border border-danger-subtle ms-1" style="font-size: 0.7rem; background: rgba(220, 53, 69, 0.25) !important; color: #ea868f !important;">Rx</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-muted" style="color: #ffffff !important; opacity: 0.7;">
+                                {% if medicine.brand %}{{ medicine.brand }}{% else %}<span class="fst-italic opacity-50">Generic</span>{% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-muted" style="color: #ffffff !important; opacity: 0.7;">
+                                {% if medicine.category %}{{ medicine.category.name }}{% else %}<span class="fst-italic opacity-50">Unassigned</span>{% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-center text-muted" style="color: #ffffff !important; opacity: 0.7;">
+                                <span class="badge bg-secondary-subtle text-secondary-emphasis" style="background: rgba(255,255,255,0.05); color: #ffffff !important;">
+                                    {{ medicine.get_unit_display }}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-end fw-semibold text-white font-monospace">${{ medicine.selling_price }}</td>
+                            <td class="py-3 px-4 text-center">
+                                {% if medicine.available_stock == 0 %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important;">Out of Stock</span>
+                                {% elif medicine.available_stock <= medicine.minimum_stock_level %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="background: rgba(234, 179, 8, 0.1) !important; color: #ffc107 !important;">Low: {{ medicine.available_stock }}</span>
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="background: rgba(25, 135, 84, 0.1) !important; color: #198754 !important;">In Stock: {{ medicine.available_stock }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-center text-muted font-monospace" style="color: #ffffff !important; opacity: 0.7;">
+                                {% if medicine.nearest_expiry %}
+                                    {{ medicine.nearest_expiry|date:"Y-m-d" }}
+                                {% else %}
+                                    <span class="opacity-50">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                {% if medicine.available_stock > 0 %}
+                                    <form action="{% url 'cashier:cashier_cart' %}" method="post" class="d-flex gap-1 justify-content-center">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="add">
+                                        <input type="hidden" name="medicine_id" value="{{ medicine.pk }}">
+                                        <input type="hidden" name="next" value="medicines">
+                                        <input type="number" name="quantity" value="1" min="1" max="{{ medicine.available_stock }}"
+                                               class="form-control form-control-sm text-center"
+                                               style="width: 55px; height: 31px; background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.12) !important; color: #fafafa !important;">
+                                        <button type="submit" class="btn btn-success btn-sm py-1 px-2" style="font-size: 0.8rem;">
+                                            <i class="bi bi-cart-plus"></i> Add
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm py-1 px-3 w-100" disabled style="font-size: 0.8rem; opacity: 0.4;">Unavailable</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <div class="py-4">
+                                    <h4 class="text-secondary fw-normal" style="color: #ffffff !important;">No medicines found</h4>
+                                    <p class="mb-0 small text-secondary" style="color: #ffffff !important; opacity: 0.7;">Try broadening your search term.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

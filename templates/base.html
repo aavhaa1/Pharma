@@ -359,7 +359,9 @@
             </form>
         </div>
     </aside>
+{% endif %}
 
+{% if user.is_authenticated and not user.is_superuser and user.groups.all.0.name == "Pharmacist" %}
     <div id="pharmacist-main">
         <!-- Top Bar -->
         <div id="pharmacist-topbar">
@@ -376,49 +378,6 @@
 
         <!-- Content -->
         <div id="pharmacist-content">
-            <!-- Django Messages -->
-            {% if messages %}
-            <div class="messages-container mb-4">
-                {% for message in messages %}
-                <div class="alert alert-dismissible fade show {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}"
-                     role="alert">
-                    {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill text-success me-2"></i>
-                    {% elif message.tags == 'error' %}<i class="bi bi-x-circle-fill text-danger me-2"></i>
-                    {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
-                    {% else %}<i class="bi bi-info-circle-fill text-info me-2"></i>{% endif %}
-                    {{ message }}
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            {% block content %}{% endblock %}
-        </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    // Mobile sidebar toggle
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebar = document.getElementById('pharmacist-sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('show');
-            overlay.classList.toggle('show');
-        });
-    }
-    if (overlay) {
-        overlay.addEventListener('click', () => {
-            sidebar.classList.remove('show');
-            overlay.classList.remove('show');
-        });
-    }
-    </script>
-    {% block extra_scripts %}{% endblock %}
-    
 {% else %}
     <!-- ───────────────────────────────────────────────────────────────── -->
     <!-- DEFAULT / ADMIN TOP-NAVBAR LAYOUT -->
@@ -534,9 +493,23 @@
     {% endif %}
 
     <div class="container mt-4">
+{% endif %}
+
+        <!-- Django Messages -->
         {% if messages %}
-            <div class="messages-container mb-4">
-                {% for message in messages %}
+        <div class="messages-container mb-4">
+            {% for message in messages %}
+                {% if user.is_authenticated and not user.is_superuser and user.groups.all.0.name == "Pharmacist" %}
+                    <div class="alert alert-dismissible fade show {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}"
+                         role="alert">
+                        {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill text-success me-2"></i>
+                        {% elif message.tags == 'error' %}<i class="bi bi-x-circle-fill text-danger me-2"></i>
+                        {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                        {% else %}<i class="bi bi-info-circle-fill text-info me-2"></i>{% endif %}
+                        {{ message }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% else %}
                     <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show"
                          role="alert"
                          style="background: rgba(24, 24, 27, 0.9); border: 1px solid rgba(255,255,255,0.1); color: #fafafa;">
@@ -547,16 +520,43 @@
                         {{ message }}
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                {% endfor %}
-            </div>
+                {% endif %}
+            {% endfor %}
+        </div>
         {% endif %}
 
         {% block content %}{% endblock %}
-    </div>
+    </div> <!-- Close the opened wrapper (either pharmacist-content or container) -->
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_scripts %}{% endblock %}
+{% if user.is_authenticated and not user.is_superuser and user.groups.all.0.name == "Pharmacist" %}
+    </div> <!-- Close pharmacist-main -->
 {% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+{% if user.is_authenticated and not user.is_superuser and user.groups.all.0.name == "Pharmacist" %}
+<script>
+// Mobile sidebar toggle
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebar = document.getElementById('pharmacist-sidebar');
+const overlay = document.getElementById('sidebar-overlay');
+
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+    });
+}
+if (overlay) {
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+    });
+}
+</script>
+{% endif %}
+
+{% block extra_scripts %}{% endblock %}
 
 </body>
 </html>
