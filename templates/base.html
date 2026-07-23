@@ -35,7 +35,7 @@
         /*  Sidebar  */
         #app-sidebar {
             width: var(--sidebar-width);
-            min-height: 100vh;
+            height: 100vh;
             background: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
             display: flex;
@@ -45,6 +45,7 @@
             left: 0;
             z-index: 1040;
             transition: transform 0.3s ease;
+            overflow: hidden;
         }
 
         #app-sidebar .sidebar-brand {
@@ -104,6 +105,8 @@
             padding: 1.25rem 0.75rem;
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
         }
 
         #app-sidebar .sidebar-nav::-webkit-scrollbar {
@@ -264,7 +267,15 @@
     <aside id="app-sidebar">
         <!-- Brand -->
         <div class="sidebar-brand">
-            <span class="brand-name">PharmaCare</span>
+            {% if user.is_superuser or user.groups.all.0.name == "Admin" %}
+                <a href="{% url 'home' %}" class="brand-name text-decoration-none">PharmaCare</a>
+            {% elif user.groups.all.0.name == "Pharmacist" %}
+                <a href="{% url 'pharmacist:dashboard' %}" class="brand-name text-decoration-none">PharmaCare</a>
+            {% elif user.groups.all.0.name == "Cashier" %}
+                <a href="{% url 'cashier:cashier_dashboard' %}" class="brand-name text-decoration-none">PharmaCare</a>
+            {% else %}
+                <a href="{% url 'home' %}" class="brand-name text-decoration-none">PharmaCare</a>
+            {% endif %}
             <span class="role-badge">
                 {% if user.is_superuser %}
                     <i class="bi bi-shield-lock"></i> Admin
@@ -303,6 +314,12 @@
             {% else %}
                 <a href="{% url 'home' %}" class="nav-item-link {% if request.path == '/' %}active{% endif %}">
                     <i class="bi bi-speedometer2 nav-icon"></i> Dashboard
+                </a>
+            {% endif %}
+
+            {% if user.is_superuser or user.is_staff or user.groups.all.0.name == "Admin" or user.groups.all.1.name == "Admin" %}
+                <a href="{% url 'user_list' %}" class="nav-item-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-people nav-icon"></i> Users
                 </a>
             {% endif %}
 
@@ -348,12 +365,7 @@
                 </a>
             {% endif %}
             
-            {% if user.is_superuser or user.groups.all.0.name == "Admin" %}
-                <div class="nav-section-label" style="margin-top: 0.5rem;">System</div>
-                <a href="{% url 'user_list' %}" class="nav-item-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
-                    <i class="bi bi-people nav-icon"></i> Users
-                </a>
-            {% endif %}
+
 
         </nav>
 

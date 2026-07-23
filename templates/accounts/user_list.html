@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}User Management | PharmaCare{% endblock %}
 
@@ -100,21 +100,21 @@
                                 {% endif %}
                             </td>
                             <td class="py-3 px-4 text-center text-muted small">{{ u.date_joined|date:"M d, Y" }}</td>
-                            <td class="py-3 px-4 text-end text-nowrap">
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{% url 'user_detail' u.pk %}" class="btn btn-outline-primary" title="View Details">
+                            <td class="py-3 px-3 text-end text-nowrap">
+                                <div class="d-inline-flex gap-1">
+                                    <a href="{% url 'user_detail' u.pk %}" class="btn btn-sm btn-outline-primary px-2 py-1" title="View Details">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    <a href="{% url 'user_edit' u.pk %}" class="btn btn-outline-secondary" title="Edit">
+                                    <a href="{% url 'user_edit' u.pk %}" class="btn btn-sm btn-outline-secondary px-2 py-1" title="Edit">
                                         <i class="bi bi-pencil"></i> Edit
                                     </a>
                                     {% if u.is_active %}
-                                        <a href="{% url 'user_deactivate' u.pk %}" class="btn btn-outline-danger" title="Deactivate">
-                                            <i class="bi bi-slash-circle"></i> Deactivate
+                                        <a href="{% url 'user_deactivate' u.pk %}" class="btn btn-sm btn-outline-danger px-2 py-1" title="Deactivate">
+                                            <i class="bi bi-slash-circle"></i>
                                         </a>
                                     {% else %}
-                                        <a href="{% url 'user_activate' u.pk %}" class="btn btn-outline-success" title="Activate">
-                                            <i class="bi bi-check-circle"></i> Activate
+                                        <a href="{% url 'user_activate' u.pk %}" class="btn btn-sm btn-outline-success px-2 py-1" title="Activate">
+                                            <i class="bi bi-check-circle"></i>
                                         </a>
                                     {% endif %}
                                 </div>
