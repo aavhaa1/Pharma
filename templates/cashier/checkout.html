@@ -1,4 +1,4 @@
-{% extends "cashier/base_cashier.html" %}
+﻿{% extends "cashier/base_cashier.html" %}
 
 {% block title %}Checkout | PharmaCare{% endblock %}
 {% block page_title %}Checkout{% endblock %}
@@ -17,8 +17,7 @@
         }
     }
     .billing-card {
-        background: rgba(14,14,16,0.9);
-        border: 1px solid rgba(255,255,255,0.09);
+        background: #FFFFFF;
         border-radius: 14px;
         position: sticky;
         top: 80px;
@@ -38,8 +37,7 @@
         gap: 0.75rem;
         padding: 0.75rem 1rem;
         border-radius: 10px;
-        border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(24,24,27,0.5);
+        background: #FFFFFF;
         cursor: pointer;
         transition: border-color 0.15s, background 0.15s;
         margin-bottom: 0.5rem;
@@ -58,7 +56,6 @@
         font-family: var(--font-heading);
         font-weight: 600;
         font-size: 0.88rem;
-        color: #fafafa;
     }
     .totals-row {
         display: flex;
@@ -73,17 +70,17 @@
         margin-top: 0.25rem;
     }
     .items-table th {
-        color: #71717a;
+        color: #64748B;
         font-size: 0.75rem;
         font-family: var(--font-heading);
         text-transform: uppercase;
         letter-spacing: 0.05em;
         font-weight: 600;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
+        border-bottom: 1px solid #E2E8F0;
     }
     .items-table td {
         padding: 0.75rem 0.5rem;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid #E2E8F0;
         font-size: 0.85rem;
         vertical-align: middle;
     }
@@ -95,7 +92,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="dashboard-title mb-1">Checkout</h1>
-        <p style="color: #71717a; font-size: 0.88rem;">Review your cart, fill in billing details, and complete the sale.</p>
+        <p style="color: #64748B; font-size: 0.88rem;">Review your cart, fill in billing details, and complete the sale.</p>
     </div>
     <a href="{% url 'cashier:cashier_pos' %}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i>Back to POS
@@ -106,26 +103,25 @@
     {% csrf_token %}
     <div class="checkout-layout">
 
-        <!-- ── LEFT: Billing Panel ──────────────────────────────── -->
+        <!--  LEFT: Billing Panel  -->
         <div class="billing-card p-0">
 
             <!-- Customer + Payment -->
-            <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+            <div class="p-4" style="border-bottom: 1px solid #E2E8F0;">
                 <div class="card-section-title">Customer Details</div>
 
                 <div class="mb-3">
-                    <label for="customer_name" class="form-label small fw-semibold" style="color: #a1a1aa;">
+                    <label for="customer_name" class="form-label small fw-semibold" style="color: #64748B;">
                         Customer Name <span style="color: #52525b;">(optional)</span>
                     </label>
                     <input type="text" id="customer_name" name="customer_name"
                            class="form-control"
-                           style="background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.1); color: #fafafa;"
                            placeholder="Walk-in Customer">
                 </div>
             </div>
 
             <!-- Payment Method -->
-            <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+            <div class="p-4" style="border-bottom: 1px solid #E2E8F0;">
                 <div class="card-section-title">Payment Method</div>
 
                 <label class="payment-option" id="pay-cash">
@@ -149,44 +145,42 @@
             </div>
 
             <!-- Discount / Tax -->
-            <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+            <div class="p-4" style="border-bottom: 1px solid #E2E8F0;">
                 <div class="card-section-title">Adjustments</div>
                 <div class="row g-2">
                     <div class="col-6">
-                        <label for="discount" class="form-label small fw-semibold" style="color: #a1a1aa;">Discount ($)</label>
+                        <label for="discount" class="form-label small fw-semibold" style="color: #64748B;">Discount (Nrs.)</label>
                         <input type="number" id="discount" name="discount" min="0" step="0.01" value="0.00"
                                class="form-control"
-                               style="background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.1); color: #f87171;"
                                oninput="recalculate()">
                     </div>
                     <div class="col-6">
-                        <label for="tax" class="form-label small fw-semibold" style="color: #a1a1aa;">Tax ($)</label>
+                        <label for="tax" class="form-label small fw-semibold" style="color: #64748B;">Tax (Nrs.)</label>
                         <input type="number" id="tax" name="tax" min="0" step="0.01" value="0.00"
                                class="form-control"
-                               style="background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.1); color: #60a5fa;"
                                oninput="recalculate()">
                     </div>
                 </div>
             </div>
 
             <!-- Order Totals -->
-            <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+            <div class="p-4" style="border-bottom: 1px solid #E2E8F0;">
                 <div class="card-section-title">Order Summary</div>
                 <div class="totals-row">
-                    <span style="color: #a1a1aa;">Subtotal</span>
-                    <span class="fw-semibold text-white">${{ subtotal }}</span>
+                    <span style="color: #64748B;">Subtotal</span>
+                    <span class="fw-semibold text-white">Nrs. {{ subtotal }}</span>
                 </div>
                 <div class="totals-row">
-                    <span style="color: #a1a1aa;">Discount</span>
-                    <span class="fw-semibold text-danger" id="discount-display">-$0.00</span>
+                    <span style="color: #64748B;">Discount</span>
+                    <span class="fw-semibold text-danger" id="discount-display">-Nrs. 0.00</span>
                 </div>
                 <div class="totals-row">
-                    <span style="color: #a1a1aa;">Tax</span>
-                    <span class="fw-semibold text-info" id="tax-display">+$0.00</span>
+                    <span style="color: #64748B;">Tax</span>
+                    <span class="fw-semibold text-info" id="tax-display">+Nrs. 0.00</span>
                 </div>
                 <div class="totals-row grand">
                     <span class="fw-bold text-white" style="font-family: var(--font-heading); font-size: 1rem;">Grand Total</span>
-                    <span class="fw-bold text-success" style="font-family: var(--font-heading); font-size: 1.4rem;" id="grand-total-display">${{ subtotal }}</span>
+                    <span class="fw-bold text-success" style="font-family: var(--font-heading); font-size: 1.4rem;" id="grand-total-display">Nrs. {{ subtotal }}</span>
                 </div>
             </div>
 
@@ -200,11 +194,11 @@
             </div>
         </div>
 
-        <!-- ── RIGHT: Items Table ───────────────────────────────── -->
+        <!--  RIGHT: Items Table  -->
         <div>
-            <div class="card" style="background: rgba(14,14,16,0.7); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="card" >
                 <div class="card-header py-3 d-flex justify-content-between align-items-center"
-                     style="background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.07);">
+                    >
                     <span class="fw-bold text-white" style="font-family: var(--font-heading);">
                         <i class="bi bi-list-check me-2"></i>Items to Checkout ({{ cart_items|length }})
                     </span>
@@ -213,7 +207,7 @@
                     </a>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-dark items-table mb-0" style="--bs-table-bg: transparent;">
+                    <table class="table items-table mb-0" style="--bs-table-bg: transparent;">
                         <thead>
                             <tr>
                                 <th class="px-4 py-3">Medicine</th>
@@ -227,16 +221,16 @@
                             <tr>
                                 <td class="px-4 fw-semibold text-white">
                                     {{ item.medicine.name }}
-                                    <span class="d-block" style="font-weight: 400; color: #71717a; font-size: 0.75rem;">
+                                    <span class="d-block" style="font-weight: 400; color: #64748B; font-size: 0.75rem;">
                                         {{ item.medicine.get_unit_display }}
                                         {% if item.medicine.requires_prescription %}
-                                        · <span style="color: #f87171;">Rx Required</span>
+                                        Â· <span style="color: #f87171;">Rx Required</span>
                                         {% endif %}
                                     </span>
                                 </td>
-                                <td class="px-4 text-center" style="color: #a1a1aa;">{{ item.quantity }}</td>
-                                <td class="px-4 text-end" style="color: #a1a1aa;">${{ item.unit_price }}</td>
-                                <td class="px-4 text-end fw-bold text-success">${{ item.total_price }}</td>
+                                <td class="px-4 text-center" style="color: #64748B;">{{ item.quantity }}</td>
+                                <td class="px-4 text-end" style="color: #64748B;">Nrs. {{ item.unit_price }}</td>
+                                <td class="px-4 text-end fw-bold text-success">Nrs. {{ item.total_price }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -256,11 +250,11 @@ const subtotal = parseFloat("{{ subtotal }}") || 0;
 function recalculate() {
     const discount = parseFloat(document.getElementById('discount').value) || 0;
     const tax = parseFloat(document.getElementById('tax').value) || 0;
-    document.getElementById('discount-display').textContent = '-$' + discount.toFixed(2);
-    document.getElementById('tax-display').textContent = '+$' + tax.toFixed(2);
+    document.getElementById('discount-display').textContent = '-Nrs. ' + discount.toFixed(2);
+    document.getElementById('tax-display').textContent = '+Nrs. ' + tax.toFixed(2);
     let grand = subtotal - discount + tax;
     if (grand < 0) grand = 0;
-    document.getElementById('grand-total-display').textContent = '$' + grand.toFixed(2);
+    document.getElementById('grand-total-display').textContent = 'Nrs. ' + grand.toFixed(2);
 }
 
 function selectPayment(radio) {
@@ -274,8 +268,8 @@ function selectPayment(radio) {
             label.style.background = 'rgba(34,197,94,0.1)';
             icon.className = 'bi bi-check-circle-fill ms-auto text-success';
         } else {
-            label.style.borderColor = 'rgba(255,255,255,0.08)';
-            label.style.background = 'rgba(24,24,27,0.5)';
+            label.style.borderColor = '#E2E8F0';
+            label.style.background = '#FFFFFF';
             icon.className = 'bi bi-circle ms-auto text-secondary';
         }
     });

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Shopping Cart | PharmaCare{% endblock %}
 
@@ -23,12 +23,12 @@
 <div class="row">
     <!-- Shopping Cart Items List -->
     <div class="col-lg-8 mb-4">
-        <div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
-            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+        <div class="card" >
+            <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
                 Cart Line Items
             </div>
             <div class="table-responsive">
-                <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
+                <table class="table table-hover align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
                     <thead>
                         <tr style="border-bottom: 1px solid var(--border-color);">
                             <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine</th>
@@ -41,23 +41,23 @@
                     <tbody>
                         {% for item in cart_items %}
                             <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td class="py-3 px-4 fw-semibold text-white">
+                                <td class="py-3 px-4 fw-semibold text-dark">
                                     {{ item.medicine.name }}
                                     <span class="text-secondary small d-block">Brand: {{ item.medicine.brand|default:"Generic" }} ({{ item.medicine.get_unit_display }})</span>
                                 </td>
                                 <td class="py-3 px-4 text-end text-success">
-                                    ${{ item.medicine.selling_price }}
+                                    Nrs. {{ item.medicine.selling_price }}
                                 </td>
                                 <td class="py-3 px-4 text-center">
                                     <form action="{% url 'cart_view' %}" method="post" class="d-inline-flex align-items-center justify-content-center gap-1">
                                         {% csrf_token %}
                                         <input type="hidden" name="action" value="update">
                                         <input type="hidden" name="medicine_id" value="{{ item.medicine.pk }}">
-                                        <input type="number" name="quantity" class="form-control form-control-sm bg-dark text-white border-secondary text-center" value="{{ item.quantity }}" min="1" style="width: 70px;" onchange="this.form.submit()">
+                                        <input type="number" name="quantity" class="form-control form-control-sm bg-white text-dark border-secondary-subtle text-center" value="{{ item.quantity }}" min="1" style="width: 70px;" onchange="this.form.submit()">
                                     </form>
                                 </td>
                                 <td class="py-3 px-4 text-end text-success fw-bold">
-                                    ${{ item.total_price }}
+                                    Nrs. {{ item.total_price }}
                                 </td>
                                 <td class="py-3 px-4 text-end">
                                     <form action="{% url 'cart_view' %}" method="post" style="display:inline;">
@@ -83,14 +83,14 @@
 
     <!-- Right Column: Subtotal & Summary -->
     <div class="col-lg-4 mb-4">
-        <div class="card" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
-            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+        <div class="card" >
+            <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
                 Summary
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-secondary fw-semibold">Subtotal:</span>
-                    <span class="fs-4 fw-bold text-success">${{ subtotal }}</span>
+                    <span class="fs-4 fw-bold text-success">Nrs. {{ subtotal }}</span>
                 </div>
                 
                 <p class="text-muted small mb-4">

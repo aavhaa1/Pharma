@@ -209,3 +209,53 @@ class InventoryTestCase(TestCase):
         self.client.login(username="pharmacist", password="password123")
         response_pharm = self.client.get(reverse("inventory_adjust", kwargs={"pk": inv.pk}))
         self.assertEqual(response_pharm.status_code, 200)
+
+    def test_stock_and_low_stock_logic(self):
+        # Initial status: self.medicine has no unexpired inventory
+        self.assertEqual(self.medicine.available_stock, 0)
+        self.assertTrue(self.medicine.is_out_of_stock)
+        self.assertFalse(self.medicine.is_low_stock)
+
+        # Create an expired batch (should not count as available stock)
+        yesterday = timezone.now().date() - timedelta(days=1)
+        # Create with a future date first to pass the creation-time clean checks, then update it.
+        expired_batch = Inventory.objects.create(
+            medicine=self.medicine,
+            batch_no="BATCH-EXP",
+            expiry_date=timezone.now().date() + timedelta(days=5),
+            quantity=50
+        )
+        expired_batch.expiry_date = yesterday
+        expired_batch.save()
+        self.assertEqual(self.medicine.available_stock, 0)
+        self.assertTrue(self.medicine.is_out_of_stock)
+        self.assertFalse(self.medicine.is_low_stock)
+        self.assertTrue(expired_batch.is_expired)
+        self.assertFalse(expired_batch.is_low_stock)
+
+        # Create an unexpired low stock batch (quantity = 5 <= minimum_stock_level of 10)
+        tomorrow = timezone.now().date() + timedelta(days=5)
+        low_stock_batch = Inventory.objects.create(
+            medicine=self.medicine,
+            batch_no="BATCH-LOW",
+            expiry_date=tomorrow,
+            quantity=5
+        )
+        self.assertEqual(self.medicine.available_stock, 5)
+        self.assertFalse(self.medicine.is_out_of_stock)
+        self.assertTrue(self.medicine.is_low_stock)
+        self.assertTrue(low_stock_batch.is_low_stock)
+
+        # Create another unexpired batch (quantity = 10)
+        # Total unexpired stock = 5 + 10 = 15 > minimum_stock_level of 10.
+        # So the medicine overall is no longer low stock, even though low_stock_batch itself has 5 units.
+        normal_batch = Inventory.objects.create(
+            medicine=self.medicine,
+            batch_no="BATCH-NORM",
+            expiry_date=tomorrow,
+            quantity=10
+        )
+        self.assertEqual(self.medicine.available_stock, 15)
+        self.assertFalse(self.medicine.is_out_of_stock)
+        self.assertFalse(self.medicine.is_low_stock)
+

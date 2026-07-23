@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Inventory Report | PharmaCare{% endblock %}
 {% block content %}
 <div class="row mb-4 align-items-center">
@@ -10,7 +10,7 @@
         <a href="{% url 'reports_export_pdf' %}?report_type=inventory&{{ request.GET.urlencode }}" class="btn btn-danger btn-sm">PDF</a>
         <a href="{% url 'reports_export_excel' %}?report_type=inventory&{{ request.GET.urlencode }}" class="btn btn-success btn-sm">Excel</a>
         <a href="{% url 'reports_export_csv' %}?report_type=inventory&{{ request.GET.urlencode }}" class="btn btn-secondary btn-sm">CSV</a>
-        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm"> Dashboard</a>
     </div>
 </div>
 
@@ -27,7 +27,7 @@
         <div class="card text-center" style="background: rgba(13,110,253,0.1); border: 1px solid rgba(13,110,253,0.3);">
             <div class="card-body py-3">
                 <p class="text-secondary small mb-1">Inventory Value</p>
-                <h4 class="text-white fw-bold mb-0">${{ inventory_value|floatformat:2 }}</h4>
+                <h4 class="text-white fw-bold mb-0">Nrs. {{ inventory_value|floatformat:2 }}</h4>
             </div>
         </div>
     </div>
@@ -41,26 +41,26 @@
     </div>
 </div>
 
-<div class="card mb-4" style="background: rgba(24,24,27,0.45); border: 1px solid var(--border-color);">
+<div class="card mb-4" >
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-end">
             <div class="col-md-3">
                 <label class="form-label mb-1 text-secondary small fw-semibold">Medicine</label>
-                <select name="medicine" class="form-select form-select-sm bg-dark text-white border-secondary">
+                <select name="medicine" class="form-select form-select-sm bg-white text-dark border-secondary-subtle">
                     <option value="">All Medicines</option>
                     {% for m in medicines %}<option value="{{ m.pk }}" {% if request.GET.medicine == m.pk|stringformat:"i" %}selected{% endif %}>{{ m.name }}</option>{% endfor %}
                 </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label mb-1 text-secondary small fw-semibold">Category</label>
-                <select name="category" class="form-select form-select-sm bg-dark text-white border-secondary">
+                <select name="category" class="form-select form-select-sm bg-white text-dark border-secondary-subtle">
                     <option value="">All Categories</option>
                     {% for c in categories %}<option value="{{ c.pk }}" {% if request.GET.category == c.pk|stringformat:"i" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
                 </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label mb-1 text-secondary small fw-semibold">Supplier</label>
-                <select name="supplier" class="form-select form-select-sm bg-dark text-white border-secondary">
+                <select name="supplier" class="form-select form-select-sm bg-white text-dark border-secondary-subtle">
                     <option value="">All Suppliers</option>
                     {% for s in suppliers %}<option value="{{ s.pk }}" {% if request.GET.supplier == s.pk|stringformat:"i" %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
                 </select>
@@ -73,9 +73,9 @@
     </div>
 </div>
 
-<div class="card" style="background: rgba(24,24,27,0.3); border: 1px solid var(--border-color);">
+<div class="card" >
     <div class="table-responsive">
-        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+        <table class="table table-hover align-middle mb-0" style="--bs-table-bg: transparent;">
             <thead>
                 <tr style="border-bottom: 2px solid var(--border-color);">
                     <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Medicine</th>
@@ -94,9 +94,9 @@
                     <td class="py-3 px-4 text-white fw-semibold">{{ item.medicine.name }}</td>
                     <td class="py-3 px-4 text-secondary small">{{ item.medicine.category.name|default:"N/A" }}</td>
                     <td class="py-3 px-4 font-monospace small text-secondary">{{ item.batch_no }}</td>
-                    <td class="py-3 px-4 text-end text-white">{{ item.quantity }}</td>
-                    <td class="py-3 px-4 text-end text-secondary small">${{ item.medicine.purchase_price }}</td>
-                    <td class="py-3 px-4 text-end text-success small">${{ item.medicine.selling_price }}</td>
+                    <td class="py-3 px-4 text-end text-dark">{{ item.quantity }}</td>
+                    <td class="py-3 px-4 text-end text-secondary small">Nrs. {{ item.medicine.purchase_price }}</td>
+                    <td class="py-3 px-4 text-end text-success small">Nrs. {{ item.medicine.selling_price }}</td>
                     <td class="py-3 px-4 text-center text-secondary small">{{ item.expiry_date|date:"Y-m-d" }}</td>
                     <td class="py-3 px-4 text-center">
                         <span class="badge {% if item.status == 'Expired' %}bg-danger{% elif item.status == 'Expiring Soon' %}bg-warning text-dark{% elif item.status == 'Low Stock' %}bg-warning text-dark{% else %}bg-success{% endif %}" style="font-size:0.7rem;">{{ item.status }}</span>
@@ -109,12 +109,12 @@
         </table>
     </div>
     {% if is_paginated %}
-    <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24,24,27,0.2); border-top: 1px solid var(--border-color);">
+    <div class="card-footer d-flex justify-content-between align-items-center" >
         <span class="text-muted small">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
         <nav><ul class="pagination pagination-sm mb-0">
-            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Prev</a></li>{% endif %}
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Prev</a></li>{% endif %}
             <li class="page-item active"><span class="page-link bg-primary border-primary">{{ page_obj.number }}</span></li>
-            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a></li>{% endif %}
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a></li>{% endif %}
         </ul></nav>
     </div>
     {% endif %}

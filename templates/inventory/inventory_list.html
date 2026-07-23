@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Inventory Registry | PharmaCare{% endblock %}
 
@@ -34,8 +34,8 @@
     </div>
 </div>
 
-<!-- 🔍 Search and Filters Bar -->
-<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45);">
+<!--  Search and Filters Bar -->
+<div class="card mb-4" >
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-end">
             <!-- Search Text -->
@@ -76,11 +76,11 @@
     </div>
 </div>
 
-<!-- 📋 Inventory Table -->
+<!--  Inventory Table -->
 <div class="card">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-dark table-hover mb-0" style="background: transparent; color: #fafafa;">
+            <table class="table table-hover mb-0" style="background: transparent;">
                 <thead>
                     <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
                         <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 60px;">SN</th>
@@ -169,7 +169,7 @@
     </div>
 </div>
 
-<!-- 📄 Pagination -->
+<!--  Pagination -->
 {% if is_paginated %}
 <div class="d-flex justify-content-between align-items-center mt-4">
     <span class="text-secondary small">

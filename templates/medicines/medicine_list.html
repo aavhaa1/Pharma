@@ -4,36 +4,36 @@
 
 {% block content %}
 <div class="row mb-4 align-items-center">
-    <div class="col-md-8">
+    <div class="col-md-7">
         <h1 class="dashboard-title mb-0">Medicines Directory</h1>
         <p class="text-muted mb-0">View and manage the master catalog of all pharmaceutical items.</p>
     </div>
-    <div class="col-md-4 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2">
-        <a href="{% url 'category_list' %}" class="btn btn-light">Manage Categories</a>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex justify-content-md-end gap-2 flex-wrap">
+        <a href="{% url 'category_list' %}" class="btn btn-outline-secondary btn-sm">Manage Categories</a>
         {% if user.is_superuser %}
-            <a href="{% url 'medicine_add' %}" class="btn btn-primary">+ Add Medicine</a>
+            <a href="{% url 'medicine_add' %}" class="btn btn-primary btn-sm">+ Add Medicine</a>
         {% else %}
             {% for group in user.groups.all %}
                 {% if group.name == "Admin" or group.name == "Pharmacist" %}
-                    <a href="{% url 'medicine_add' %}" class="btn btn-primary">+ Add Medicine</a>
+                    <a href="{% url 'medicine_add' %}" class="btn btn-primary btn-sm">+ Add Medicine</a>
                 {% endif %}
             {% endfor %}
         {% endif %}
     </div>
 </div>
 
-<!-- 🔍 Search and Filters Bar -->
-<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45);">
+<!--  Search and Filters Bar -->
+<div class="card mb-4">
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-end">
             <!-- Search Text -->
-            <div class="col-md-5">
+            <div class="col-lg-4 col-md-4">
                 <label for="search-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Search Medicine</label>
                 <input type="text" id="search-input" name="q" class="form-control form-control-sm" placeholder="Search by name, brand, usage..." value="{{ search_query }}">
             </div>
             
             <!-- Category Filter -->
-            <div class="col-md-3">
+            <div class="col-lg-3 col-md-3">
                 <label for="category-select" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Category</label>
                 <select id="category-select" name="category" class="form-select form-select-sm">
                     <option value="">All Categories</option>
@@ -44,7 +44,7 @@
             </div>
 
             <!-- Status Filter -->
-            <div class="col-md-2">
+            <div class="col-lg-3 col-md-3">
                 <label for="status-select" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Status</label>
                 <select id="status-select" name="status" class="form-select form-select-sm">
                     <option value="" {% if not selected_status %}selected{% endif %}>All Statuses</option>
@@ -54,7 +54,7 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="col-md-2 d-flex gap-1 mt-3 mt-md-0">
+            <div class="col-lg-2 col-md-2 d-flex gap-1 mt-3 mt-md-0">
                 <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Filter</button>
                 <a href="{% url 'medicine_list' %}" class="btn btn-light btn-sm flex-grow-1 text-center">Reset</a>
             </div>
@@ -62,88 +62,97 @@
     </div>
 </div>
 
-<!-- 📋 Medicines Table -->
+<!--  Medicines Table -->
 <div class="card">
     <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-dark table-hover mb-0" style="background: transparent; color: #fafafa;">
+        <div class="table-responsive" style="overflow-x: auto;">
+            <table class="table table-hover mb-0" style="background: transparent;">
                 <thead>
-                    <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
-                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine Name</th>
-                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Brand</th>
-                        <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Category</th>
-                        <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 100px;">Unit</th>
-                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Purchase (Rs.)</th>
-                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Selling (Rs.)</th>
-                        <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">Min Stock</th>
-                        <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 120px;">Status</th>
-                        <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 240px;">Actions</th>
+                    <tr style="border-bottom: 1px solid #E2E8F0;">
+                        <th class="py-3 px-3" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine Name</th>
+                        <th class="py-3 px-3" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Brand</th>
+                        <th class="py-3 px-3" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Category</th>
+                        <th class="py-3 px-3 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 80px;">Unit</th>
+                        <th class="py-3 px-3 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 110px;">Purchase</th>
+                        <th class="py-3 px-3 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 110px;">Selling</th>
+                        <th class="py-3 px-3 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 100px;">Stock</th>
+                        <th class="py-3 px-3 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 90px;">Min</th>
+                        <th class="py-3 px-3 text-center" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 90px;">Status</th>
+                        <th class="py-3 px-3 text-end text-nowrap" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for medicine in medicines %}
                         <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle; {% if not medicine.is_active %}opacity: 0.45; background: rgba(220, 53, 69, 0.02);{% endif %}">
-                            <td class="py-3 px-4 fw-semibold">
-                                <a href="{% url 'medicine_detail' medicine.pk %}" class="text-white text-decoration-none hover-link" style="transition: var(--transition-smooth); {% if not medicine.is_active %}text-decoration: line-through;{% endif %}">
+                            <td class="py-3 px-3 fw-semibold">
+                                <a href="{% url 'medicine_detail' medicine.pk %}" class="text-dark fw-bold text-decoration-none hover-link" style="transition: var(--transition-smooth); {% if not medicine.is_active %}text-decoration: line-through;{% endif %}">
                                     {{ medicine.name }}
                                 </a>
                                 {% if medicine.requires_prescription %}
-                                    <span class="badge bg-danger text-white border border-danger-subtle ms-1" style="font-size: 0.7rem; background: rgba(220, 53, 69, 0.25) !important; color: #ea868f !important;">Rx</span>
+                                    <span class="badge bg-danger text-white border border-danger-subtle ms-1" style="font-size: 0.7rem;">Rx</span>
                                 {% endif %}
                             </td>
-                            <td class="py-3 px-4 text-muted">
+                            <td class="py-3 px-3 text-muted">
                                 {% if medicine.brand %}
                                     {{ medicine.brand }}
                                 {% else %}
                                     <span class="fst-italic opacity-50">Generic</span>
                                 {% endif %}
                             </td>
-                            <td class="py-3 px-4 text-muted">
+                            <td class="py-3 px-3 text-muted">
                                 {% if medicine.category %}
                                     {{ medicine.category.name }}
                                 {% else %}
                                     <span class="fst-italic opacity-50">Unassigned</span>
                                 {% endif %}
                             </td>
-                            <td class="py-3 px-4 text-center text-muted">
-                                <span class="badge bg-secondary-subtle text-secondary-emphasis" style="background: rgba(255,255,255,0.05); color: var(--text-secondary);">
+                            <td class="py-3 px-3 text-center text-muted">
+                                <span class="badge bg-secondary-subtle text-secondary-emphasis" style="background: #F1F5F9; color: #475569;">
                                     {{ medicine.get_unit_display }}
                                 </span>
                             </td>
-                            <td class="py-3 px-4 text-end text-muted font-monospace">{{ medicine.purchase_price }}</td>
-                            <td class="py-3 px-4 text-end fw-semibold text-white font-monospace">{{ medicine.selling_price }}</td>
-                            <td class="py-3 px-4 text-center text-muted">
-                                <span class="opacity-50" title="Will be implemented in Inventory Module (Sprint 3)">—</span>
+                            <td class="py-3 px-3 text-end text-muted font-monospace">{{ medicine.purchase_price }}</td>
+                            <td class="py-3 px-3 text-end fw-semibold font-monospace">{{ medicine.selling_price }}</td>
+                            <td class="py-3 px-3 text-center">
+                                {% if medicine.available_stock == 0 %}
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important;">Out of Stock</span>
+                                {% elif medicine.available_stock <= medicine.minimum_stock_level %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="background: rgba(234, 179, 8, 0.1) !important; color: #b45309 !important;">Low: {{ medicine.available_stock }}</span>
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="background: rgba(25, 135, 84, 0.1) !important; color: #198754 !important;">{{ medicine.available_stock }}</span>
+                                {% endif %}
                             </td>
-                            <td class="py-3 px-4 text-center">
+                            <td class="py-3 px-3 text-center text-secondary font-monospace">
+                                {{ medicine.minimum_stock_level }}
+                            </td>
+                            <td class="py-3 px-3 text-center">
                                 {% if medicine.is_active %}
                                     <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="background: rgba(25, 135, 84, 0.1) !important; color: #198754 !important;">Active</span>
                                 {% else %}
                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important;">Inactive</span>
                                 {% endif %}
                             </td>
-                            <td class="py-3 px-4 text-end">
-                                <a href="{% url 'medicine_detail' medicine.pk %}" class="btn btn-light btn-sm me-1">View</a>
-                                {% if user.is_superuser %}
-                                    <a href="{% url 'medicine_edit' medicine.pk %}" class="btn btn-light btn-sm me-1">Edit</a>
-                                    {% if medicine.is_active %}
-                                        <a href="{% url 'medicine_delete' medicine.pk %}" class="btn btn-danger btn-sm">Deactivate</a>
-                                    {% endif %}
-                                {% else %}
-                                    {% for group in user.groups.all %}
-                                        {% if group.name == "Admin" or group.name == "Pharmacist" %}
-                                            <a href="{% url 'medicine_edit' medicine.pk %}" class="btn btn-light btn-sm me-1">Edit</a>
-                                            {% if medicine.is_active %}
-                                                <a href="{% url 'medicine_delete' medicine.pk %}" class="btn btn-danger btn-sm">Deactivate</a>
-                                            {% endif %}
+                            <td class="py-3 px-3 text-end text-nowrap">
+                                <div class="d-inline-flex gap-1" role="group">
+                                    <a href="{% url 'medicine_detail' medicine.pk %}" class="btn btn-sm btn-outline-primary px-2 py-1" title="View Details">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                    {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" %}
+                                        <a href="{% url 'medicine_edit' medicine.pk %}" class="btn btn-sm btn-outline-secondary px-2 py-1" title="Edit">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        {% if medicine.is_active %}
+                                            <a href="{% url 'medicine_delete' medicine.pk %}" class="btn btn-sm btn-outline-danger px-2 py-1" title="Deactivate">
+                                                <i class="bi bi-slash-circle"></i>
+                                            </a>
                                         {% endif %}
-                                    {% endfor %}
-                                {% endif %}
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="9" class="text-center py-5 text-muted">
+                            <td colspan="10" class="text-center py-5 text-muted">
                                 <div class="py-4">
                                     <h4 class="text-secondary fw-normal">No medicines found</h4>
                                     <p class="mb-0 small text-secondary">Try broadening your search term or adjusting filters.</p>
@@ -157,7 +166,7 @@
     </div>
 </div>
 
-<!-- 📑 Pagination -->
+<!--  Pagination -->
 {% if is_paginated %}
     <div class="d-flex justify-content-between align-items-center mt-4">
         <div class="text-secondary small">
@@ -168,13 +177,13 @@
                 <!-- Previous Button -->
                 {% if page_obj.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" aria-label="Previous" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" aria-label="Previous" >
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                 {% else %}
                     <li class="page-item disabled">
-                        <span class="page-link" style="background: rgba(24, 24, 27, 0.3); border-color: var(--border-color); color: var(--text-secondary);">&laquo;</span>
+                        <span class="page-link" >&laquo;</span>
                     </li>
                 {% endif %}
 
@@ -186,7 +195,7 @@
                         </li>
                     {% elif page_num > page_obj.number|add:"-3" and page_num < page_obj.number|add:"3" %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_num }}{% if query_params %}&{{ query_params }}{% endif %}" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">{{ page_num }}</a>
+                            <a class="page-link" href="?page={{ page_num }}{% if query_params %}&{{ query_params }}{% endif %}" >{{ page_num }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
@@ -194,13 +203,13 @@
                 <!-- Next Button -->
                 {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" aria-label="Next" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" aria-label="Next" >
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                 {% else %}
                     <li class="page-item disabled">
-                        <span class="page-link" style="background: rgba(24, 24, 27, 0.3); border-color: var(--border-color); color: var(--text-secondary);">&raquo;</span>
+                        <span class="page-link" >&raquo;</span>
                     </li>
                 {% endif %}
             </ul>

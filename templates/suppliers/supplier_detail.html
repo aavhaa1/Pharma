@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}{{ supplier.name }} | PharmaCare{% endblock %}
 
@@ -24,7 +24,7 @@
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-start">
                 <div>
-                    <h2 class="mb-0 text-white">{{ supplier.name }}</h2>
+                    <h2 class="mb-0 text-dark">{{ supplier.name }}</h2>
                     <p class="text-secondary mb-0 small">
                         Contact Person: 
                         {% if supplier.contact_person %}
@@ -48,7 +48,7 @@
                     <div class="col-md-6 mb-4 mb-md-0">
                         <h4 class="text-secondary mb-3 pb-2" style="border-bottom: 1px solid var(--border-color); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Contact Information</h4>
                         
-                        <table class="table table-dark table-borderless bg-transparent" style="color: #fafafa; font-size: 0.95rem;">
+                        <table class="table table-borderless bg-transparent" style="font-size: 0.95rem;">
                             <tbody>
                                 <tr>
                                     <td class="text-secondary ps-0" style="width: 140px;">Phone:</td>
@@ -97,14 +97,14 @@
             </div>
         </div>
 
-        <!-- 📜 Purchase History Placeholder Section -->
+        <!--  Purchase History Placeholder Section -->
         <div class="card">
             <div class="card-header">
-                <h4 class="mb-0 text-white" style="font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em;">Purchase History</h4>
+                <h4 class="mb-0 text-dark" style="font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em;">Purchase History</h4>
             </div>
             <div class="card-body py-4 text-center">
                 <div class="py-3">
-                    <span class="fs-2 mb-2 d-block">📦</span>
+                    <span class="fs-2 mb-2 d-block"></span>
                     <p class="text-secondary mb-0">
                         Purchase history will be available after Purchase Module implementation.
                     </p>

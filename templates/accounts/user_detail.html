@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}{{ profile_user.username }} | User Details | PharmaCare{% endblock %}
 
@@ -24,7 +24,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-start">
                 <div>
-                    <h2 class="mb-0 text-white">{{ profile_user.get_full_name|default:profile_user.username }}</h2>
+                    <h2 class="mb-0 text-dark">{{ profile_user.get_full_name|default:profile_user.username }}</h2>
                     <p class="text-secondary mb-0 small">
                         Username: <strong class="text-white">{{ profile_user.username }}</strong>
                     </p>
@@ -43,7 +43,7 @@
                     <div class="col-md-6 mb-4 mb-md-0">
                         <h4 class="text-secondary mb-3 pb-2" style="border-bottom: 1px solid var(--border-color); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Staff Information</h4>
                         
-                        <table class="table table-dark table-borderless bg-transparent" style="color: #fafafa; font-size: 0.95rem;">
+                        <table class="table table-borderless bg-transparent" style="font-size: 0.95rem;">
                             <tbody>
                                 <tr>
                                     <td class="text-secondary ps-0" style="width: 140px;">First Name:</td>
@@ -61,10 +61,10 @@
                                     <td class="text-secondary ps-0">Assigned Role:</td>
                                     <td>
                                         {% if profile_user.is_superuser %}
-                                            <span class="badge bg-warning text-dark">Superuser</span>
+                                            <span class="badge" style="background:rgba(37,99,235,0.1);color:#2563EB;border:1px solid rgba(37,99,235,0.25);">Superuser</span>
                                         {% else %}
                                             {% for group in profile_user.groups.all %}
-                                                <span class="badge bg-secondary-subtle text-secondary-emphasis" style="background: rgba(25, 25, 25, 0.5); color: var(--text-secondary); border: 1px solid rgba(255, 255, 255, 0.1);">
+                                                <span class="badge bg-secondary-subtle text-secondary-emphasis" style="background: rgba(25, 25, 25, 0.5); color: var(--text-secondary);">
                                                     {{ group.name }}
                                                 </span>
                                             {% empty %}
@@ -81,7 +81,7 @@
                     <div class="col-md-6">
                         <h4 class="text-secondary mb-3 pb-2" style="border-bottom: 1px solid var(--border-color); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">System Access Logs</h4>
                         
-                        <table class="table table-dark table-borderless bg-transparent" style="color: #fafafa; font-size: 0.95rem;">
+                        <table class="table table-borderless bg-transparent" style="font-size: 0.95rem;">
                             <tbody>
                                 <tr>
                                     <td class="text-secondary ps-0" style="width: 140px;">Status:</td>

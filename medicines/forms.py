@@ -80,6 +80,7 @@ class MedicineForm(forms.ModelForm):
             "requires_prescription",
             "purchase_price",
             "selling_price",
+            "minimum_stock_level",
             "description",
             "is_active",
         ]
@@ -122,6 +123,12 @@ class MedicineForm(forms.ModelForm):
                 "rows":        4,
             }),
 
+            "minimum_stock_level": forms.NumberInput(attrs={
+                "class":       NUMBER_INPUT_CLASS,
+                "placeholder": "10",
+                "min":         "0",
+            }),
+
             # --- Boolean Flags ---
             "requires_prescription": forms.CheckboxInput(attrs={
                 "class": CHECKBOX_CLASS,
@@ -138,6 +145,7 @@ class MedicineForm(forms.ModelForm):
             "requires_prescription": "Requires Prescription",
             "purchase_price":        "Purchase Price (Rs.)",
             "selling_price":         "Selling Price (Rs.)",
+            "minimum_stock_level":   "Minimum Stock Level",
             "description":           "Description / Usage (optional)",
             "is_active":             "Active (visible to staff)",
         }
@@ -148,6 +156,7 @@ class MedicineForm(forms.ModelForm):
             "requires_prescription": "If checked, a valid prescription is required before sale.",
             "purchase_price":        "Cost paid to the supplier per unit.",
             "selling_price":         "Retail price charged to customers per unit.",
+            "minimum_stock_level":   "The threshold level below which stock is considered low.",
             "is_active":             "Uncheck to hide this medicine from sales and inventory without deleting it.",
         }
 

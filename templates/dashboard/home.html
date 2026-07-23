@@ -1,165 +1,608 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard | PharmaCare{% endblock %}
+{% block title %}Admin Dashboard | PharmaCare{% endblock %}
 
 {% block content %}
-<div class="py-4">
+<div class="py-3">
 
     <!-- ── Welcome Banner ───────────────────────────────────────────── -->
-    <div class="mb-5">
-        <h1 class="dashboard-title mb-1">
-            Welcome, {{ user.username }} 👋
-        </h1>
-        <p class="lead mb-0">
-            {% if user.is_superuser %}
-                You have full Superuser access to PharmaCare.
-            {% else %}
-                {% for group in user.groups.all %}
-                    You are logged in as a <strong>{{ group.name }}</strong>. Select a module below to get started.
-                {% endfor %}
-            {% endif %}
-        </p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="dashboard-title mb-1">Welcome, {{ user.username }}</h1>
+            <p class="text-secondary mb-0" style="font-size: 0.95rem;">
+                Here is the real-time operational overview for PharmaCare Pharmacy Management System.
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'cashier:cashier_pos' %}" class="btn btn-primary me-2">
+                <i class="bi bi-bag-plus-fill me-1"></i> New Sale
+            </a>
+            <a href="{% url 'purchase_add' %}" class="btn btn-success">
+                <i class="bi bi-cart-plus me-1"></i> Restock Inventory
+            </a>
+        </div>
     </div>
 
-    <!-- ── Dashboard Navigation Cards ──────────────────────────────── -->
-    <div class="row g-4">
+    <!-- ── KPI Summary Cards ───────────────────────────────────────── -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold text-uppercase font-heading">Today's Sales</span>
+                        <div style="background: rgba(34,197,94,0.12); color: #16a34a; padding: 0.4rem 0.6rem; border-radius: 8px;">
+                            <i class="bi bi-currency-exchange fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-0 fw-bold font-monospace text-success">Nrs. {{ total_sales_today|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
 
-        {# ── Medicines: Admin, Pharmacist, Superuser ── #}
-        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold text-uppercase font-heading">Total Revenue</span>
+                        <div style="background: rgba(37,99,235,0.1); color: #2563EB; padding: 0.4rem 0.6rem; border-radius: 8px;">
+                            <i class="bi bi-wallet2 fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-0 fw-bold font-monospace" style="color: #2563EB;">Nrs. {{ total_revenue|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold text-uppercase font-heading">Inventory Value</span>
+                        <div style="background: rgba(245,158,11,0.12); color: #b45309; padding: 0.4rem 0.6rem; border-radius: 8px;">
+                            <i class="bi bi-box-seam fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-0 fw-bold font-monospace" style="color: #b45309;">Nrs. {{ inventory_value|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small fw-semibold text-uppercase font-heading">Active Medicines</span>
+                        <div style="background: rgba(16,185,129,0.1); color: #10B981; padding: 0.4rem 0.6rem; border-radius: 8px;">
+                            <i class="bi bi-capsule fs-5"></i>
+                        </div>
+                    </div>
+                    <h3 class="mb-0 fw-bold font-monospace" style="color: #1E293B;">{{ total_medicines }} <small class="text-secondary fs-6">items</small></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Charts Section ─────────────────────────────────────────── -->
+    <div class="row g-4 mb-4">
+        <!-- Chart 1: Monthly Sales Trend -->
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold font-heading">
+                        <i class="bi bi-graph-up me-2 text-primary"></i>Monthly Sales Trend (Nrs.)
+                    </h6>
+                    <span class="badge bg-secondary">Last 6 Months</span>
+                </div>
+                <div class="card-body">
+                    <div style="height: 280px; position: relative;">
+                        <canvas id="salesTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart 2: Stock Status Doughnut -->
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h6 class="mb-0 fw-bold font-heading">
+                        <i class="bi bi-pie-chart me-2 text-warning"></i>Stock Status Overview
+                    </h6>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <div style="height: 240px; position: relative;">
+                        <canvas id="stockStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Chart 3: Category Distribution -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h6 class="mb-0 fw-bold font-heading">
+                        <i class="bi bi-diagram-2 me-2 text-info"></i>Category Stock Distribution
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Feed -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header py-3">
+                    <h6 class="mb-0 fw-bold font-heading">
+                        <i class="bi bi-bell me-2 text-danger"></i>Inventory Alerts & Expiries
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" style="max-height: 260px; overflow-y: auto;">
+                        {% if out_of_stock_medicines %}
+                            {% for item in out_of_stock_medicines %}
+                            <div class="list-group-item" style="padding: 0.75rem 1.25rem;">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0 text-danger fw-bold"><i class="bi bi-x-circle me-1"></i> Out of Stock</h6>
+                                        <small class="text-secondary">{{ item.name }}</small>
+                                    </div>
+                                    <a href="{% url 'inventory_add' %}?medicine={{ item.id }}" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 0.75rem;">Restock</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if low_stock_medicines %}
+                            {% for item in low_stock_medicines %}
+                            <div class="list-group-item" style="padding: 0.75rem 1.25rem;">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0 text-warning fw-bold"><i class="bi bi-exclamation-triangle me-1"></i> Low Stock</h6>
+                                        <small class="text-secondary">{{ item.medicine.name }} (Batch: {{ item.batch_no }})</small>
+                                    </div>
+                                    <span class="badge bg-warning-subtle text-warning">{{ item.quantity }} left</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if expiring_soon_medicines %}
+                            {% for item in expiring_soon_medicines %}
+                            <div class="list-group-item" style="padding: 0.75rem 1.25rem;">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0 text-info fw-bold"><i class="bi bi-calendar-x me-1"></i> Expiring Soon</h6>
+                                        <small class="text-secondary">{{ item.medicine.name }} (Batch: {{ item.batch_no }})</small>
+                                    </div>
+                                    <span class="badge bg-info text-white">{{ item.expiry_date|date:"M j, Y" }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if not out_of_stock_medicines and not low_stock_medicines and not expiring_soon_medicines %}
+                            <div class="p-4 text-center">
+                                <i class="bi bi-check-circle-fill text-success fs-2 mb-2 d-block"></i>
+                                <span class="text-secondary">All inventory stock and expiry levels are optimal.</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Recent Activity Tables ────────────────────────────────── -->
+    <div class="row g-4 mb-5">
+        <!-- Recent Sales -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold font-heading">
+                        <i class="bi bi-receipt me-2 text-success"></i>Recent Sales Transactions
+                    </h6>
+                    <a href="{% url 'sale_list' %}" class="btn btn-sm btn-light">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Cashier</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in recent_sales %}
+                            <tr>
+                                <td class="font-monospace fw-semibold"><a href="{% url 'sale_detail' sale.pk %}">{{ sale.invoice_number }}</a></td>
+                                <td>{{ sale.cashier.username }}</td>
+                                <td class="text-success fw-bold">Nrs. {{ sale.total_amount }}</td>
+                                <td><span class="badge bg-secondary">{{ sale.payment_method }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-3 text-secondary">No recent sales</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Purchases -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold font-heading">
+                        <i class="bi bi-truck me-2 text-primary"></i>Recent Restock Orders
+                    </h6>
+                    <a href="{% url 'purchase_list' %}" class="btn btn-sm btn-light">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>PO Number</th>
+                                <th>Supplier</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for purchase in recent_purchases %}
+                            <tr>
+                                <td class="font-monospace fw-semibold"><a href="{% url 'purchase_detail' purchase.pk %}">PO-{{ purchase.id }}</a></td>
+                                <td>{{ purchase.supplier.name }}</td>
+                                <td class="text-primary fw-bold">Nrs. {{ purchase.total_amount }}</td>
+                                <td>
+                                    {% if purchase.status == 'Received' %}
+                                        <span class="badge bg-success-subtle text-success">Received</span>
+                                    {% elif purchase.status == 'Pending' %}
+                                        <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-3 text-secondary">No recent purchases</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Module Navigation Grid ─────────────────────────────────── -->
+    <h5 class="fw-bold mb-3 font-heading"><i class="bi bi-grid-3x3-gap me-2 text-primary"></i>Management Modules</h5>
+    <div class="row g-4">
+        {# Medicines #}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'medicine_list' %}" class="text-decoration-none">
-                <div class="card h-100">
+                <div class="card h-100 dash-nav-card">
                     <div class="card-body">
-                        <div class="dashboard-card-icon">💊</div>
-                        <h3 class="dashboard-card-title">Medicines</h3>
+                        <div class="dash-nav-icon" style="background: rgba(37,99,235,0.1); color: #2563EB;">
+                            <i class="bi bi-capsule"></i>
+                        </div>
+                        <h3 class="dashboard-card-title mt-3">Medicines</h3>
                         <p class="dashboard-card-description">
-                            Manage the medicine catalog, categories, dosage units, and formulation details.
+                            Manage the medicine catalog, categories, dosage units, and formulations.
                         </p>
                     </div>
+                    <div class="dash-nav-bar" style="background: #2563EB;"></div>
                 </div>
             </a>
         </div>
-        {% endif %}
 
-        {# ── Categories: Admin, Pharmacist, Superuser ── #}
-        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        {# Categories #}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'category_list' %}" class="text-decoration-none">
-                <div class="card h-100">
+                <div class="card h-100 dash-nav-card">
                     <div class="card-body">
-                        <div class="dashboard-card-icon">🗂️</div>
-                        <h3 class="dashboard-card-title">Categories</h3>
+                        <div class="dash-nav-icon" style="background: rgba(16,185,129,0.1); color: #10B981;">
+                            <i class="bi bi-diagram-2"></i>
+                        </div>
+                        <h3 class="dashboard-card-title mt-3">Categories</h3>
                         <p class="dashboard-card-description">
                             Organize medicine groups and manage classification categories.
                         </p>
                     </div>
+                    <div class="dash-nav-bar" style="background: #10B981;"></div>
                 </div>
             </a>
         </div>
-        {% endif %}
 
-        {# ── Inventory: Admin, Pharmacist, Cashier, Superuser ── #}
-        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.0.name == "Cashier" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" or user.groups.all.1.name == "Cashier" %}
+        {# Inventory #}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'inventory_list' %}" class="text-decoration-none">
-                <div class="card h-100">
+                <div class="card h-100 dash-nav-card">
                     <div class="card-body">
-                        <div class="dashboard-card-icon">📦</div>
-                        <h3 class="dashboard-card-title">Inventory</h3>
+                        <div class="dash-nav-icon" style="background: rgba(245,158,11,0.1); color: #d97706;">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h3 class="dashboard-card-title mt-3">Inventory</h3>
                         <p class="dashboard-card-description">
                             Track stock levels, batch numbers, expiry dates, and low-stock alerts.
                         </p>
                     </div>
+                    <div class="dash-nav-bar" style="background: #F59E0B;"></div>
                 </div>
             </a>
         </div>
-        {% endif %}
 
-        {# ── Suppliers: Admin, Pharmacist, Superuser ── #}
-        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        {# Suppliers #}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'supplier_list' %}" class="text-decoration-none">
-                <div class="card h-100">
+                <div class="card h-100 dash-nav-card">
                     <div class="card-body">
-                        <div class="dashboard-card-icon">🤝</div>
-                        <h3 class="dashboard-card-title">Suppliers</h3>
+                        <div class="dash-nav-icon" style="background: rgba(99,102,241,0.1); color: #6366f1;">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <h3 class="dashboard-card-title mt-3">Suppliers</h3>
                         <p class="dashboard-card-description">
                             Maintain supplier contact records and purchase ordering histories.
                         </p>
                     </div>
+                    <div class="dash-nav-bar" style="background: #6366f1;"></div>
                 </div>
             </a>
         </div>
-        {% endif %}
 
-        {# ── Purchases: Admin, Pharmacist, Superuser ── #}
-        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
+        {# Purchases #}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'purchase_list' %}" class="text-decoration-none">
-                <div class="card h-100">
+                <div class="card h-100 dash-nav-card">
                     <div class="card-body">
-                        <div class="dashboard-card-icon">🛒</div>
-                        <h3 class="dashboard-card-title">Purchases</h3>
+                        <div class="dash-nav-icon" style="background: rgba(239,68,68,0.1); color: #dc2626;">
+                            <i class="bi bi-cart3"></i>
+                        </div>
+                        <h3 class="dashboard-card-title mt-3">Purchases</h3>
                         <p class="dashboard-card-description">
                             Record supplier purchase orders and restock pharmacy inventory.
                         </p>
                     </div>
+                    <div class="dash-nav-bar" style="background: #EF4444;"></div>
                 </div>
             </a>
         </div>
-        {% endif %}
 
-        {# ── Sales: Admin, Pharmacist, Cashier, Superuser ── #}
-        {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.0.name == "Cashier" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" or user.groups.all.1.name == "Cashier" %}
+        {# Sales #}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'sale_list' %}" class="text-decoration-none">
-                <div class="card h-100">
+                <div class="card h-100 dash-nav-card">
                     <div class="card-body">
-                        <div class="dashboard-card-icon">📈</div>
-                        <h3 class="dashboard-card-title">Sales</h3>
+                        <div class="dash-nav-icon" style="background: rgba(34,197,94,0.1); color: #16a34a;">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+                        <h3 class="dashboard-card-title mt-3">Sales</h3>
                         <p class="dashboard-card-description">
                             Process customer transactions, generate invoices, and view receipts.
                         </p>
                     </div>
+                    <div class="dash-nav-bar" style="background: #22C55E;"></div>
                 </div>
             </a>
         </div>
-        {% endif %}
 
-        {# ── Reports: Admin, Pharmacist, Cashier, Superuser ── #}
-        {% if user.is_authenticated %}
+        {# Reports #}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'reports_home' %}" class="text-decoration-none">
-                <div class="card h-100">
+                <div class="card h-100 dash-nav-card">
                     <div class="card-body">
-                        <div class="dashboard-card-icon">📊</div>
-                        <h3 class="dashboard-card-title">Reports</h3>
+                        <div class="dash-nav-icon" style="background: rgba(37,99,235,0.08); color: #2563EB;">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+                        <h3 class="dashboard-card-title mt-3">Reports</h3>
                         <p class="dashboard-card-description">
                             Generate sales, inventory, and purchase reports with export options.
                         </p>
                     </div>
+                    <div class="dash-nav-bar" style="background: #2563EB;"></div>
                 </div>
             </a>
         </div>
-        {% endif %}
 
-        {# ── Users: Admin, Superuser ── #}
+        {# Users #}
         {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.1.name == "Admin" %}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'user_list' %}" class="text-decoration-none">
-                <div class="card h-100">
+                <div class="card h-100 dash-nav-card">
                     <div class="card-body">
-                        <div class="dashboard-card-icon">👥</div>
-                        <h3 class="dashboard-card-title">Users</h3>
+                        <div class="dash-nav-icon" style="background: rgba(99,102,241,0.1); color: #6366f1;">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3 class="dashboard-card-title mt-3">Users</h3>
                         <p class="dashboard-card-description">
                             Manage staff accounts, assign roles, and control system access.
                         </p>
                     </div>
+                    <div class="dash-nav-bar" style="background: #6366f1;"></div>
                 </div>
             </a>
         </div>
         {% endif %}
-
     </div>
 </div>
+
+<style>
+.dash-nav-card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.dash-nav-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.dash-nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    font-size: 1.4rem;
+}
+.dash-nav-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.dash-nav-card:hover .dash-nav-bar {
+    opacity: 1;
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    Chart.defaults.color = '#64748B';
+    Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+    // 1. Sales Trend Line Chart
+    const salesCtx = document.getElementById('salesTrendChart').getContext('2d');
+    const gradient = salesCtx.createLinearGradient(0, 0, 0, 280);
+    gradient.addColorStop(0, 'rgba(37, 99, 235, 0.18)');
+    gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_labels_json|safe }},
+            datasets: [{
+                label: 'Monthly Revenue (Nrs.)',
+                data: {{ monthly_sales_json|safe }},
+                borderColor: '#2563EB',
+                backgroundColor: gradient,
+                borderWidth: 2.5,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#2563EB',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.35
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#FFFFFF',
+                    titleColor: '#1E293B',
+                    bodyColor: '#64748B',
+                    borderColor: '#E2E8F0',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) { return 'Revenue: Nrs. ' + context.parsed.y.toFixed(2); }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: '#F1F5F9', drawBorder: false },
+                    ticks: { callback: function(val) { return 'Nrs. ' + val; } },
+                    border: { color: '#E2E8F0' }
+                },
+                x: {
+                    grid: { display: false, drawBorder: false },
+                    border: { color: '#E2E8F0' }
+                }
+            }
+        }
+    });
+
+    // 2. Stock Status Doughnut Chart
+    const statusCtx = document.getElementById('stockStatusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+            datasets: [{
+                data: {{ stock_status_data_json|safe }},
+                backgroundColor: ['#22C55E', '#F59E0B', '#EF4444'],
+                borderColor: ['#16a34a', '#d97706', '#dc2626'],
+                borderWidth: 1,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#64748B', padding: 16, usePointStyle: true }
+                },
+                tooltip: {
+                    backgroundColor: '#FFFFFF',
+                    titleColor: '#1E293B',
+                    bodyColor: '#64748B',
+                    borderColor: '#E2E8F0',
+                    borderWidth: 1
+                }
+            }
+        }
+    });
+
+    // 3. Category Bar Chart
+    const catCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(catCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ cat_labels_json|safe }},
+            datasets: [{
+                label: 'Stock Quantity',
+                data: {{ cat_data_json|safe }},
+                backgroundColor: 'rgba(16, 185, 129, 0.65)',
+                borderColor: '#10B981',
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#FFFFFF',
+                    titleColor: '#1E293B',
+                    bodyColor: '#64748B',
+                    borderColor: '#E2E8F0',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: '#F1F5F9', drawBorder: false },
+                    beginAtZero: true,
+                    border: { color: '#E2E8F0' }
+                },
+                x: {
+                    grid: { display: false, drawBorder: false },
+                    border: { color: '#E2E8F0' }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Checkout | PharmaCare{% endblock %}
 
@@ -18,21 +18,21 @@
     <div class="row">
         <!-- Billing / Customer Form info -->
         <div class="col-lg-5 mb-4">
-            <div class="card" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color); position: sticky; top: 20px;">
-                <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+            <div class="card" >
+                <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
                     Billing Details
                 </div>
                 <div class="card-body">
                     <!-- Customer Name -->
                     <div class="mb-3">
                         <label for="customer_name" class="form-label text-secondary small fw-semibold">Customer Name (Optional)</label>
-                        <input type="text" id="customer_name" name="customer_name" class="form-control bg-dark text-white border-secondary" placeholder="Enter Customer Name">
+                        <input type="text" id="customer_name" name="customer_name" class="form-control bg-white text-dark border-secondary-subtle" placeholder="Enter Customer Name">
                     </div>
 
                     <!-- Payment Method -->
                     <div class="mb-3">
                         <label for="payment_method" class="form-label text-secondary small fw-semibold">Payment Method</label>
-                        <select id="payment_method" name="payment_method" class="form-select bg-dark text-white border-secondary">
+                        <select id="payment_method" name="payment_method" class="form-select bg-white text-dark border-secondary-subtle">
                             <option value="Cash">Cash</option>
                             <option value="Card">Card</option>
                             <option value="Mobile Payment">Mobile Payment</option>
@@ -41,32 +41,32 @@
 
                     <!-- Discount -->
                     <div class="mb-3">
-                        <label for="discount" class="form-label text-secondary small fw-semibold">Discount ($)</label>
-                        <input type="number" id="discount" name="discount" class="form-control bg-dark text-white border-secondary" min="0" step="0.01" value="0.00">
+                        <label for="discount" class="form-label text-secondary small fw-semibold">Discount (Nrs.)</label>
+                        <input type="number" id="discount" name="discount" class="form-control bg-white text-dark border-secondary-subtle" min="0" step="0.01" value="0.00">
                     </div>
 
                     <!-- Tax -->
                     <div class="mb-3">
-                        <label for="tax" class="form-label text-secondary small fw-semibold">Tax ($)</label>
-                        <input type="number" id="tax" name="tax" class="form-control bg-dark text-white border-secondary" min="0" step="0.01" value="0.00">
+                        <label for="tax" class="form-label text-secondary small fw-semibold">Tax (Nrs.)</label>
+                        <input type="number" id="tax" name="tax" class="form-control bg-white text-dark border-secondary-subtle" min="0" step="0.01" value="0.00">
                     </div>
 
                     <div class="pt-3 border-top border-secondary">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="text-secondary small">Cart Subtotal:</span>
-                            <span class="text-white fw-semibold" id="subtotal-val">${{ subtotal }}</span>
+                            <span class="text-dark fw-semibold" id="subtotal-val">Nrs. {{ subtotal }}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="text-secondary small">Discount:</span>
-                            <span class="text-danger fw-semibold" id="discount-display">-$0.00</span>
+                            <span class="text-danger fw-semibold" id="discount-display">-Nrs. 0.00</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-secondary small">Tax:</span>
-                            <span class="text-info fw-semibold" id="tax-display">+$0.00</span>
+                            <span class="text-info fw-semibold" id="tax-display">+Nrs. 0.00</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-secondary fw-semibold">Invoice Grand Total:</span>
-                            <span class="fs-4 fw-bold text-success" id="grand-total-display">${{ subtotal }}</span>
+                            <span class="fs-4 fw-bold text-success" id="grand-total-display">Nrs. {{ subtotal }}</span>
                         </div>
                         <button type="submit" class="btn btn-success w-100 py-2 fw-semibold">Complete Checkout & Invoice</button>
                     </div>
@@ -76,12 +76,12 @@
 
         <!-- Checkout Line Items List -->
         <div class="col-lg-7 mb-4">
-            <div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
-                <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+            <div class="card" >
+                <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
                     Items to Checkout
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
+                    <table class="table table-hover align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
                         <thead>
                             <tr style="border-bottom: 1px solid var(--border-color);">
                                 <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine</th>
@@ -92,15 +92,15 @@
                         <tbody>
                             {% for item in cart_items %}
                                 <tr style="border-bottom: 1px solid var(--border-color);">
-                                    <td class="py-3 px-4 fw-semibold text-white">
+                                    <td class="py-3 px-4 fw-semibold text-dark">
                                         {{ item.medicine.name }}
                                         <span class="text-secondary small d-block">{{ item.medicine.get_unit_display }}</span>
                                     </td>
-                                    <td class="py-3 px-4 text-center text-white-50">
+                                    <td class="py-3 px-4 text-center text-secondary">
                                         {{ item.quantity }}
                                     </td>
                                     <td class="py-3 px-4 text-end text-success fw-semibold">
-                                        ${{ item.total_price }}
+                                        Nrs. {{ item.total_price }}
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -125,13 +125,13 @@
             let discount = parseFloat(discountInput.value) || 0;
             let tax = parseFloat(taxInput.value) || 0;
             
-            discountDisplay.textContent = "-$" + discount.toFixed(2);
-            taxDisplay.textContent = "+$" + tax.toFixed(2);
+            discountDisplay.textContent = "-Nrs. " + discount.toFixed(2);
+            taxDisplay.textContent = "+Nrs. " + tax.toFixed(2);
             
             let grandTotal = subtotal - discount + tax;
             if (grandTotal < 0) grandTotal = 0;
             
-            grandTotalDisplay.textContent = "$" + grandTotal.toFixed(2);
+            grandTotalDisplay.textContent = "Nrs. " + grandTotal.toFixed(2);
         }
 
         discountInput.addEventListener("input", recalculate);

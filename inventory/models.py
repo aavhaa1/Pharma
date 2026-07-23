@@ -57,7 +57,8 @@ class Inventory(models.Model):
 
     @property
     def is_low_stock(self):
-        return self.quantity <= self.medicine.minimum_stock_level
+        return not self.is_expired and 0 < self.quantity <= self.medicine.minimum_stock_level
+
 
     @property
     def status(self):

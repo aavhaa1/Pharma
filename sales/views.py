@@ -360,15 +360,15 @@ class InvoiceView(LoginRequiredMixin, View):
                 Paragraph(item.medicine.name, table_style),
                 Paragraph(item.inventory_batch.batch_no, table_style),
                 Paragraph(str(item.quantity), table_style),
-                Paragraph(f"${item.unit_price}", table_style),
-                Paragraph(f"${item.total_price}", table_style)
+                Paragraph(f"Nrs. {item.unit_price}", table_style),
+                Paragraph(f"Nrs. {item.total_price}", table_style)
             ])
             
         # Pricing totals rows
-        table_data.append(["", "", "", Paragraph("<b>Subtotal:</b>", table_style), Paragraph(f"${sale.subtotal}", table_style)])
-        table_data.append(["", "", "", Paragraph("<b>Discount:</b>", table_style), Paragraph(f"-${sale.discount}", table_style)])
-        table_data.append(["", "", "", Paragraph("<b>Tax:</b>", table_style), Paragraph(f"+${sale.tax}", table_style)])
-        table_data.append(["", "", "", Paragraph("<b>Grand Total:</b>", table_style), Paragraph(f"${sale.total_amount}", table_style)])
+        table_data.append(["", "", "", Paragraph("<b>Subtotal:</b>", table_style), Paragraph(f"Nrs. {sale.subtotal}", table_style)])
+        table_data.append(["", "", "", Paragraph("<b>Discount:</b>", table_style), Paragraph(f"-Nrs. {sale.discount}", table_style)])
+        table_data.append(["", "", "", Paragraph("<b>Tax:</b>", table_style), Paragraph(f"+Nrs. {sale.tax}", table_style)])
+        table_data.append(["", "", "", Paragraph("<b>Grand Total:</b>", table_style), Paragraph(f"Nrs. {sale.total_amount}", table_style)])
         
         col_widths = [200, 100, 60, 90, 90]
         items_table = Table(table_data, colWidths=col_widths)

@@ -123,7 +123,8 @@ class CashierDashboardView(CashierRequiredMixin, TemplateView):
             'medicine'
         ).filter(
             quantity__lte=F('medicine__minimum_stock_level'),
-            quantity__gt=0
+            quantity__gt=0,
+            expiry_date__gte=today
         ).order_by('quantity')[:8]
 
         # Expiring soon (within 30 days, view-only)

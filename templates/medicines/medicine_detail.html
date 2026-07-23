@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}{{ medicine.name }} | PharmaCare{% endblock %}
 
@@ -35,7 +35,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-start">
                 <div>
-                    <h2 class="mb-0 text-white">{{ medicine.name }}</h2>
+                    <h2 class="mb-0 text-dark">{{ medicine.name }}</h2>
                     <p class="text-secondary mb-0 small">
                         Brand: 
                         {% if medicine.brand %}
@@ -59,7 +59,7 @@
                     <div class="col-md-6 mb-4 mb-md-0">
                         <h4 class="text-secondary mb-3 pb-2" style="border-bottom: 1px solid var(--border-color); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Product Information</h4>
                         
-                        <table class="table table-dark table-borderless bg-transparent" style="color: #fafafa; font-size: 0.95rem;">
+                        <table class="table table-borderless bg-transparent" style="font-size: 0.95rem;">
                             <tbody>
                                 <tr>
                                     <td class="text-secondary ps-0" style="width: 160px;">Category:</td>
@@ -101,7 +101,7 @@
                     <div class="col-md-6">
                         <h4 class="text-secondary mb-3 pb-2" style="border-bottom: 1px solid var(--border-color); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Financial Details</h4>
                         
-                        <table class="table table-dark table-borderless bg-transparent" style="color: #fafafa; font-size: 0.95rem;">
+                        <table class="table table-borderless bg-transparent" style="font-size: 0.95rem;">
                             <tbody>
                                 <tr>
                                     <td class="text-secondary ps-0" style="width: 180px;">Purchase Price:</td>
@@ -122,8 +122,18 @@
                                 </tr>
                                 <tr>
                                     <td class="text-secondary ps-0">Inventory Min Stock:</td>
-                                    <td class="text-muted fst-italic small">
-                                        Will connect in Sprint 3
+                                    <td class="fw-semibold">{{ medicine.minimum_stock_level }} units</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-secondary ps-0">Current Available Stock:</td>
+                                    <td>
+                                        {% if medicine.available_stock == 0 %}
+                                            <span class="text-danger fw-bold">Out of Stock</span>
+                                        {% elif medicine.available_stock <= medicine.minimum_stock_level %}
+                                            <span class="text-warning fw-bold">Low Stock ({{ medicine.available_stock }} units left)</span>
+                                        {% else %}
+                                            <span class="text-success fw-bold">{{ medicine.available_stock }} units (In Stock)</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             </tbody>

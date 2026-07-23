@@ -97,6 +97,14 @@ def get_filtered_data(report_type, params):
         sup = params.get('supplier', '').strip()
         if sup:
             queryset = queryset.filter(purchase_items__purchase__supplier_id=sup).distinct()
+
+        from django.db.models.functions import Coalesce
+        queryset = queryset.annotate(
+            total_stock=Coalesce(
+                Sum('inventory_batches__quantity', filter=Q(inventory_batches__expiry_date__gte=today)),
+                0
+            )
+        )
         return queryset
 
     elif report_type == 'suppliers':
@@ -108,9 +116,15 @@ def get_filtered_data(report_type, params):
 
     elif report_type == 'low-stock':
         # Annotate total stock quantity and filter by minimum stock level
+        from django.db.models.functions import Coalesce
         queryset = Medicine.objects.select_related('category').annotate(
-            total_stock=Sum('inventory_batches__quantity')
-        ).filter(Q(total_stock__lte=F('minimum_stock_level')) | Q(total_stock__isnull=True))
+            total_stock=Coalesce(
+                Sum('inventory_batches__quantity', filter=Q(inventory_batches__expiry_date__gte=today)),
+                0
+            )
+        ).filter(total_stock__lte=F('minimum_stock_level'), is_active=True).annotate(
+            shortage=F('minimum_stock_level') - F('total_stock')
+        )
         return queryset
 
     elif report_type == 'expiry':
@@ -146,7 +160,7 @@ def generate_csv(report_type, queryset):
     elif report_type == 'medicines':
         writer.writerow(['Medicine Name', 'Brand/Generic Name', 'Category', 'Selling Price', 'Purchase Price', 'Total Stock'])
         for m in queryset:
-            stock = m.inventory_batches.aggregate(total=Sum('quantity'))['total'] or 0
+            stock = m.total_stock
             writer.writerow([m.name, m.brand or 'Generic', m.category.name if m.category else 'N/A', m.selling_price, m.purchase_price, stock])
 
     elif report_type == 'suppliers':
@@ -232,7 +246,7 @@ def generate_excel(report_type, queryset):
         ws.append(headers)
         
         for m in queryset:
-            stock = m.inventory_batches.aggregate(total=Sum('quantity'))['total'] or 0
+            stock = m.total_stock
             ws.append([m.name, m.brand or 'Generic', m.category.name if m.category else 'N/A', float(m.selling_price), float(m.purchase_price), stock])
 
     elif report_type == 'suppliers':
@@ -283,7 +297,7 @@ def generate_excel(report_type, queryset):
             cell = ws.cell(row=row, column=col)
             cell.border = border_thin
             if isinstance(cell.value, float):
-                cell.number_format = '$#,##0.00'
+                cell.number_format = '"Nrs." #,##0.00'
                 cell.alignment = align_right
             elif isinstance(cell.value, int):
                 cell.alignment = align_right
@@ -335,7 +349,7 @@ def generate_pdf_report(report_type, queryset):
                 Paragraph(sale.customer_name or 'Walk-in', table_cell_style),
                 Paragraph(sale.cashier.username, table_cell_style),
                 Paragraph(str(sale.sale_date), table_cell_style),
-                Paragraph(f"${sale.total_amount}", table_cell_style),
+                Paragraph(f"Nrs. {sale.total_amount}", table_cell_style),
                 Paragraph(sale.payment_method, table_cell_style)
             ])
         col_widths = [100, 120, 80, 80, 80, 80]
@@ -348,7 +362,7 @@ def generate_pdf_report(report_type, queryset):
                 Paragraph(p.supplier.name, table_cell_style),
                 Paragraph(p.invoice_number, table_cell_style),
                 Paragraph(str(p.purchase_date), table_cell_style),
-                Paragraph(f"${p.total_amount}", table_cell_style),
+                Paragraph(f"Nrs. {p.total_amount}", table_cell_style),
                 Paragraph(p.status, table_cell_style)
             ])
         col_widths = [80, 140, 100, 80, 70, 70]
@@ -361,7 +375,7 @@ def generate_pdf_report(report_type, queryset):
                 Paragraph(i.medicine.category.name if i.medicine.category else 'N/A', table_cell_style),
                 Paragraph(i.batch_no, table_cell_style),
                 Paragraph(str(i.quantity), table_cell_style),
-                Paragraph(f"${i.medicine.selling_price}", table_cell_style),
+                Paragraph(f"Nrs. {i.medicine.selling_price}", table_cell_style),
                 Paragraph(str(i.expiry_date), table_cell_style)
             ])
         col_widths = [140, 100, 80, 60, 80, 80]
@@ -369,12 +383,12 @@ def generate_pdf_report(report_type, queryset):
     elif report_type == 'medicines':
         data = [[Paragraph("Medicine Name", table_header_style), Paragraph("Brand/Generic", table_header_style), Paragraph("Category", table_header_style), Paragraph("Retail Price", table_header_style), Paragraph("Stock", table_header_style)]]
         for m in queryset:
-            stock = m.inventory_batches.aggregate(total=Sum('quantity'))['total'] or 0
+            stock = m.total_stock
             data.append([
                 Paragraph(m.name, table_cell_style),
                 Paragraph(m.brand or 'Generic', table_cell_style),
                 Paragraph(m.category.name if m.category else 'N/A', table_cell_style),
-                Paragraph(f"${m.selling_price}", table_cell_style),
+                Paragraph(f"Nrs. {m.selling_price}", table_cell_style),
                 Paragraph(str(stock), table_cell_style)
             ])
         col_widths = [180, 120, 100, 80, 60]

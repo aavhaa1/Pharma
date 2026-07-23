@@ -1,4 +1,4 @@
-{% extends "cashier/base_cashier.html" %}
+﻿{% extends "cashier/base_cashier.html" %}
 
 {% block title %}New Sale — POS | PharmaCare{% endblock %}
 {% block page_title %}Point of Sale{% endblock %}
@@ -18,8 +18,7 @@
     }
 
     .med-card {
-        background: rgba(24,24,27,0.55);
-        border: 1px solid rgba(255,255,255,0.08);
+        background: #FFFFFF;
         border-radius: 12px;
         padding: 1.1rem;
         transition: transform 0.18s ease, border-color 0.18s ease;
@@ -36,12 +35,11 @@
         font-family: var(--font-heading);
         font-weight: 700;
         font-size: 0.95rem;
-        color: #fafafa;
         margin-bottom: 0.2rem;
     }
     .med-card .med-brand {
         font-size: 0.75rem;
-        color: #71717a;
+        color: #64748B;
     }
     .med-card .med-price {
         font-size: 1.2rem;
@@ -61,8 +59,7 @@
 
     /* Cart sidebar */
     .cart-sidebar {
-        background: rgba(14,14,16,0.9);
-        border: 1px solid rgba(255,255,255,0.09);
+        background: #FFFFFF;
         border-radius: 14px;
         position: sticky;
         top: 80px;
@@ -78,7 +75,7 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.65rem 0;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid #E2E8F0;
         font-size: 0.82rem;
     }
     .cart-item-row:last-child { border-bottom: none; }
@@ -93,15 +90,12 @@
         text-align: center;
         padding: 0.2rem 0.3rem !important;
         font-size: 0.8rem !important;
-        background: rgba(9,9,11,0.8) !important;
-        border: 1px solid rgba(255,255,255,0.12) !important;
-        color: #fafafa !important;
+        background: #FFFFFF !important !important !important;
         border-radius: 6px !important;
     }
     .qty-btn {
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #a1a1aa;
+        background: #E2E8F0;
+        color: #64748B;
         border-radius: 5px;
         width: 24px;
         height: 24px;
@@ -121,24 +115,23 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="dashboard-title mb-1">New Sale</h1>
-        <p style="color: #71717a; font-size: 0.88rem;">Search medicines and add to cart. Review cart, then proceed to checkout.</p>
+        <p style="color: #64748B; font-size: 0.88rem;">Search medicines and add to cart. Review cart, then proceed to checkout.</p>
     </div>
 </div>
 
 <div class="pos-layout">
 
-    <!-- ── LEFT: Medicine Catalogue ────────────────────────────── -->
+    <!--  LEFT: Medicine Catalogue  -->
     <div>
         <!-- Search Bar -->
         <form method="get" class="mb-3" id="pos-search-form">
             <div class="input-group">
-                <span class="input-group-text" style="background: rgba(9,9,11,0.8); border: 1px solid rgba(255,255,255,0.1); border-right: none; color: #71717a;">
+                <span class="input-group-text" >
                     <i class="bi bi-search"></i>
                 </span>
                 <input type="text" name="q" id="pos-search-input"
                        value="{{ search_query }}"
                        class="form-control"
-                       style="background: rgba(9,9,11,0.8); border: 1px solid rgba(255,255,255,0.1); border-left: none; color: #fafafa;"
                        placeholder="Search by medicine name, brand, description..."
                        autocomplete="off">
                 {% if search_query %}
@@ -164,7 +157,7 @@
                         </div>
                         <div class="med-brand mb-2">
                             {% if medicine.brand %}Brand: {{ medicine.brand }}{% else %}Generic{% endif %}
-                            {% if medicine.category %} · {{ medicine.category.name }}{% endif %}
+                            {% if medicine.category %} Â· {{ medicine.category.name }}{% endif %}
                         </div>
                         <div class="d-flex align-items-center gap-2 mb-2">
                             {% if medicine.available_stock == 0 %}
@@ -175,7 +168,7 @@
                                 <span class="stock-badge stock-ok"><i class="bi bi-check-circle me-1"></i>{{ medicine.available_stock }} avail.</span>
                             {% endif %}
                             {% if medicine.nearest_expiry %}
-                            <span style="font-size: 0.68rem; color: #71717a;">Exp: {{ medicine.nearest_expiry|date:"M Y" }}</span>
+                            <span style="font-size: 0.68rem; color: #64748B;">Exp: {{ medicine.nearest_expiry|date:"M Y" }}</span>
                             {% endif %}
                         </div>
                         {% if medicine.requires_prescription %}
@@ -188,9 +181,9 @@
                     </div>
 
                     <!-- Price + Add to Cart -->
-                    <div class="pt-2 mt-2" style="border-top: 1px solid rgba(255,255,255,0.07);">
+                    <div class="pt-2 mt-2" style="border-top: 1px solid #E2E8F0;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="med-price">${{ medicine.selling_price }}</span>
+                            <span class="med-price">Nrs. {{ medicine.selling_price }}</span>
                         </div>
                         {% if medicine.available_stock > 0 %}
                         <form action="{% url 'cashier:cashier_cart' %}" method="post" class="d-flex gap-1">
@@ -199,7 +192,7 @@
                             <input type="hidden" name="medicine_id" value="{{ medicine.pk }}">
                             <input type="number" name="quantity" value="1" min="1" max="{{ medicine.available_stock }}"
                                    class="form-control form-control-sm text-center"
-                                   style="width: 64px; background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.12); color: #fafafa;">
+                                   style="width: 64px; background: #FFFFFF;">
                             <button type="submit" class="btn btn-success btn-sm flex-grow-1">
                                 <i class="bi bi-cart-plus me-1"></i>Add
                             </button>
@@ -215,7 +208,7 @@
         {% elif search_query %}
         <div class="text-center py-5" style="color: #52525b;">
             <i class="bi bi-search fs-2 d-block mb-2"></i>
-            No medicines found for "<strong style="color: #a1a1aa;">{{ search_query }}</strong>".
+            No medicines found for "<strong style="color: #64748B;">{{ search_query }}</strong>".
         </div>
         {% else %}
         <div class="text-center py-5" style="color: #52525b;">
@@ -225,9 +218,9 @@
         {% endif %}
     </div>
 
-    <!-- ── RIGHT: Cart Sidebar ──────────────────────────────────── -->
+    <!--  RIGHT: Cart Sidebar  -->
     <div class="cart-sidebar">
-        <div class="p-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+        <div class="p-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #E2E8F0;">
             <span class="fw-bold text-white" style="font-family: var(--font-heading);">
                 <i class="bi bi-cart3 me-2 text-success"></i>Cart
                 {% if cart_count %}
@@ -253,7 +246,7 @@
                         <div class="fw-semibold text-white" style="font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             {{ item.medicine.name }}
                         </div>
-                        <div style="color: #71717a; font-size: 0.72rem;">${{ item.unit_price }} each</div>
+                        <div style="color: #64748B; font-size: 0.72rem;">Nrs. {{ item.unit_price }} each</div>
                     </div>
 
                     <!-- Quantity update -->
@@ -275,14 +268,14 @@
                         </button>
                     </form>
                 </div>
-                <div style="text-align: right; margin-top: -0.3rem; margin-bottom: 0.3rem; font-size: 0.78rem; color: #22c55e; font-weight: 600;">${{ item.total_price }}</div>
+                <div style="text-align: right; margin-top: -0.3rem; margin-bottom: 0.3rem; font-size: 0.78rem; color: #22c55e; font-weight: 600;">Nrs. {{ item.total_price }}</div>
                 {% endfor %}
 
                 <!-- Subtotal -->
                 <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 0.75rem; margin-top: 0.5rem;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span style="color: #a1a1aa; font-size: 0.85rem; font-family: var(--font-heading); font-weight: 600;">Subtotal</span>
-                        <span style="color: #22c55e; font-size: 1.2rem; font-weight: 800; font-family: var(--font-heading);">${{ cart_subtotal }}</span>
+                        <span style="color: #64748B; font-size: 0.85rem; font-family: var(--font-heading); font-weight: 600;">Subtotal</span>
+                        <span style="color: #22c55e; font-size: 1.2rem; font-weight: 800; font-family: var(--font-heading);">Nrs. {{ cart_subtotal }}</span>
                     </div>
                     <a href="{% url 'cashier:cashier_checkout' %}" class="btn btn-success w-100 fw-bold py-2" id="proceed-checkout-btn">
                         <i class="bi bi-arrow-right-circle me-2"></i>Proceed to Checkout

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Supplier Report | PharmaCare{% endblock %}
 {% block content %}
 <div class="row mb-4 align-items-center">
@@ -10,7 +10,7 @@
         <a href="{% url 'reports_export_pdf' %}?report_type=suppliers&{{ request.GET.urlencode }}" class="btn btn-danger btn-sm">PDF</a>
         <a href="{% url 'reports_export_excel' %}?report_type=suppliers&{{ request.GET.urlencode }}" class="btn btn-success btn-sm">Excel</a>
         <a href="{% url 'reports_export_csv' %}?report_type=suppliers&{{ request.GET.urlencode }}" class="btn btn-secondary btn-sm">CSV</a>
-        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm"> Dashboard</a>
     </div>
 </div>
 
@@ -33,12 +33,12 @@
     </div>
 </div>
 
-<div class="card mb-4" style="background: rgba(24,24,27,0.45); border: 1px solid var(--border-color);">
+<div class="card mb-4" >
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-end">
             <div class="col-md-8">
                 <label class="form-label mb-1 text-secondary small fw-semibold">Search Supplier Name</label>
-                <input type="text" name="supplier_name" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Search by supplier name..." value="{{ request.GET.supplier_name }}">
+                <input type="text" name="supplier_name" class="form-control form-control-sm bg-white text-dark border-secondary-subtle" placeholder="Search by supplier name..." value="{{ request.GET.supplier_name }}">
             </div>
             <div class="col-md-4 d-flex gap-2 align-items-end">
                 <button type="submit" class="btn btn-primary btn-sm px-4">Search</button>
@@ -48,9 +48,9 @@
     </div>
 </div>
 
-<div class="card" style="background: rgba(24,24,27,0.3); border: 1px solid var(--border-color);">
+<div class="card" >
     <div class="table-responsive">
-        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+        <table class="table table-hover align-middle mb-0" style="--bs-table-bg: transparent;">
             <thead>
                 <tr style="border-bottom: 2px solid var(--border-color);">
                     <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Supplier Name</th>
@@ -69,9 +69,9 @@
                     <td class="py-3 px-4 text-secondary small">{{ s.contact_person|default:"N/A" }}</td>
                     <td class="py-3 px-4 text-secondary small">{{ s.phone|default:"N/A" }}</td>
                     <td class="py-3 px-4 text-secondary small">{{ s.email|default:"N/A" }}</td>
-                    <td class="py-3 px-4 text-end text-white">{{ s.num_medicines }}</td>
-                    <td class="py-3 px-4 text-end text-white">{{ s.num_purchases }}</td>
-                    <td class="py-3 px-4 text-end fw-bold text-success">${{ s.total_value|floatformat:2 }}</td>
+                    <td class="py-3 px-4 text-end text-dark">{{ s.num_medicines }}</td>
+                    <td class="py-3 px-4 text-end text-dark">{{ s.num_purchases }}</td>
+                    <td class="py-3 px-4 text-end fw-bold text-success">Nrs. {{ s.total_value|floatformat:2 }}</td>
                 </tr>
                 {% empty %}
                     <tr><td colspan="7" class="text-center py-5 text-muted">No suppliers found.</td></tr>
@@ -80,12 +80,12 @@
         </table>
     </div>
     {% if is_paginated %}
-    <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24,24,27,0.2); border-top: 1px solid var(--border-color);">
+    <div class="card-footer d-flex justify-content-between align-items-center" >
         <span class="text-muted small">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
         <nav><ul class="pagination pagination-sm mb-0">
-            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Prev</a></li>{% endif %}
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Prev</a></li>{% endif %}
             <li class="page-item active"><span class="page-link bg-primary border-primary">{{ page_obj.number }}</span></li>
-            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a></li>{% endif %}
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a></li>{% endif %}
         </ul></nav>
     </div>
     {% endif %}

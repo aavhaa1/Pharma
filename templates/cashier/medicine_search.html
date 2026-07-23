@@ -1,4 +1,4 @@
-{% extends "cashier/base_cashier.html" %}
+﻿{% extends "cashier/base_cashier.html" %}
 
 {% block title %}Medicines Catalog | PharmaCare{% endblock %}
 {% block page_title %}Search Medicines{% endblock %}
@@ -11,17 +11,17 @@
     </div>
 </div>
 
-<!-- 🔍 Search Bar -->
-<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45);">
+<!--  Search Bar -->
+<div class="card mb-4" >
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-end">
             <div class="col-md-10">
                 <label for="search-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500; color: #ffffff !important;">Search Medicine</label>
                 <div class="input-group">
-                    <span class="input-group-text" style="background: rgba(9,9,11,0.8); border: 1px solid rgba(255,255,255,0.1); border-right: none; color: #71717a;">
+                    <span class="input-group-text" >
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" id="search-input" name="q" class="form-control form-control-sm" style="border-left: none; background-color: rgba(9, 9, 11, 0.6) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: #fafafa !important;" placeholder="Search by name, brand, description..." value="{{ search_query }}">
+                    <input type="text" id="search-input" name="q" class="form-control form-control-sm" style="border-left: none; background-color: #FFFFFF !important !important !important;" placeholder="Search by name, brand, description..." value="{{ search_query }}">
                 </div>
             </div>
             <div class="col-md-2 d-flex gap-1">
@@ -32,11 +32,11 @@
     </div>
 </div>
 
-<!-- 📋 Medicines Table -->
+<!--  Medicines Table -->
 <div class="card">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-dark table-hover mb-0" style="background: transparent; color: #fafafa;">
+            <table class="table table-hover mb-0" style="background: transparent;">
                 <thead>
                     <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
                         <th class="py-3 px-4" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine Name</th>
@@ -65,11 +65,11 @@
                                 {% if medicine.category %}{{ medicine.category.name }}{% else %}<span class="fst-italic opacity-50">Unassigned</span>{% endif %}
                             </td>
                             <td class="py-3 px-4 text-center text-muted" style="color: #ffffff !important; opacity: 0.7;">
-                                <span class="badge bg-secondary-subtle text-secondary-emphasis" style="background: rgba(255,255,255,0.05); color: #ffffff !important;">
+                                <span class="badge bg-secondary-subtle text-secondary-emphasis" style="background: #E2E8F0; color: #ffffff !important;">
                                     {{ medicine.get_unit_display }}
                                 </span>
                             </td>
-                            <td class="py-3 px-4 text-end fw-semibold text-white font-monospace">${{ medicine.selling_price }}</td>
+                            <td class="py-3 px-4 text-end fw-semibold font-monospace">Nrs. {{ medicine.selling_price }}</td>
                             <td class="py-3 px-4 text-center">
                                 {% if medicine.available_stock == 0 %}
                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important;">Out of Stock</span>
@@ -95,7 +95,7 @@
                                         <input type="hidden" name="next" value="medicines">
                                         <input type="number" name="quantity" value="1" min="1" max="{{ medicine.available_stock }}"
                                                class="form-control form-control-sm text-center"
-                                               style="width: 55px; height: 31px; background: rgba(9,9,11,0.7); border: 1px solid rgba(255,255,255,0.12) !important; color: #fafafa !important;">
+                                               style="width: 55px; height: 31px; background: #FFFFFF !important !important;">
                                         <button type="submit" class="btn btn-success btn-sm py-1 px-2" style="font-size: 0.8rem;">
                                             <i class="bi bi-cart-plus"></i> Add
                                         </button>

@@ -86,29 +86,29 @@
                     <td class="fw-semibold text-dark">{{ item.medicine.name }}</td>
                     <td class="font-monospace small text-muted">{{ item.inventory_batch.batch_no }}</td>
                     <td class="text-end">{{ item.quantity }}</td>
-                    <td class="text-end">${{ item.unit_price }}</td>
-                    <td class="text-end fw-semibold">${{ item.total_price }}</td>
+                    <td class="text-end">Nrs. {{ item.unit_price }}</td>
+                    <td class="text-end fw-semibold">Nrs. {{ item.total_price }}</td>
                 </tr>
             {% endfor %}
             <tr>
                 <td colspan="3"></td>
                 <td class="text-end text-muted small">Subtotal:</td>
-                <td class="text-end">${{ sale.subtotal }}</td>
+                <td class="text-end">Nrs. {{ sale.subtotal }}</td>
             </tr>
             <tr>
                 <td colspan="3"></td>
                 <td class="text-end text-muted small">Discount:</td>
-                <td class="text-end text-danger">-${{ sale.discount }}</td>
+                <td class="text-end text-danger">-Nrs. {{ sale.discount }}</td>
             </tr>
             <tr>
                 <td colspan="3"></td>
                 <td class="text-end text-muted small">Tax:</td>
-                <td class="text-end text-info">+${{ sale.tax }}</td>
+                <td class="text-end text-info">+Nrs. {{ sale.tax }}</td>
             </tr>
             <tr class="table-success fw-bold">
                 <td colspan="3"></td>
                 <td class="text-end">Grand Total:</td>
-                <td class="text-end text-success">${{ sale.total_amount }}</td>
+                <td class="text-end text-success">Nrs. {{ sale.total_amount }}</td>
             </tr>
         </tbody>
     </table>

@@ -132,6 +132,17 @@ class MedicineListView(LoginRequiredMixin, ListView):
         elif status == "inactive":
             queryset = queryset.filter(is_active=False)
 
+        from django.db.models import Sum, Q
+        from django.db.models.functions import Coalesce
+        from django.utils import timezone
+        today = timezone.now().date()
+        queryset = queryset.annotate(
+            available_stock=Coalesce(
+                Sum('inventory_batches__quantity', filter=Q(inventory_batches__expiry_date__gte=today)),
+                0
+            )
+        )
+
         return queryset.select_related("category")
 
     def get_context_data(self, **kwargs):

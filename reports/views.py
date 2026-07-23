@@ -63,9 +63,13 @@ class ReportsDashboardView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, Templ
         )['total'] or Decimal('0.00')
         
         # 7. Low Stock Medicines count
+        from django.db.models.functions import Coalesce
         context['low_stock_medicines_count'] = Medicine.objects.annotate(
-            total_stock=Sum('inventory_batches__quantity')
-        ).filter(Q(total_stock__lte=F('minimum_stock_level')) | Q(total_stock__isnull=True)).count()
+            total_stock=Coalesce(
+                Sum('inventory_batches__quantity', filter=Q(inventory_batches__expiry_date__gte=today)),
+                0
+            )
+        ).filter(total_stock__lte=F('minimum_stock_level'), is_active=True).count()
         
         # 8. Expired Medicines count
         context['expired_medicines_count'] = Inventory.objects.filter(expiry_date__lt=today).count()

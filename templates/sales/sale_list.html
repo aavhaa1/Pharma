@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Sales History | PharmaCare{% endblock %}
 
@@ -23,26 +23,26 @@
     </div>
 </div>
 
-<!-- 🔍 Search and Filters Bar -->
-<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
+<!--  Search and Filters Bar -->
+<div class="card mb-4" >
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-end">
             <!-- Search Text -->
             <div class="col-md-4">
                 <label for="search-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Search Sale</label>
-                <input type="text" id="search-input" name="q" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Search invoice or customer..." value="{{ request.GET.q }}">
+                <input type="text" id="search-input" name="q" class="form-control form-control-sm bg-white text-dark border-secondary-subtle" placeholder="Search invoice or customer..." value="{{ request.GET.q }}">
             </div>
             
             <!-- Date Filter -->
             <div class="col-md-3">
                 <label for="date-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Sale Date</label>
-                <input type="date" id="date-input" name="date" class="form-control form-control-sm bg-dark text-white border-secondary" value="{{ request.GET.date }}">
+                <input type="date" id="date-input" name="date" class="form-control form-control-sm bg-white text-dark border-secondary-subtle" value="{{ request.GET.date }}">
             </div>
             
             <!-- Payment Method Filter -->
             <div class="col-md-3">
                 <label for="payment-select" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Payment Method</label>
-                <select id="payment-select" name="payment_method" class="form-select form-select-sm bg-dark text-white border-secondary">
+                <select id="payment-select" name="payment_method" class="form-select form-select-sm bg-white text-dark border-secondary-subtle">
                     <option value="">All Methods</option>
                     <option value="Cash" {% if request.GET.payment_method == 'Cash' %}selected{% endif %}>Cash</option>
                     <option value="Card" {% if request.GET.payment_method == 'Card' %}selected{% endif %}>Card</option>
@@ -59,10 +59,10 @@
     </div>
 </div>
 
-<!-- 📊 Sales Data Table -->
-<div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
+<!--  Sales Data Table -->
+<div class="card" >
     <div class="table-responsive">
-        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
+        <table class="table table-hover align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
             <thead>
                 <tr style="border-bottom: 2px solid var(--border-color);">
                     <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase; width: 140px;">Invoice No</th>
@@ -80,7 +80,7 @@
                         <td class="py-3 px-4 font-monospace" style="font-size: 0.9rem;">
                             {{ sale.invoice_number }}
                         </td>
-                        <td class="py-3 px-4 fw-semibold text-white">
+                        <td class="py-3 px-4 fw-semibold text-dark">
                             {{ sale.customer_name|default:"Walk-in Customer" }}
                         </td>
                         <td class="py-3 px-4 text-center small text-secondary">
@@ -95,7 +95,7 @@
                             </span>
                         </td>
                         <td class="py-3 px-4 text-end fw-bold text-success" style="font-size: 0.95rem;">
-                            ${{ sale.total_amount }}
+                            Nrs. {{ sale.total_amount }}
                         </td>
                         <td class="py-3 px-4 text-end">
                             <a href="{% url 'sale_detail' sale.pk %}" class="btn btn-outline-info btn-xs py-1 px-2.5" style="font-size: 0.8rem;">View</a>
@@ -114,7 +114,7 @@
 
     <!-- Pagination -->
     {% if is_paginated %}
-        <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24, 24, 27, 0.2); border-top: 1px solid var(--border-color);">
+        <div class="card-footer d-flex justify-content-between align-items-center" >
             <div class="text-muted small">
                 Showing page {{ page_obj.number }} of {{ paginator.num_pages }}
             </div>
@@ -122,10 +122,10 @@
                 <ul class="pagination pagination-sm mb-0">
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link bg-dark text-white border-secondary" href="?page=1{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">&laquo; First</a>
+                            <a class="page-link bg-white text-dark border-secondary-subtle" href="?page=1{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">&laquo; First</a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Prev</a>
+                            <a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ page_obj.previous_page_number }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Prev</a>
                         </li>
                     {% endif %}
 
@@ -135,10 +135,10 @@
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Next</a>
+                            <a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ page_obj.next_page_number }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Next</a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link bg-dark text-white border-secondary" href="?page={{ paginator.num_pages }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Last &raquo;</a>
+                            <a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ paginator.num_pages }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">Last &raquo;</a>
                         </li>
                     {% endif %}
                 </ul>

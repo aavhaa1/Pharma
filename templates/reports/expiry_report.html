@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Expiry Report | PharmaCare{% endblock %}
 {% block content %}
 <div class="row mb-4 align-items-center">
@@ -10,19 +10,19 @@
         <a href="{% url 'reports_export_pdf' %}?report_type=expiry" class="btn btn-danger btn-sm">PDF</a>
         <a href="{% url 'reports_export_excel' %}?report_type=expiry" class="btn btn-success btn-sm">Excel</a>
         <a href="{% url 'reports_export_csv' %}?report_type=expiry" class="btn btn-secondary btn-sm">CSV</a>
-        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm"> Dashboard</a>
     </div>
 </div>
 
 {% if inventory_items %}
 <div class="alert" style="background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.4); color: #f8d7da;" role="alert">
-    🚫 <strong>{{ page_obj.paginator.count }} inventory batch(es)</strong> are expired or expiring within 30 days. Immediate attention required.
+     <strong>{{ page_obj.paginator.count }} inventory batch(es)</strong> are expired or expiring within 30 days. Immediate attention required.
 </div>
 {% endif %}
 
-<div class="card" style="background: rgba(24,24,27,0.3); border: 1px solid var(--border-color);">
+<div class="card" >
     <div class="table-responsive">
-        <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+        <table class="table table-hover align-middle mb-0" style="--bs-table-bg: transparent;">
             <thead>
                 <tr style="border-bottom: 2px solid var(--border-color);">
                     <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Medicine</th>
@@ -46,25 +46,25 @@
                         {% if item.days_remaining < 0 %}Expired ({{ item.days_remaining|abs }} days ago)
                         {% else %}{{ item.days_remaining }} days{% endif %}
                     </td>
-                    <td class="py-3 px-4 text-end text-white">{{ item.quantity }}</td>
+                    <td class="py-3 px-4 text-end text-dark">{{ item.quantity }}</td>
                     <td class="py-3 px-4 text-secondary small">{{ item.supplier_name|default:"N/A" }}</td>
                     <td class="py-3 px-4 text-center">
                         <span class="badge {% if item.days_remaining < 0 %}bg-danger{% elif item.days_remaining <= 30 %}bg-warning text-dark{% else %}bg-success{% endif %}" style="font-size: 0.7rem;">{{ item.status }}</span>
                     </td>
                 </tr>
                 {% empty %}
-                    <tr><td colspan="8" class="text-center py-5 text-success fw-semibold">✅ No expired or expiring batches detected in the next 30 days.</td></tr>
+                    <tr><td colspan="8" class="text-center py-5 text-success fw-semibold"> No expired or expiring batches detected in the next 30 days.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
     {% if is_paginated %}
-    <div class="card-footer d-flex justify-content-between align-items-center" style="background: rgba(24,24,27,0.2); border-top: 1px solid var(--border-color);">
+    <div class="card-footer d-flex justify-content-between align-items-center" >
         <span class="text-muted small">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
         <nav><ul class="pagination pagination-sm mb-0">
-            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>{% endif %}
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>{% endif %}
             <li class="page-item active"><span class="page-link bg-primary border-primary">{{ page_obj.number }}</span></li>
-            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-dark text-white border-secondary" href="?page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link bg-white text-dark border-secondary-subtle" href="?page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
         </ul></nav>
     </div>
     {% endif %}

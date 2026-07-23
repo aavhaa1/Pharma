@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Purchase Order Details | PharmaCare{% endblock %}
 
@@ -22,7 +22,7 @@
     <!-- Left Column: Summary and Supplier Details -->
     <div class="col-lg-4 mb-4">
         <!-- Status Card -->
-        <div class="card mb-4" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
+        <div class="card mb-4" >
             <div class="card-body">
                 <div class="mb-3">
                     <span class="text-secondary small fw-semibold d-block">Status</span>
@@ -30,50 +30,50 @@
                         {% if purchase.status == 'Pending' %}text-warning
                         {% elif purchase.status == 'Received' %}text-success
                         {% else %}text-danger{% endif %}">
-                        ● {{ purchase.status }}
+                         {{ purchase.status }}
                     </span>
                 </div>
                 <div class="mb-3">
                     <span class="text-secondary small fw-semibold d-block">Invoice Number</span>
-                    <span class="text-white fw-medium">{{ purchase.invoice_number }}</span>
+                    <span class="text-dark fw-medium">{{ purchase.invoice_number }}</span>
                 </div>
                 <div class="mb-3">
                     <span class="text-secondary small fw-semibold d-block">Purchase Date</span>
-                    <span class="text-white fw-medium">{{ purchase.purchase_date|date:"Y-m-d" }}</span>
+                    <span class="text-dark fw-medium">{{ purchase.purchase_date|date:"Y-m-d" }}</span>
                 </div>
                 <div class="mb-3">
                     <span class="text-secondary small fw-semibold d-block">Created By</span>
-                    <span class="text-white fw-medium">{{ purchase.created_by.username }}</span>
+                    <span class="text-dark fw-medium">{{ purchase.created_by.username }}</span>
                 </div>
                 <div class="mb-3">
                     <span class="text-secondary small fw-semibold d-block">Remarks</span>
-                    <span class="text-white-50 text-wrap">{{ purchase.remarks|default:"No remarks provided." }}</span>
+                    <span class="text-secondary text-wrap">{{ purchase.remarks|default:"No remarks provided." }}</span>
                 </div>
             </div>
         </div>
 
         <!-- Supplier Information Card -->
-        <div class="card mb-4" style="background: rgba(24, 24, 27, 0.45); border: 1px solid var(--border-color);">
-            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+        <div class="card mb-4" >
+            <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
                 Supplier Information
             </div>
             <div class="card-body">
                 <h5 class="text-white fw-semibold mb-3">{{ purchase.supplier.name }}</h5>
                 <div class="mb-2">
                     <span class="text-secondary small fw-semibold d-block">Contact Person</span>
-                    <span class="text-white-50">{{ purchase.supplier.contact_person|default:"N/A" }}</span>
+                    <span class="text-secondary">{{ purchase.supplier.contact_person|default:"N/A" }}</span>
                 </div>
                 <div class="mb-2">
                     <span class="text-secondary small fw-semibold d-block">Phone</span>
-                    <span class="text-white-50">{{ purchase.supplier.phone|default:"N/A" }}</span>
+                    <span class="text-secondary">{{ purchase.supplier.phone|default:"N/A" }}</span>
                 </div>
                 <div class="mb-2">
                     <span class="text-secondary small fw-semibold d-block">Email</span>
-                    <span class="text-white-50">{{ purchase.supplier.email|default:"N/A" }}</span>
+                    <span class="text-secondary">{{ purchase.supplier.email|default:"N/A" }}</span>
                 </div>
                 <div>
                     <span class="text-secondary small fw-semibold d-block">Address</span>
-                    <span class="text-white-50 text-wrap">{{ purchase.supplier.address|default:"N/A" }}</span>
+                    <span class="text-secondary text-wrap">{{ purchase.supplier.address|default:"N/A" }}</span>
                 </div>
             </div>
         </div>
@@ -99,12 +99,12 @@
 
     <!-- Right Column: Purchase Items Table -->
     <div class="col-lg-8 mb-4">
-        <div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
-            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+        <div class="card" >
+            <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
                 Purchase Items List
             </div>
             <div class="table-responsive">
-                <table class="table table-hover table-dark align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
+                <table class="table table-hover align-middle mb-0" style="--bs-table-bg: transparent; border-collapse: collapse;">
                     <thead>
                         <tr style="border-bottom: 1px solid var(--border-color);">
                             <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Medicine</th>
@@ -118,7 +118,7 @@
                     <tbody>
                         {% for item in purchase.items.all %}
                             <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td class="py-3 px-4 fw-semibold text-white">
+                                <td class="py-3 px-4 fw-semibold text-dark">
                                     {{ item.medicine.name }}
                                 </td>
                                 <td class="py-3 px-4 font-monospace text-secondary" style="font-size: 0.9rem;">
@@ -127,14 +127,14 @@
                                 <td class="py-3 px-4 text-center small text-secondary">
                                     {{ item.expiry_date|date:"Y-m-d" }}
                                 </td>
-                                <td class="py-3 px-4 text-end text-white">
+                                <td class="py-3 px-4 text-end text-dark">
                                     {{ item.quantity }}
                                 </td>
                                 <td class="py-3 px-4 text-end text-success">
-                                    ${{ item.unit_cost }}
+                                    Nrs. {{ item.unit_cost }}
                                 </td>
                                 <td class="py-3 px-4 text-end text-success fw-bold">
-                                    ${{ item.total_cost }}
+                                    Nrs. {{ item.total_cost }}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -144,7 +144,7 @@
                                 Purchase Grand Total:
                             </td>
                             <td colspan="2" class="py-3 px-4 text-end text-success fs-5 fw-bold">
-                                ${{ purchase.total_amount }}
+                                Nrs. {{ purchase.total_amount }}
                             </td>
                         </tr>
                     </tbody>

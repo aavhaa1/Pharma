@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% block title %}Revenue Report | PharmaCare{% endblock %}
 
 {% block content %}
@@ -8,7 +8,7 @@
         <p class="text-muted mb-0">Revenue analytics with period-wise breakdown and Chart.js visualizations.</p>
     </div>
     <div class="col-md-4 text-md-end mt-3 mt-md-0">
-        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+        <a href="{% url 'reports_home' %}" class="btn btn-outline-secondary btn-sm"> Dashboard</a>
     </div>
 </div>
 
@@ -18,7 +18,7 @@
         <div class="card text-center h-100" style="background: linear-gradient(135deg, rgba(13,110,253,0.15), rgba(13,110,253,0.05)); border: 1px solid rgba(13,110,253,0.4);">
             <div class="card-body py-4">
                 <p class="text-secondary small fw-semibold mb-1">Today's Revenue</p>
-                <h3 class="text-white fw-bold mb-2">${{ daily_revenue|floatformat:2 }}</h3>
+                <h3 class="text-white fw-bold mb-2">Nrs. {{ daily_revenue|floatformat:2 }}</h3>
                 <span class="text-primary small">Daily</span>
             </div>
         </div>
@@ -27,7 +27,7 @@
         <div class="card text-center h-100" style="background: linear-gradient(135deg, rgba(25,135,84,0.15), rgba(25,135,84,0.05)); border: 1px solid rgba(25,135,84,0.4);">
             <div class="card-body py-4">
                 <p class="text-secondary small fw-semibold mb-1">Weekly Revenue</p>
-                <h3 class="text-white fw-bold mb-2">${{ weekly_revenue|floatformat:2 }}</h3>
+                <h3 class="text-white fw-bold mb-2">Nrs. {{ weekly_revenue|floatformat:2 }}</h3>
                 <span class="text-success small">Last 7 Days</span>
             </div>
         </div>
@@ -36,7 +36,7 @@
         <div class="card text-center h-100" style="background: linear-gradient(135deg, rgba(111,66,193,0.15), rgba(111,66,193,0.05)); border: 1px solid rgba(111,66,193,0.4);">
             <div class="card-body py-4">
                 <p class="text-secondary small fw-semibold mb-1">Monthly Revenue</p>
-                <h3 class="text-white fw-bold mb-2">${{ monthly_revenue|floatformat:2 }}</h3>
+                <h3 class="text-white fw-bold mb-2">Nrs. {{ monthly_revenue|floatformat:2 }}</h3>
                 <span style="color: #9a6edf;" class="small">Last 30 Days</span>
             </div>
         </div>
@@ -45,7 +45,7 @@
         <div class="card text-center h-100" style="background: linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,193,7,0.05)); border: 1px solid rgba(255,193,7,0.4);">
             <div class="card-body py-4">
                 <p class="text-secondary small fw-semibold mb-1">Yearly Revenue</p>
-                <h3 class="text-white fw-bold mb-2">${{ yearly_revenue|floatformat:2 }}</h3>
+                <h3 class="text-white fw-bold mb-2">Nrs. {{ yearly_revenue|floatformat:2 }}</h3>
                 <span class="text-warning small">Last 365 Days</span>
             </div>
         </div>
@@ -56,8 +56,8 @@
 <div class="row g-4">
     <!-- Monthly Sales Count Chart -->
     <div class="col-md-6">
-        <div class="card" style="background: rgba(24,24,27,0.45); border: 1px solid var(--border-color);">
-            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+        <div class="card" >
+            <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
                 Monthly Sales Count ({% now "Y" %})
             </div>
             <div class="card-body">
@@ -68,9 +68,9 @@
 
     <!-- Monthly Revenue Chart -->
     <div class="col-md-6">
-        <div class="card" style="background: rgba(24,24,27,0.45); border: 1px solid var(--border-color);">
-            <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
-                Monthly Revenue ($) ({% now "Y" %})
+        <div class="card" >
+            <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+                Monthly Revenue (Nrs.) ({% now "Y" %})
             </div>
             <div class="card-body">
                 <canvas id="monthlyRevenueChart" height="200"></canvas>
@@ -100,8 +100,8 @@ new Chart(document.getElementById('monthlySalesChart'), {
         datasets: [{
             label: 'Number of Sales',
             data: salesData,
-            backgroundColor: 'rgba(13, 110, 253, 0.6)',
-            borderColor: 'rgba(13, 110, 253, 1)',
+            backgroundColor: 'rgba(37, 99, 235, 0.65)',
+            borderColor: '#2563EB',
             borderWidth: 1,
             borderRadius: 4,
         }]
@@ -111,14 +111,14 @@ new Chart(document.getElementById('monthlySalesChart'), {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.85)',
+                backgroundColor: '#FFFFFF',
                 titleColor: '#fff',
                 bodyColor: '#a1a1aa',
             }
         },
         scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true, ticks: { precision: 0 } }
+            x: { grid: { color: '#F1F5F9' } },
+            y: { grid: { color: '#F1F5F9' }, beginAtZero: true, ticks: { precision: 0 } }
         }
     }
 });
@@ -129,14 +129,14 @@ new Chart(document.getElementById('monthlyRevenueChart'), {
     data: {
         labels: labels,
         datasets: [{
-            label: 'Revenue ($)',
+            label: 'Revenue (Nrs.)',
             data: revenueData,
-            backgroundColor: 'rgba(25, 135, 84, 0.15)',
-            borderColor: 'rgba(25, 135, 84, 1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            borderColor: '#10B981',
             borderWidth: 2,
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: 'rgba(25, 135, 84, 1)',
+            pointBackgroundColor: '#10B981',
             pointRadius: 4,
         }]
     },
@@ -145,17 +145,17 @@ new Chart(document.getElementById('monthlyRevenueChart'), {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.85)',
+                backgroundColor: '#FFFFFF',
                 titleColor: '#fff',
                 bodyColor: '#a1a1aa',
                 callbacks: {
-                    label: ctx => `$${ctx.parsed.y.toFixed(2)}`
+                    label: ctx => `Nrs. ${ctx.parsed.y.toFixed(2)}`
                 }
             }
         },
         scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true, ticks: { callback: val => '$' + val } }
+            x: { grid: { color: '#F1F5F9' } },
+            y: { grid: { color: '#F1F5F9' }, beginAtZero: true, ticks: { callback: val => 'Nrs. ' + val } }
         }
     }
 });

@@ -146,3 +146,28 @@ class Medicine(models.Model):
     def profit_margin(self):
         """Returns the profit per unit in Rs."""
         return self.selling_price - self.purchase_price
+
+    @property
+    def available_stock(self):
+        if hasattr(self, '_available_stock'):
+            return self._available_stock
+        from django.utils import timezone
+        from django.db.models import Sum
+        today = timezone.now().date()
+        return self.inventory_batches.filter(
+            expiry_date__gte=today
+        ).aggregate(total=Sum('quantity'))['total'] or 0
+
+    @available_stock.setter
+    def available_stock(self, value):
+        self._available_stock = value
+
+    @property
+    def is_out_of_stock(self):
+        return self.available_stock == 0
+
+    @property
+    def is_low_stock(self):
+        available = self.available_stock
+        return 0 < available <= self.minimum_stock_level
+

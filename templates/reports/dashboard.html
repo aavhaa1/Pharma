@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Reports Dashboard | PharmaCare{% endblock %}
 
@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<!-- 📊 Summary Cards Grid -->
+<!--  Summary Cards Grid -->
 <div class="row g-3 mb-4">
 
     <!-- Today's Sales -->
@@ -21,9 +21,9 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <p class="text-secondary small fw-semibold mb-1">Sales Today</p>
-                            <h3 class="text-white fw-bold mb-0">${{ total_sales_today|floatformat:2 }}</h3>
+                            <h3 class="text-white fw-bold mb-0">Nrs. {{ total_sales_today|floatformat:2 }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">💰</span>
+                        <span style="font-size: 2rem;"><i class="bi bi-currency-exchange text-success"></i></span>
                     </div>
                 </div>
             </div>
@@ -38,9 +38,9 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <p class="text-secondary small fw-semibold mb-1">Sales This Month</p>
-                            <h3 class="text-white fw-bold mb-0">${{ total_sales_month|floatformat:2 }}</h3>
+                            <h3 class="text-white fw-bold mb-0">Nrs. {{ total_sales_month|floatformat:2 }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">📈</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                 </div>
             </div>
@@ -55,9 +55,9 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <p class="text-secondary small fw-semibold mb-1">Monthly Revenue</p>
-                            <h3 class="text-white fw-bold mb-0">${{ monthly_revenue|floatformat:2 }}</h3>
+                            <h3 class="text-white fw-bold mb-0">Nrs. {{ monthly_revenue|floatformat:2 }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">📊</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                 </div>
             </div>
@@ -72,9 +72,9 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <p class="text-secondary small fw-semibold mb-1">Total Purchases</p>
-                            <h3 class="text-white fw-bold mb-0">${{ total_purchases|floatformat:2 }}</h3>
+                            <h3 class="text-white fw-bold mb-0">Nrs. {{ total_purchases|floatformat:2 }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">🛒</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                 </div>
             </div>
@@ -91,7 +91,7 @@
                             <p class="text-secondary small fw-semibold mb-1">Active Medicines</p>
                             <h3 class="text-white fw-bold mb-0">{{ total_medicines }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">💊</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                             <p class="text-secondary small fw-semibold mb-1">Active Suppliers</p>
                             <h3 class="text-white fw-bold mb-0">{{ total_suppliers }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">🤝</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                 </div>
             </div>
@@ -123,9 +123,9 @@
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
                             <p class="text-secondary small fw-semibold mb-1">Inventory Value</p>
-                            <h3 class="text-white fw-bold mb-0">${{ inventory_value|floatformat:2 }}</h3>
+                            <h3 class="text-white fw-bold mb-0">Nrs. {{ inventory_value|floatformat:2 }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">📦</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                             <p class="text-secondary small fw-semibold mb-1">Low Stock Medicines</p>
                             <h3 class="text-warning fw-bold mb-0">{{ low_stock_medicines_count }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">⚠️</span>
+                        <span style="font-size: 2rem;"> ï¸</span>
                     </div>
                 </div>
             </div>
@@ -159,7 +159,7 @@
                             <p class="text-secondary small fw-semibold mb-1">Expired Batches</p>
                             <h3 class="text-danger fw-bold mb-0">{{ expired_medicines_count }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">🚫</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                 </div>
             </div>
@@ -176,7 +176,7 @@
                             <p class="text-secondary small fw-semibold mb-1">Expiring in 30 Days</p>
                             <h3 class="text-warning fw-bold mb-0">{{ expiring_soon_count }}</h3>
                         </div>
-                        <span style="font-size: 2rem;">⏰</span>
+                        <span style="font-size: 2rem;"></span>
                     </div>
                 </div>
             </div>
@@ -185,8 +185,8 @@
 </div>
 
 <!-- Quick Links -->
-<div class="card" style="background: rgba(24, 24, 27, 0.3); border: 1px solid var(--border-color);">
-    <div class="card-header fw-bold text-white py-3" style="border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.2);">
+<div class="card" >
+    <div class="card-header fw-bold text-dark py-3" style="border-bottom: 1px solid var(--border-color); background: #F8FAFC;">
         Detailed Reports
     </div>
     <div class="card-body">
@@ -194,14 +194,14 @@
             {% url 'reports_sales' as url_sales %}{% url 'reports_purchases' as url_purchases %}{% url 'reports_inventory' as url_inventory %}{% url 'reports_medicines' as url_medicines %}{% url 'reports_suppliers' as url_suppliers %}{% url 'reports_low_stock' as url_low_stock %}{% url 'reports_expiry' as url_expiry %}{% url 'reports_revenue' as url_revenue %}
             {% for name, url, icon in reports_list %}
             {% endfor %}
-            <div class="col-md-3"><a href="{{ url_sales }}" class="btn btn-outline-primary w-100 py-2">📈 Sales Report</a></div>
-            <div class="col-md-3"><a href="{{ url_purchases }}" class="btn btn-outline-warning w-100 py-2">🛒 Purchase Report</a></div>
-            <div class="col-md-3"><a href="{{ url_inventory }}" class="btn btn-outline-success w-100 py-2">📦 Inventory Report</a></div>
-            <div class="col-md-3"><a href="{{ url_medicines }}" class="btn btn-outline-info w-100 py-2">💊 Medicine Report</a></div>
-            <div class="col-md-3"><a href="{{ url_suppliers }}" class="btn btn-outline-secondary w-100 py-2">🤝 Supplier Report</a></div>
-            <div class="col-md-3"><a href="{{ url_low_stock }}" class="btn btn-outline-warning w-100 py-2">⚠️ Low Stock Report</a></div>
-            <div class="col-md-3"><a href="{{ url_expiry }}" class="btn btn-outline-danger w-100 py-2">⏰ Expiry Report</a></div>
-            <div class="col-md-3"><a href="{{ url_revenue }}" class="btn btn-outline-light w-100 py-2">💹 Revenue Report</a></div>
+            <div class="col-md-3"><a href="{{ url_sales }}" class="btn btn-outline-primary w-100 py-2"> Sales Report</a></div>
+            <div class="col-md-3"><a href="{{ url_purchases }}" class="btn btn-outline-warning w-100 py-2"> Purchase Report</a></div>
+            <div class="col-md-3"><a href="{{ url_inventory }}" class="btn btn-outline-success w-100 py-2"> Inventory Report</a></div>
+            <div class="col-md-3"><a href="{{ url_medicines }}" class="btn btn-outline-info w-100 py-2"> Medicine Report</a></div>
+            <div class="col-md-3"><a href="{{ url_suppliers }}" class="btn btn-outline-secondary w-100 py-2"> Supplier Report</a></div>
+            <div class="col-md-3"><a href="{{ url_low_stock }}" class="btn btn-outline-warning w-100 py-2"> ï¸ Low Stock Report</a></div>
+            <div class="col-md-3"><a href="{{ url_expiry }}" class="btn btn-outline-danger w-100 py-2"> Expiry Report</a></div>
+            <div class="col-md-3"><a href="{{ url_revenue }}" class="btn btn-outline-light w-100 py-2"> Revenue Report</a></div>
         </div>
     </div>
 </div>

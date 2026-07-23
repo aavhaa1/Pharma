@@ -1,4 +1,4 @@
-{% extends "cashier/base_cashier.html" %}
+﻿{% extends "cashier/base_cashier.html" %}
 
 {% block title %}Sales Report | PharmaCare{% endblock %}
 {% block page_title %}Detailed Sales Report{% endblock %}
@@ -6,8 +6,7 @@
 {% block content %}
 <style>
     .metric-box {
-        background: rgba(24, 24, 27, 0.55);
-        border: 1px solid rgba(255,255,255,0.07);
+        background: #FFFFFF;
         border-radius: 12px;
         padding: 1.2rem;
     }
@@ -23,7 +22,6 @@
     .metric-value {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #fafafa;
         font-family: var(--font-heading);
     }
 </style>
@@ -40,8 +38,8 @@
     </div>
 </div>
 
-<!-- 🔍 Filters Card -->
-<div class="card mb-4" style="background: rgba(24, 24, 27, 0.45);">
+<!--  Filters Card -->
+<div class="card mb-4" >
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-end">
             <!-- Invoice number -->
@@ -83,12 +81,12 @@
     </div>
 </div>
 
-<!-- 📊 Filtered Metrics Overview -->
+<!--  Filtered Metrics Overview -->
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="metric-box border-success" style="border-left: 4px solid #22c55e;">
             <div class="metric-label">Filtered Revenue</div>
-            <div class="metric-value text-success">${{ total_revenue|floatformat:2 }}</div>
+            <div class="metric-value text-success">Nrs. {{ total_revenue|floatformat:2 }}</div>
         </div>
     </div>
     <div class="col-md-4">
@@ -100,16 +98,16 @@
     <div class="col-md-4">
         <div class="metric-box border-warning" style="border-left: 4px solid #eab308;">
             <div class="metric-label">Avg. Transaction Value</div>
-            <div class="metric-value" style="color: #facc15;">${{ avg_sale_value|floatformat:2 }}</div>
+            <div class="metric-value" style="color: #facc15;">Nrs. {{ avg_sale_value|floatformat:2 }}</div>
         </div>
     </div>
 </div>
 
-<!-- 📋 Sales Table -->
+<!--  Sales Table -->
 <div class="card">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-dark table-hover mb-0" style="background: transparent; color: #fafafa;">
+            <table class="table table-hover mb-0" style="background: transparent;">
                 <thead>
                     <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
                         <th class="py-3 px-4" style="color: #ffffff !important; font-family: var(--font-heading); font-size: 0.85rem; text-transform: uppercase;">Date</th>
@@ -129,17 +127,17 @@
                             <td class="py-3 px-4 fw-semibold font-monospace text-white">{{ sale.invoice_number }}</td>
                             <td class="py-3 px-4 text-muted" style="color: #ffffff !important; opacity: 0.7;">{{ sale.customer_name|default:"Walk-in Customer" }}</td>
                             <td class="py-3 px-4 text-center">
-                                <span class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-primary); border: 1px solid var(--border-color);">{{ sale.payment_method }}</span>
+                                <span class="badge" style="background: #E2E8F0; color: var(--text-primary); border: 1px solid var(--border-color);">{{ sale.payment_method }}</span>
                             </td>
-                            <td class="py-3 px-4 text-end text-muted font-monospace" style="color: #ffffff !important; opacity: 0.7;">${{ sale.subtotal }}</td>
+                            <td class="py-3 px-4 text-end text-muted font-monospace" style="color: #ffffff !important; opacity: 0.7;">Nrs. {{ sale.subtotal }}</td>
                             <td class="py-3 px-4 text-end text-muted font-monospace" style="color: #ffffff !important; opacity: 0.7;">
                                 {% if sale.tax or sale.discount %}
-                                    <span style="font-size: 0.78rem;">+${{ sale.tax }} / -${{ sale.discount }}</span>
+                                    <span style="font-size: 0.78rem;">+Nrs. {{ sale.tax }} / -Nrs. {{ sale.discount }}</span>
                                 {% else %}
                                     <span class="opacity-30">—</span>
                                 {% endif %}
                             </td>
-                            <td class="py-3 px-4 text-end fw-bold text-success font-monospace">${{ sale.total_amount }}</td>
+                            <td class="py-3 px-4 text-end fw-bold text-success font-monospace">Nrs. {{ sale.total_amount }}</td>
                             <td class="py-3 px-4 text-end">
                                 <a href="{% url 'cashier:cashier_sale_detail' sale.pk %}" class="btn btn-light btn-sm py-1 px-2" style="font-size: 0.8rem;">View</a>
                                 <a href="{% url 'cashier:cashier_invoice' sale.pk %}" target="_blank" class="btn btn-outline-secondary btn-sm py-1 px-2" style="border-color: rgba(255,255,255,0.15); font-size: 0.8rem;">
@@ -163,7 +161,7 @@
     </div>
 </div>
 
-<!-- 📑 Pagination -->
+<!--  Pagination -->
 {% if is_paginated %}
     <div class="d-flex justify-content-between align-items-center mt-4">
         <div class="text-secondary small" style="color: #ffffff !important; opacity: 0.7;">
@@ -174,13 +172,13 @@
                 <!-- Previous Button -->
                 {% if page_obj.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&start_date={{ request.GET.start_date|urlencode }}&end_date={{ request.GET.end_date|urlencode }}&payment_method={{ request.GET.payment_method|urlencode }}&invoice_number={{ request.GET.invoice_number|urlencode }}" aria-label="Previous" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&start_date={{ request.GET.start_date|urlencode }}&end_date={{ request.GET.end_date|urlencode }}&payment_method={{ request.GET.payment_method|urlencode }}&invoice_number={{ request.GET.invoice_number|urlencode }}" aria-label="Previous" >
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                 {% else %}
                     <li class="page-item disabled">
-                        <span class="page-link" style="background: rgba(24, 24, 27, 0.3); border-color: var(--border-color); color: var(--text-secondary);">&laquo;</span>
+                        <span class="page-link" >&laquo;</span>
                     </li>
                 {% endif %}
 
@@ -192,7 +190,7 @@
                         </li>
                     {% elif page_num > page_obj.number|add:"-3" and page_num < page_obj.number|add:"3" %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_num }}&start_date={{ request.GET.start_date|urlencode }}&end_date={{ request.GET.end_date|urlencode }}&payment_method={{ request.GET.payment_method|urlencode }}&invoice_number={{ request.GET.invoice_number|urlencode }}" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">{{ page_num }}</a>
+                            <a class="page-link" href="?page={{ page_num }}&start_date={{ request.GET.start_date|urlencode }}&end_date={{ request.GET.end_date|urlencode }}&payment_method={{ request.GET.payment_method|urlencode }}&invoice_number={{ request.GET.invoice_number|urlencode }}" >{{ page_num }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
@@ -200,13 +198,13 @@
                 <!-- Next Button -->
                 {% if page_obj.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}&start_date={{ request.GET.start_date|urlencode }}&end_date={{ request.GET.end_date|urlencode }}&payment_method={{ request.GET.payment_method|urlencode }}&invoice_number={{ request.GET.invoice_number|urlencode }}" aria-label="Next" style="background: rgba(24, 24, 27, 0.7); border-color: var(--border-color); color: var(--text-primary);">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}&start_date={{ request.GET.start_date|urlencode }}&end_date={{ request.GET.end_date|urlencode }}&payment_method={{ request.GET.payment_method|urlencode }}&invoice_number={{ request.GET.invoice_number|urlencode }}" aria-label="Next" >
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                 {% else %}
                     <li class="page-item disabled">
-                        <span class="page-link" style="background: rgba(24, 24, 27, 0.3); border-color: var(--border-color); color: var(--text-secondary);">&raquo;</span>
+                        <span class="page-link" >&raquo;</span>
                     </li>
                 {% endif %}
             </ul>

@@ -1,4 +1,4 @@
-{% extends "cashier/base_cashier.html" %}
+﻿{% extends "cashier/base_cashier.html" %}
 
 {% block title %}Sales History | PharmaCare{% endblock %}
 {% block page_title %}Sales History{% endblock %}
@@ -7,37 +7,36 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h1 class="dashboard-title mb-1">Sales History</h1>
-        <p style="color: #71717a; font-size: 0.88rem;">All completed transactions processed by you. View or print any invoice.</p>
+        <p style="color: #64748B; font-size: 0.88rem;">All completed transactions processed by you. View or print any invoice.</p>
     </div>
     <a href="{% url 'cashier:cashier_pos' %}" class="btn btn-success btn-sm">
         <i class="bi bi-plus-lg me-1"></i>New Sale
     </a>
 </div>
 
-<!-- ── Filter Bar ──────────────────────────────────────────────── -->
-<div class="card mb-4" style="background: rgba(14,14,16,0.7); border: 1px solid rgba(255,255,255,0.08);">
+<!--  Filter Bar  -->
+<div class="card mb-4" >
     <div class="card-body py-3">
         <form method="get" class="row g-2 align-items-end" id="history-filter-form">
             <div class="col-md-4">
-                <label class="form-label small fw-semibold" style="color: #71717a; font-family: var(--font-heading); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em;">Search</label>
+                <label class="form-label small fw-semibold" style="color: #64748B; font-family: var(--font-heading); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em;">Search</label>
                 <div class="input-group input-group-sm">
-                    <span class="input-group-text" style="background: rgba(9,9,11,0.8); border-color: rgba(255,255,255,0.1); color: #71717a;"><i class="bi bi-search"></i></span>
+                    <span class="input-group-text" ><i class="bi bi-search"></i></span>
                     <input type="text" name="q" value="{{ request.GET.q }}"
                            class="form-control form-control-sm"
-                           style="background: rgba(9,9,11,0.8); border-color: rgba(255,255,255,0.1); color: #fafafa;"
                            placeholder="Invoice # or customer name...">
                 </div>
             </div>
             <div class="col-md-3">
-                <label class="form-label small fw-semibold" style="color: #71717a; font-family: var(--font-heading); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em;">Date</label>
+                <label class="form-label small fw-semibold" style="color: #64748B; font-family: var(--font-heading); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em;">Date</label>
                 <input type="date" name="date" value="{{ request.GET.date }}"
                        class="form-control form-control-sm"
-                       style="background: rgba(9,9,11,0.8); border-color: rgba(255,255,255,0.1); color: #fafafa;">
+                       >
             </div>
             <div class="col-md-3">
-                <label class="form-label small fw-semibold" style="color: #71717a; font-family: var(--font-heading); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em;">Payment Method</label>
+                <label class="form-label small fw-semibold" style="color: #64748B; font-family: var(--font-heading); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em;">Payment Method</label>
                 <select name="payment_method" class="form-select form-select-sm"
-                        style="background: rgba(9,9,11,0.8); border-color: rgba(255,255,255,0.1); color: #fafafa;">
+                        >
                     <option value="">All Methods</option>
                     <option value="Cash" {% if request.GET.payment_method == 'Cash' %}selected{% endif %}>Cash</option>
                     <option value="Card" {% if request.GET.payment_method == 'Card' %}selected{% endif %}>Card</option>
@@ -52,10 +51,10 @@
     </div>
 </div>
 
-<!-- ── Sales Table ─────────────────────────────────────────────── -->
-<div class="card" style="background: rgba(14,14,16,0.7); border: 1px solid rgba(255,255,255,0.08);">
+<!--  Sales Table  -->
+<div class="card" >
     <div class="table-responsive">
-        <table class="table table-dark align-middle mb-0" style="--bs-table-bg: transparent;">
+        <table class="table align-middle mb-0" style="--bs-table-bg: transparent;">
             <thead>
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
                     <th class="py-3 px-4" style="color: #52525b; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-family: var(--font-heading);">Invoice No.</th>
@@ -76,9 +75,9 @@
                         <span class="font-monospace fw-semibold text-white" style="font-size: 0.85rem;">{{ sale.invoice_number }}</span>
                     </td>
                     <td class="py-3 px-4">
-                        <span class="text-white fw-medium" style="font-size: 0.88rem;">{{ sale.customer_name|default:"Walk-in Customer" }}</span>
+                        <span class="text-dark fw-medium" style="font-size: 0.88rem;">{{ sale.customer_name|default:"Walk-in Customer" }}</span>
                     </td>
-                    <td class="py-3 px-4 text-center" style="color: #71717a; font-size: 0.82rem;">
+                    <td class="py-3 px-4 text-center" style="color: #64748B; font-size: 0.82rem;">
                         {{ sale.sale_date|date:"M j, Y" }}
                     </td>
                     <td class="py-3 px-4 text-center">
@@ -102,7 +101,7 @@
                         </span>
                     </td>
                     <td class="py-3 px-4 text-end">
-                        <span class="fw-bold text-success" style="font-size: 0.92rem; font-family: var(--font-heading);">${{ sale.total_amount }}</span>
+                        <span class="fw-bold text-success" style="font-size: 0.92rem; font-family: var(--font-heading);">Nrs. {{ sale.total_amount }}</span>
                     </td>
                     <td class="py-3 px-4 text-end">
                         <div class="d-flex gap-1 justify-content-end">
@@ -141,14 +140,13 @@
     <!-- Pagination -->
     {% if is_paginated %}
     <div class="card-footer d-flex justify-content-between align-items-center py-3"
-         style="background: rgba(0,0,0,0.15); border-top: 1px solid rgba(255,255,255,0.07);">
-        <span style="color: #71717a; font-size: 0.8rem;">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        >
+        <span style="color: #64748B; font-size: 0.8rem;">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
         <nav>
             <ul class="pagination pagination-sm mb-0 gap-1">
                 {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" style="background: rgba(24,24,27,0.8); border-color: rgba(255,255,255,0.1); color: #a1a1aa;"
-                       href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                 </li>
@@ -158,8 +156,7 @@
                 </li>
                 {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" style="background: rgba(24,24,27,0.8); border-color: rgba(255,255,255,0.1); color: #a1a1aa;"
-                       href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.payment_method %}&payment_method={{ request.GET.payment_method }}{% endif %}">
                         <i class="bi bi-chevron-right"></i>
                     </a>
                 </li>

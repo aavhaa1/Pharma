@@ -60,7 +60,11 @@ class InventoryListView(LoginRequiredMixin, ListView):
         elif status_filter == "expiring_soon":
             queryset = queryset.filter(expiry_date__gte=today, expiry_date__lte=today + timedelta(days=30))
         elif status_filter == "low_stock":
-            queryset = queryset.filter(quantity__lte=F('medicine__minimum_stock_level'))
+            queryset = queryset.filter(
+                quantity__lte=F('medicine__minimum_stock_level'),
+                quantity__gt=0,
+                expiry_date__gte=today
+            )
         elif status_filter == "normal":
             queryset = queryset.filter(
                 expiry_date__gt=today + timedelta(days=30),
