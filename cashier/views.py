@@ -122,7 +122,7 @@ class CashierDashboardView(CashierRequiredMixin, TemplateView):
         context['low_stock_items'] = Inventory.objects.select_related(
             'medicine'
         ).filter(
-            quantity__lte=F('medicine__minimum_stock_level'),
+            quantity__lt=50,
             quantity__gt=0,
             expiry_date__gte=today
         ).order_by('quantity')[:8]

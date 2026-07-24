@@ -49,7 +49,7 @@ def home(request):
 
     # Stock alerts
     low_stock_medicines = Inventory.objects.select_related('medicine').filter(
-        quantity__lte=F('medicine__minimum_stock_level'),
+        quantity__lt=50,
         quantity__gt=0,
         expiry_date__gte=today
     ).order_by('quantity')[:6]
@@ -100,7 +100,7 @@ def home(request):
         )
     ).filter(
         total_stock__gt=0,
-        total_stock__lte=F('minimum_stock_level'),
+        total_stock__lt=50,
         is_active=True
     ).count()
 

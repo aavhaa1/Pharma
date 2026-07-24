@@ -122,8 +122,8 @@ def get_filtered_data(report_type, params):
                 Sum('inventory_batches__quantity', filter=Q(inventory_batches__expiry_date__gte=today)),
                 0
             )
-        ).filter(total_stock__lte=F('minimum_stock_level'), is_active=True).annotate(
-            shortage=F('minimum_stock_level') - F('total_stock')
+        ).filter(total_stock__lt=50, total_stock__gt=0, is_active=True).annotate(
+            shortage=50 - F('total_stock')
         )
         return queryset
 

@@ -78,14 +78,60 @@
                             {% endif %}
                         </div>
                         <div class="col-md-6">
-                            <label for="{{ form.unit.id_for_label }}">{{ form.unit.label }}</label>
-                            {{ form.unit }}
-                            {% if form.unit.help_text %}
-                                <div class="form-text text-secondary">{{ form.unit.help_text }}</div>
+                            <label for="{{ form.sellable_unit.id_for_label }}">{{ form.sellable_unit.label }}</label>
+                            {{ form.sellable_unit }}
+                            {% if form.sellable_unit.help_text %}
+                                <div class="form-text text-secondary">{{ form.sellable_unit.help_text }}</div>
                             {% endif %}
-                            {% if form.unit.errors %}
+                            {% if form.sellable_unit.errors %}
                                 <div class="text-danger small mt-1">
-                                    {% for error in form.unit.errors %}
+                                    {% for error in form.sellable_unit.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Row 2.5: Packaging & Stock -->
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <label for="{{ form.purchase_package_type.id_for_label }}">{{ form.purchase_package_type.label }}</label>
+                            {{ form.purchase_package_type }}
+                            {% if form.purchase_package_type.help_text %}
+                                <div class="form-text text-secondary">{{ form.purchase_package_type.help_text }}</div>
+                            {% endif %}
+                            {% if form.purchase_package_type.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.purchase_package_type.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <label for="{{ form.units_per_package.id_for_label }}">{{ form.units_per_package.label }}</label>
+                            {{ form.units_per_package }}
+                            {% if form.units_per_package.help_text %}
+                                <div class="form-text text-secondary">{{ form.units_per_package.help_text }}</div>
+                            {% endif %}
+                            {% if form.units_per_package.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.units_per_package.errors %}
+                                        ● {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label for="{{ form.minimum_stock_level.id_for_label }}">{{ form.minimum_stock_level.label }}</label>
+                            {{ form.minimum_stock_level }}
+                            {% if form.minimum_stock_level.help_text %}
+                                <div class="form-text text-secondary">{{ form.minimum_stock_level.help_text }}</div>
+                            {% endif %}
+                            {% if form.minimum_stock_level.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.minimum_stock_level.errors %}
                                         ● {{ error }}
                                     {% endfor %}
                                 </div>

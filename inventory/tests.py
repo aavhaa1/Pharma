@@ -35,7 +35,9 @@ class InventoryTestCase(TestCase):
             name="Amoxicillin",
             brand="Amoxil",
             category=self.category,
-            unit="capsule",
+            purchase_package_type='Box',
+            units_per_package=10,
+            sellable_unit='tablet',
             requires_prescription=True,
             purchase_price=10.00,
             selling_price=15.00,
@@ -246,16 +248,16 @@ class InventoryTestCase(TestCase):
         self.assertTrue(self.medicine.is_low_stock)
         self.assertTrue(low_stock_batch.is_low_stock)
 
-        # Create another unexpired batch (quantity = 10)
-        # Total unexpired stock = 5 + 10 = 15 > minimum_stock_level of 10.
-        # So the medicine overall is no longer low stock, even though low_stock_batch itself has 5 units.
+        # Create another unexpired batch (quantity = 50)
+        # Total unexpired stock = 5 + 50 = 55 >= 50 threshold.
+        # So the medicine overall is no longer low stock.
         normal_batch = Inventory.objects.create(
             medicine=self.medicine,
             batch_no="BATCH-NORM",
             expiry_date=tomorrow,
-            quantity=10
+            quantity=50
         )
-        self.assertEqual(self.medicine.available_stock, 15)
+        self.assertEqual(self.medicine.available_stock, 55)
         self.assertFalse(self.medicine.is_out_of_stock)
         self.assertFalse(self.medicine.is_low_stock)
 

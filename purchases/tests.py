@@ -65,6 +65,8 @@ class PurchaseModuleTestCase(TestCase):
             'items-0-batch_no': 'B-999',
             'items-0-expiry_date': '2027-12-31',
             'items-0-quantity': '50',
+            'items-0-package_type': 'Box',
+            'items-0-units_per_package': '1',
             'items-0-unit_cost': '2.50',
         }
         

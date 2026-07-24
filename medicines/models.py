@@ -191,5 +191,5 @@ class Medicine(models.Model):
     @property
     def is_low_stock(self):
         available = self.available_stock
-        return 0 < available <= self.minimum_stock_level
+        return 0 < available < 50
 
