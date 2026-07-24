@@ -65,6 +65,8 @@ class InventoryListView(LoginRequiredMixin, ListView):
                 quantity__gt=0,
                 expiry_date__gte=today
             )
+        elif status_filter == "out_of_stock":
+            queryset = queryset.filter(quantity=0)
         elif status_filter == "normal":
             queryset = queryset.filter(
                 expiry_date__gt=today + timedelta(days=30),

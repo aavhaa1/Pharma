@@ -25,13 +25,15 @@ class PurchaseForm(forms.ModelForm):
 class PurchaseItemForm(forms.ModelForm):
     class Meta:
         model = PurchaseItem
-        fields = ['medicine', 'batch_no', 'expiry_date', 'quantity', 'unit_cost']
+        fields = ['medicine', 'batch_no', 'expiry_date', 'quantity', 'package_type', 'units_per_package', 'unit_cost']
         widgets = {
-            'medicine': forms.Select(attrs={'class': 'form-select bg-dark text-white border-secondary medicine-select'}),
-            'batch_no': forms.TextInput(attrs={'class': 'form-control bg-dark text-white border-secondary', 'placeholder': 'Batch No'}),
-            'expiry_date': forms.DateInput(attrs={'class': 'form-control bg-dark text-white border-secondary', 'type': 'date'}),
-            'quantity': forms.NumberInput(attrs={'class': 'form-control bg-dark text-white border-secondary quantity-input', 'min': 1}),
-            'unit_cost': forms.NumberInput(attrs={'class': 'form-control bg-dark text-white border-secondary cost-input', 'min': 0.01, 'step': 0.01}),
+            'medicine': forms.Select(attrs={'class': 'form-select form-select-sm bg-dark text-white border-secondary medicine-select'}),
+            'batch_no': forms.TextInput(attrs={'class': 'form-control form-control-sm bg-dark text-white border-secondary', 'placeholder': 'Batch No'}),
+            'expiry_date': forms.DateInput(attrs={'class': 'form-control form-control-sm bg-dark text-white border-secondary', 'type': 'date'}),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control form-control-sm bg-dark text-white border-secondary quantity-input', 'min': 1}),
+            'package_type': forms.Select(choices=Medicine.PACKAGE_CHOICES, attrs={'class': 'form-select form-select-sm bg-dark text-white border-secondary package-type-input'}),
+            'units_per_package': forms.NumberInput(attrs={'class': 'form-control form-control-sm bg-dark text-white border-secondary units-per-package-input', 'min': 1}),
+            'unit_cost': forms.NumberInput(attrs={'class': 'form-control form-control-sm bg-dark text-white border-secondary cost-input', 'min': 0.00, 'step': 0.01}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -51,10 +53,16 @@ class PurchaseItemForm(forms.ModelForm):
             raise forms.ValidationError("Quantity must be greater than zero.")
         return quantity
 
+    def clean_units_per_package(self):
+        units = self.cleaned_data.get('units_per_package')
+        if units is not None and units <= 0:
+            raise forms.ValidationError("Units per Package must be greater than zero.")
+        return units
+
     def clean_unit_cost(self):
         unit_cost = self.cleaned_data.get('unit_cost')
-        if unit_cost is not None and unit_cost <= 0:
-            raise forms.ValidationError("Unit cost must be greater than zero.")
+        if unit_cost is not None and unit_cost < 0:
+            raise forms.ValidationError("Unit cost cannot be negative.")
         return unit_cost
 
 

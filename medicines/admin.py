@@ -20,20 +20,22 @@ class MedicineAdmin(admin.ModelAdmin):
         "name",
         "brand",
         "category",
-        "unit",
+        "purchase_package_type",
+        "units_per_package",
+        "sellable_unit",
         "purchase_price",
         "selling_price",
         "requires_prescription",
         "is_active",
     )
-    list_filter   = ("category", "unit", "requires_prescription", "is_active")
+    list_filter   = ("category", "purchase_package_type", "sellable_unit", "requires_prescription", "is_active")
     search_fields = ("name", "brand", "description")
     ordering      = ("name",)
     readonly_fields = ("created_at", "updated_at")
 
     fieldsets = (
         ("Basic Information", {
-            "fields": ("name", "brand", "category", "unit", "description")
+            "fields": ("name", "brand", "category", "purchase_package_type", "units_per_package", "sellable_unit", "description")
         }),
         ("Pricing", {
             "fields": ("purchase_price", "selling_price")

@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Shopping Cart | PharmaCare{% endblock %}
 
@@ -43,7 +43,7 @@
                             <tr style="border-bottom: 1px solid var(--border-color);">
                                 <td class="py-3 px-4 fw-semibold text-dark">
                                     {{ item.medicine.name }}
-                                    <span class="text-secondary small d-block">Brand: {{ item.medicine.brand|default:"Generic" }} ({{ item.medicine.get_unit_display }})</span>
+                                    <span class="text-secondary small d-block">Brand: {{ item.medicine.brand|default:"Generic" }} ({{ item.medicine.get_sellable_unit_display }})</span>
                                 </td>
                                 <td class="py-3 px-4 text-end text-success">
                                     Nrs. {{ item.medicine.selling_price }}

@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Batch Detail: {{ inventory.batch_no }} | PharmaCare{% endblock %}
 
@@ -28,7 +28,9 @@
                     </p>
                 </div>
                 <div class="text-end">
-                    {% if inventory.status == 'Expired' %}
+                    {% if inventory.status == 'Out of Stock' %}
+                        <span class="badge border px-3 py-1.5" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; border-color: rgba(220, 53, 69, 0.2) !important; font-size: 0.85rem;">Out of Stock</span>
+                    {% elif inventory.status == 'Expired' %}
                         <span class="badge border px-3 py-1.5" style="background: rgba(220, 53, 69, 0.25) !important; color: #ea868f !important; border-color: rgba(220, 53, 69, 0.4) !important; font-size: 0.85rem;">Expired</span>
                     {% elif inventory.status == 'Expiring Soon' %}
                         <span class="badge border px-3 py-1.5" style="background: rgba(253, 126, 20, 0.25) !important; color: #ffc107 !important; border-color: rgba(253, 126, 20, 0.4) !important; font-size: 0.85rem;">Expiring Soon</span>

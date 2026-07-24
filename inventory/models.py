@@ -61,8 +61,14 @@ class Inventory(models.Model):
 
 
     @property
+    def is_out_of_stock(self):
+        return self.quantity == 0
+
+    @property
     def status(self):
-        if self.is_expired:
+        if self.is_out_of_stock:
+            return "Out of Stock"
+        elif self.is_expired:
             return "Expired"
         elif self.is_expiring_soon:
             return "Expiring Soon"

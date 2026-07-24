@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Inventory Registry | PharmaCare{% endblock %}
 
@@ -6,6 +6,9 @@
 <style>
     .batch-row {
         border-bottom: 1px solid var(--border-color);
+    }
+    .batch-row-out-of-stock {
+        background: rgba(220, 53, 69, 0.05) !important;
     }
     .batch-row-expired {
         background: rgba(220, 53, 69, 0.12) !important;
@@ -61,6 +64,7 @@
                 <select id="status-select" name="status" class="form-select form-select-sm">
                     <option value="" {% if not selected_status %}selected{% endif %}>All Batches</option>
                     <option value="normal" {% if selected_status == "normal" %}selected{% endif %}>Normal</option>
+                    <option value="out_of_stock" {% if selected_status == "out_of_stock" %}selected{% endif %}>Out of Stock</option>
                     <option value="low_stock" {% if selected_status == "low_stock" %}selected{% endif %}>Low Stock</option>
                     <option value="expiring_soon" {% if selected_status == "expiring_soon" %}selected{% endif %}>Expiring Soon</option>
                     <option value="expired" {% if selected_status == "expired" %}selected{% endif %}>Expired</option>
@@ -96,7 +100,9 @@
                 <tbody>
                     {% for batch in inventory_list %}
                         <tr class="align-middle batch-row
-                            {% if batch.status == 'Expired' %}
+                            {% if batch.status == 'Out of Stock' %}
+                                batch-row-out-of-stock
+                            {% elif batch.status == 'Expired' %}
                                 batch-row-expired
                             {% elif batch.status == 'Expiring Soon' %}
                                 batch-row-expiring-soon
@@ -137,7 +143,9 @@
                             </td>
                             
                             <td class="py-3 px-4 text-center">
-                                {% if batch.status == 'Expired' %}
+                                {% if batch.status == 'Out of Stock' %}
+                                    <span class="badge border px-3 py-1.5" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; border-color: rgba(220, 53, 69, 0.2) !important;">Out of Stock</span>
+                                {% elif batch.status == 'Expired' %}
                                     <span class="badge border px-3 py-1.5" style="background: rgba(220, 53, 69, 0.25) !important; color: #ea868f !important; border-color: rgba(220, 53, 69, 0.4) !important;">Expired</span>
                                 {% elif batch.status == 'Expiring Soon' %}
                                     <span class="badge border px-3 py-1.5" style="background: rgba(253, 126, 20, 0.25) !important; color: #ffc107 !important; border-color: rgba(253, 126, 20, 0.4) !important;">Expiring Soon</span>

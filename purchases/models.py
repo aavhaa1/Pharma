@@ -37,11 +37,15 @@ class PurchaseItem(models.Model):
     batch_no = models.CharField(max_length=100)
     expiry_date = models.DateField()
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
-    unit_cost = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
+    package_type = models.CharField(max_length=50, default='Unit')
+    units_per_package = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+    total_units_received = models.PositiveIntegerField(default=0, help_text="Calculated as quantity * units_per_package")
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.00'))])
     total_cost = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
 
     def save(self, *args, **kwargs):
-        self.total_cost = Decimal(str(self.quantity)) * Decimal(str(self.unit_cost))
+        self.total_units_received = self.quantity * self.units_per_package
+        self.total_cost = Decimal(str(self.total_units_received)) * Decimal(str(self.unit_cost))
         super().save(*args, **kwargs)
 
     def __str__(self):

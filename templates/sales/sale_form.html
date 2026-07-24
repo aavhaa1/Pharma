@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}New Sale | PharmaCare{% endblock %}
 
@@ -43,7 +43,7 @@
                     <div>
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <h5 class="text-white fw-bold mb-0">{{ medicine.name }}</h5>
-                            <span class="badge bg-primary-subtle text-primary border border-primary small">{{ medicine.get_unit_display }}</span>
+                            <span class="badge bg-primary-subtle text-primary border border-primary small">{{ medicine.get_sellable_unit_display }}</span>
                         </div>
                         <p class="text-secondary small mb-3">Brand: {{ medicine.brand|default:"Generic" }}</p>
                     </div>
@@ -65,11 +65,17 @@
                             {% csrf_token %}
                             <input type="hidden" name="action" value="add">
                             <input type="hidden" name="medicine_id" value="{{ medicine.pk }}">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <input type="number" name="quantity" class="form-control form-control-sm bg-white text-dark border-secondary-subtle" value="1" min="1" required>
                             </div>
-                            <div class="col-6 d-grid">
-                                <button type="submit" class="btn btn-success btn-sm">Add to Cart</button>
+                            <div class="col-4">
+                                <select name="sell_by" class="form-select form-select-sm bg-white text-dark border-secondary-subtle">
+                                    <option value="unit">Unit</option>
+                                    <option value="package">Package ({{ medicine.units_per_package }} {{ medicine.get_sellable_unit_display }}s)</option>
+                                </select>
+                            </div>
+                            <div class="col-4 d-grid">
+                                <button type="submit" class="btn btn-success btn-sm">Add</button>
                             </div>
                         </form>
                     </div>

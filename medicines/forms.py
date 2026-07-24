@@ -76,7 +76,9 @@ class MedicineForm(forms.ModelForm):
             "name",
             "brand",
             "category",
-            "unit",
+            "purchase_package_type",
+            "units_per_package",
+            "sellable_unit",
             "requires_prescription",
             "purchase_price",
             "selling_price",
@@ -98,7 +100,15 @@ class MedicineForm(forms.ModelForm):
             "category": forms.Select(attrs={
                 "class": SELECT_CLASS,
             }),
-            "unit": forms.Select(attrs={
+            "purchase_package_type": forms.Select(attrs={
+                "class": SELECT_CLASS,
+            }),
+            "units_per_package": forms.NumberInput(attrs={
+                "class":       NUMBER_INPUT_CLASS,
+                "placeholder": "1",
+                "min":         "1",
+            }),
+            "sellable_unit": forms.Select(attrs={
                 "class": SELECT_CLASS,
             }),
 
@@ -141,7 +151,9 @@ class MedicineForm(forms.ModelForm):
             "name":                  "Medicine Name",
             "brand":                 "Brand Name (optional)",
             "category":              "Category",
-            "unit":                  "Unit of Measurement",
+            "purchase_package_type": "Purchase Package Type",
+            "units_per_package":     "Units per Package",
+            "sellable_unit":         "Sellable Unit",
             "requires_prescription": "Requires Prescription",
             "purchase_price":        "Purchase Price (Rs.)",
             "selling_price":         "Selling Price (Rs.)",
@@ -152,7 +164,9 @@ class MedicineForm(forms.ModelForm):
         help_texts = {
             "name":                  "Generic drug name. Must be unique.",
             "brand":                 "Manufacturer brand if different from generic.",
-            "unit":                  "How this medicine is dispensed per unit.",
+            "purchase_package_type": "How this medicine is purchased (e.g. Box, Strip).",
+            "units_per_package":     "Number of sellable units inside one purchase package.",
+            "sellable_unit":         "How this medicine is dispensed per unit.",
             "requires_prescription": "If checked, a valid prescription is required before sale.",
             "purchase_price":        "Cost paid to the supplier per unit.",
             "selling_price":         "Retail price charged to customers per unit.",

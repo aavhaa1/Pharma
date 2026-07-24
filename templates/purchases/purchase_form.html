@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{% if object %}Edit{% else %}Create{% endif %} Purchase Order | PharmaCare{% endblock %}
 
@@ -100,7 +100,7 @@
 
                                         <!-- Quantity -->
                                         <div class="col-md-2">
-                                            <label class="form-label text-secondary small mb-1">Qty</label>
+                                            <label class="form-label text-secondary small mb-1">Qty (Packages)</label>
                                             {{ item_form.quantity }}
                                             {{ item_form.quantity.errors }}
                                         </div>
@@ -110,6 +110,23 @@
                                             <label class="form-label text-secondary small mb-1">Unit Cost</label>
                                             {{ item_form.unit_cost }}
                                             {{ item_form.unit_cost.errors }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row g-2 mt-1">
+                                        <div class="col-md-4">
+                                            <label class="form-label text-secondary small mb-1">Package Type</label>
+                                            {{ item_form.package_type }}
+                                            {{ item_form.package_type.errors }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-secondary small mb-1">Units per Package</label>
+                                            {{ item_form.units_per_package }}
+                                            {{ item_form.units_per_package.errors }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-secondary small mb-1">Total Units</label>
+                                            <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary total-units-input" readonly>
                                         </div>
                                     </div>
                                     
@@ -154,12 +171,27 @@
                     {{ items.empty_form.expiry_date }}
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label text-secondary small mb-1">Qty</label>
+                    <label class="form-label text-secondary small mb-1">Qty (Packages)</label>
                     {{ items.empty_form.quantity }}
                 </div>
                 <div class="col-md-2">
                     <label class="form-label text-secondary small mb-1">Unit Cost</label>
                     {{ items.empty_form.unit_cost }}
+                </div>
+            </div>
+
+            <div class="row g-2 mt-1">
+                <div class="col-md-4">
+                    <label class="form-label text-secondary small mb-1">Package Type</label>
+                    {{ items.empty_form.package_type }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-secondary small mb-1">Units per Package</label>
+                    {{ items.empty_form.units_per_package }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-secondary small mb-1">Total Units</label>
+                    <input type="text" class="form-control form-control-sm bg-dark text-white border-secondary total-units-input" readonly>
                 </div>
             </div>
             
@@ -180,10 +212,41 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        const medicineData = {
+            {% for med in items.empty_form.fields.medicine.queryset %}
+            "{{ med.id }}": {
+                "package_type": "{{ med.purchase_package_type|escapejs }}",
+                "units": {{ med.units_per_package }}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        };
+
         const itemsContainer = document.getElementById("items-container");
         const addItemBtn = document.getElementById("add-item-btn");
         const totalFormsInput = document.getElementById("id_items-TOTAL_FORMS");
         const grandTotalDisplay = document.getElementById("grand-total-display");
+
+        function updateMedicineDetails(row) {
+            const select = row.querySelector(".medicine-select");
+            const pkgInput = row.querySelector(".package-type-input");
+            const unitsInput = row.querySelector(".units-per-package-input");
+            const totalUnitsInput = row.querySelector(".total-units-input");
+            const qtyInput = row.querySelector(".quantity-input");
+            
+            if (select && select.value && medicineData[select.value]) {
+                const data = medicineData[select.value];
+                if(pkgInput && !pkgInput.value) pkgInput.value = data.package_type;
+                if(unitsInput && !unitsInput.value) unitsInput.value = data.units;
+                
+                let qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+                let unitsPerPkg = parseFloat(unitsInput ? unitsInput.value : 1) || 1;
+                if(totalUnitsInput) totalUnitsInput.value = qty * unitsPerPkg;
+            } else {
+                if(pkgInput && !pkgInput.value) pkgInput.value = "";
+                if(unitsInput && !unitsInput.value) unitsInput.value = "";
+                if(totalUnitsInput) totalUnitsInput.value = "";
+            }
+        }
 
         function calculateTotals() {
             let grandTotal = 0;
@@ -201,11 +264,18 @@
 
                 const qtyInput = row.querySelector(".quantity-input");
                 const costInput = row.querySelector(".cost-input");
+                const unitsInput = row.querySelector(".units-per-package-input");
+                const totalUnitsInput = row.querySelector(".total-units-input");
                 const totalSpan = row.querySelector(".item-total-val");
 
                 let qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+                let unitsPerPkg = parseFloat(unitsInput ? unitsInput.value : 1) || 1;
                 let cost = parseFloat(costInput ? costInput.value : 0) || 0;
-                let itemTotal = qty * cost;
+                
+                let totalUnits = qty * unitsPerPkg;
+                if(totalUnitsInput) totalUnitsInput.value = totalUnits;
+                
+                let itemTotal = totalUnits * cost;
                 
                 totalSpan.textContent = "Nrs. " + itemTotal.toFixed(2);
                 grandTotal += itemTotal;
@@ -215,7 +285,22 @@
         }
 
         itemsContainer.addEventListener("input", function(e) {
-            if (e.target.classList.contains("quantity-input") || e.target.classList.contains("cost-input")) {
+            if (e.target.classList.contains("quantity-input") || 
+                e.target.classList.contains("cost-input") || 
+                e.target.classList.contains("units-per-package-input") ||
+                e.target.classList.contains("package-type-input")) {
+                calculateTotals();
+            }
+        });
+        
+        itemsContainer.addEventListener("change", function(e) {
+            if (e.target.classList.contains("medicine-select")) {
+                const row = e.target.closest('.item-row');
+                const pkgInput = row.querySelector(".package-type-input");
+                const unitsInput = row.querySelector(".units-per-package-input");
+                if(pkgInput) pkgInput.value = ""; // Reset to trigger default population
+                if(unitsInput) unitsInput.value = ""; 
+                updateMedicineDetails(row);
                 calculateTotals();
             }
         });

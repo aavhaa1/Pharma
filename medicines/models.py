@@ -44,6 +44,15 @@ class Medicine(models.Model):
     (restocking), and Sales (transactions) via ForeignKey.
     """
 
+    PACKAGE_CHOICES = [
+        ("Strip", "Strip"),
+        ("Packet", "Packet"),
+        ("Box", "Box"),
+        ("Bottle", "Bottle"),
+        ("Carton", "Carton"),
+        ("Unit", "Unit"),
+    ]
+
     UNIT_CHOICES = [
         ("tablet",  "Tablet"),
         ("capsule", "Capsule"),
@@ -52,6 +61,7 @@ class Medicine(models.Model):
         ("cream",   "Cream (g)"),
         ("drops",   "Drops (ml)"),
         ("sachet",  "Sachet"),
+        ("piece",   "Piece"),
         ("other",   "Other"),
     ]
 
@@ -78,11 +88,23 @@ class Medicine(models.Model):
     )
 
     # --- Classification ---
-    unit = models.CharField(
+    purchase_package_type = models.CharField(
+        max_length=50,
+        choices=PACKAGE_CHOICES,
+        default="Unit",
+        verbose_name="Purchase Package Type",
+        help_text="How this medicine is purchased (e.g. Box, Strip)."
+    )
+    units_per_package = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Units per Package",
+        help_text="Number of sellable units inside one purchase package."
+    )
+    sellable_unit = models.CharField(
         max_length=20,
         choices=UNIT_CHOICES,
         default="tablet",
-        verbose_name="Unit of Measurement",
+        verbose_name="Sellable Unit",
         help_text="How this medicine is measured/dispensed."
     )
     requires_prescription = models.BooleanField(
@@ -140,7 +162,7 @@ class Medicine(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name} ({self.get_unit_display()})"
+        return f"{self.name} ({self.get_sellable_unit_display()})"
 
     @property
     def profit_margin(self):

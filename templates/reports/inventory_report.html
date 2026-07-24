@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Inventory Report | PharmaCare{% endblock %}
 {% block content %}
 <div class="row mb-4 align-items-center">
@@ -99,7 +99,7 @@
                     <td class="py-3 px-4 text-end text-success small">Nrs. {{ item.medicine.selling_price }}</td>
                     <td class="py-3 px-4 text-center text-secondary small">{{ item.expiry_date|date:"Y-m-d" }}</td>
                     <td class="py-3 px-4 text-center">
-                        <span class="badge {% if item.status == 'Expired' %}bg-danger{% elif item.status == 'Expiring Soon' %}bg-warning text-dark{% elif item.status == 'Low Stock' %}bg-warning text-dark{% else %}bg-success{% endif %}" style="font-size:0.7rem;">{{ item.status }}</span>
+                        <span class="badge {% if item.status == 'Expired' or item.status == 'Out of Stock' %}bg-danger{% elif item.status == 'Expiring Soon' %}bg-warning text-dark{% elif item.status == 'Low Stock' %}bg-warning text-dark{% else %}bg-success{% endif %}" style="font-size:0.7rem;">{{ item.status }}</span>
                     </td>
                 </tr>
                 {% empty %}

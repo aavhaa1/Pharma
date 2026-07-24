@@ -160,12 +160,12 @@ class ReceivePurchaseView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, Vi
                     inventory_batch.expiry_date = item.expiry_date
 
                 quantity_before = inventory_batch.quantity
-                inventory_batch.quantity += item.quantity
+                inventory_batch.quantity += item.total_units_received
                 
                 inventory_batch.save_with_history(
                     user=request.user,
                     action="Added",
-                    quantity_changed=item.quantity,
+                    quantity_changed=item.total_units_received,
                     reason="New Stock",
                     quantity_before=quantity_before
                 )

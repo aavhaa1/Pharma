@@ -96,6 +96,10 @@ class CartView(LoginRequiredMixin, View):
                 
             medicine = get_object_or_404(Medicine, pk=medicine_id, is_active=True)
             
+            sell_by = request.POST.get('sell_by', 'unit')
+            if sell_by == 'package':
+                qty = qty * medicine.units_per_package
+            
             # Check unexpired stock
             today = timezone.now().date()
             available_stock = Inventory.objects.filter(
