@@ -1,4 +1,4 @@
-﻿{% extends "cashier/base_cashier.html" %}
+{% extends "cashier/base_cashier.html" %}
 
 {% block title %}Sales Report | PharmaCare{% endblock %}
 {% block page_title %}Detailed Sales Report{% endblock %}
@@ -139,8 +139,8 @@
                             </td>
                             <td class="py-3 px-4 text-end fw-bold text-success font-monospace">Nrs. {{ sale.total_amount }}</td>
                             <td class="py-3 px-4 text-end">
-                                <a href="{% url 'cashier:cashier_sale_detail' sale.pk %}" class="btn btn-light btn-sm py-1 px-2" style="font-size: 0.8rem;">View</a>
-                                <a href="{% url 'cashier:cashier_invoice' sale.pk %}" target="_blank" class="btn btn-outline-secondary btn-sm py-1 px-2" style="border-color: rgba(255,255,255,0.15); font-size: 0.8rem;">
+                                <a href="{% url 'sale_detail' sale.pk %}" class="btn btn-light btn-sm py-1 px-2" style="font-size: 0.8rem;">View</a>
+                                <a href="{% url 'invoice_view' sale.pk %}" target="_blank" class="btn btn-outline-secondary btn-sm py-1 px-2" style="border-color: rgba(255,255,255,0.15); font-size: 0.8rem;">
                                     <i class="bi bi-printer"></i>
                                 </a>
                             </td>

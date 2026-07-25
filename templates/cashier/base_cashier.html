@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -297,29 +297,22 @@
             Dashboard
         </a>
 
-        <a href="{% url 'cashier:cashier_pos' %}"
-           class="nav-item-link {% if 'cashier_pos' in request.resolver_match.url_name or 'cashier_cart' in request.resolver_match.url_name or 'cashier_checkout' in request.resolver_match.url_name %}active{% endif %}">
+        <a href="{% url 'sale_new' %}"
+           class="nav-item-link {% if 'sale_new' in request.resolver_match.url_name or 'cart_view' in request.resolver_match.url_name or 'checkout_view' in request.resolver_match.url_name %}active{% endif %}">
             <i class="bi bi-bag-plus nav-icon"></i>
             New Sale
-            {% if cart_count %}
-                <span class="cart-badge">{{ cart_count }}</span>
+            {% if request.session.cart %}
+                <span class="cart-badge">{{ request.session.cart|length }}</span>
             {% endif %}
         </a>
 
-        <a href="{% url 'cashier:cashier_sale_history' %}"
-           class="nav-item-link {% if 'cashier_sale_history' in request.resolver_match.url_name or 'cashier_sale_detail' in request.resolver_match.url_name or 'cashier_invoice' in request.resolver_match.url_name %}active{% endif %}">
+        <a href="{% url 'sale_list' %}"
+           class="nav-item-link {% if 'sale_list' in request.resolver_match.url_name or 'sale_detail' in request.resolver_match.url_name or 'invoice_view' in request.resolver_match.url_name %}active{% endif %}">
             <i class="bi bi-receipt nav-icon"></i>
             Sales History
         </a>
 
-        <div class="nav-section-label" style="margin-top: 0.5rem;">Catalogue</div>
 
-        <a href="{% url 'cashier:cashier_medicines' %}"
-           class="nav-item-link {% if request.resolver_match.url_name == 'cashier_medicines' %}active{% endif %}">
-            <i class="bi bi-capsule nav-icon"></i>
-            Medicines
-            <span style="margin-left: auto; font-size: 0.6rem; color: #94a3b8; font-family: var(--font-heading); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">View Only</span>
-        </a>
 
         <div class="nav-section-label" style="margin-top: 0.5rem;">Analytics</div>
 
@@ -359,15 +352,15 @@
             <h6 class="page-title">{% block page_title %}Cashier Portal{% endblock %}</h6>
         </div>
         <div class="topbar-actions">
-            {% if cart_count %}
-            <a href="{% url 'cashier:cashier_checkout' %}" class="btn btn-sm position-relative"
+            {% if request.session.cart %}
+            <a href="{% url 'cart_view' %}" class="btn btn-sm position-relative"
               >
                 <i class="bi bi-cart3 me-1"></i> Cart
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill"
-                      style="background: #22c55e; color: #000; font-size: 0.6rem;">{{ cart_count }}</span>
+                      style="background: #22c55e; color: #000; font-size: 0.6rem;">{{ request.session.cart|length }}</span>
             </a>
             {% endif %}
-            <a href="{% url 'cashier:cashier_pos' %}" class="btn btn-sm btn-primary">
+            <a href="{% url 'sale_new' %}" class="btn btn-sm btn-primary">
                 <i class="bi bi-plus-lg me-1"></i>New Sale
             </a>
         </div>

@@ -11,7 +11,7 @@ import calendar
 
 from accounts.utils import is_admin, is_pharmacist
 from medicines.models import Medicine, Category
-from inventory.models import Inventory
+from inventory.models import Inventory, InventoryBatch
 from purchases.models import Purchase, PurchaseItem
 from sales.models import Sale
 from suppliers.models import Supplier
@@ -58,23 +58,21 @@ class ReportsDashboardView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, Templ
         context['total_suppliers'] = Supplier.objects.filter(is_active=True).count()
         
         # 6. Current Inventory Value
-        context['inventory_value'] = Inventory.objects.aggregate(
+        context['inventory_value'] = InventoryBatch.objects.aggregate(
             total=Sum(F('quantity') * F('medicine__purchase_price'))
         )['total'] or Decimal('0.00')
         
         # 7. Low Stock Medicines count
         from django.db.models.functions import Coalesce
-        context['low_stock_medicines_count'] = Medicine.objects.annotate(
-            total_stock=Coalesce(
-                Sum('inventory_batches__quantity', filter=Q(inventory_batches__expiry_date__gte=today)),
-                0
-            )
-        ).filter(total_stock__lt=50, total_stock__gt=0, is_active=True).count()
+        context['low_stock_medicines_count'] = Inventory.objects.filter(
+            current_stock__gt=0,
+            current_stock__lte=F('medicine__minimum_stock_level')
+        ).count()
         
         # 8. Expired Medicines count
-        context['expired_medicines_count'] = Inventory.objects.filter(expiry_date__lt=today).count()
+        context['expired_medicines_count'] = InventoryBatch.objects.filter(expiry_date__lt=today).count()
         # 9. Medicines Expiring Within 30 Days count
-        context['expiring_soon_count'] = Inventory.objects.filter(
+        context['expiring_soon_count'] = InventoryBatch.objects.filter(
             expiry_date__gte=today,
             expiry_date__lte=today + timedelta(days=30)
         ).count()

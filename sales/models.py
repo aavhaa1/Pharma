@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from decimal import Decimal
 from medicines.models import Medicine
-from inventory.models import Inventory
+from inventory.models import InventoryBatch
 
 User = get_user_model()
 
@@ -55,7 +55,7 @@ class Sale(models.Model):
 class SaleItem(models.Model):
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name='items')
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='sale_items')
-    inventory_batch = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name='sale_items')
+    inventory_batch = models.ForeignKey(InventoryBatch, on_delete=models.CASCADE, related_name='sale_items')
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     total_price = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))

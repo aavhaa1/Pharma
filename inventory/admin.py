@@ -1,8 +1,14 @@
 from django.contrib import admin
-from .models import Inventory, InventoryHistory
+from .models import Inventory, InventoryBatch, InventoryHistory
 
 @admin.register(Inventory)
 class InventoryAdmin(admin.ModelAdmin):
+    list_display = ["id", "medicine", "current_stock", "last_updated"]
+    search_fields = ["medicine__name"]
+
+
+@admin.register(InventoryBatch)
+class InventoryBatchAdmin(admin.ModelAdmin):
     list_display = ["id", "medicine", "batch_no", "expiry_date", "quantity", "location", "created_at", "updated_at"]
     list_filter = ["expiry_date", "medicine"]
     search_fields = ["batch_no", "medicine__name"]

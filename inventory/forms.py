@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 from medicines.models import Medicine
-from .models import Inventory, InventoryHistory
+from .models import Inventory, InventoryBatch, InventoryHistory
 
 TEXT_INPUT_CLASS    = "form-control"
 SELECT_CLASS        = "form-select"
@@ -14,7 +14,7 @@ class InventoryForm(forms.ModelForm):
     Used by Admin and Pharmacist roles.
     """
     class Meta:
-        model = Inventory
+        model = InventoryBatch
         fields = ["medicine", "batch_no", "expiry_date", "quantity", "location"]
         widgets = {
             "medicine": forms.Select(attrs={
@@ -108,12 +108,10 @@ class StockAdjustmentForm(forms.ModelForm):
         self.inventory = kwargs.pop("inventory", None)
         super().__init__(*args, **kwargs)
         if self.inventory:
-            self.fields["inventory"].initial = self.inventory
-            self.fields["inventory"].queryset = Inventory.objects.filter(pk=self.inventory.pk)
-            self.fields["inventory"].widget.attrs["readonly"] = "readonly"
-            self.fields["inventory"].widget.attrs["style"] = "pointer-events: none; opacity: 0.8;"
+            self.fields["inventory"].queryset = self.inventory.medicine.inventory_batches.all()
+            self.fields["inventory"].empty_label = "Select a batch to adjust..."
         else:
-            self.fields["inventory"].queryset = Inventory.objects.all()
+            self.fields["inventory"].queryset = InventoryBatch.objects.all()
 
     def clean_quantity_changed(self):
         qty = self.cleaned_data.get("quantity_changed")

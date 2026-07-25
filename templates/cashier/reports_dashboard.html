@@ -1,4 +1,4 @@
-﻿{% extends "cashier/base_cashier.html" %}
+{% extends "cashier/base_cashier.html" %}
 
 {% block title %}Sales Reports | PharmaCare{% endblock %}
 {% block page_title %}Reports Dashboard{% endblock %}
@@ -110,7 +110,7 @@
                     <h5 class="fw-bold text-white mb-2" style="font-family: var(--font-heading);"> Transaction History</h5>
                     <p class="text-secondary small mb-4" style="color: #ffffff !important; opacity: 0.7;">Quickly jump back to your recent invoices list to view details, update customer information, or reprint customer copies.</p>
                 </div>
-                <a href="{% url 'cashier:cashier_sale_history' %}" class="btn btn-light w-100">
+                <a href="{% url 'sale_list' %}" class="btn btn-light w-100">
                     View Transaction History <i class="bi bi-clock-history ms-1"></i>
                 </a>
             </div>

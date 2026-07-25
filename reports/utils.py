@@ -7,7 +7,7 @@ from datetime import timedelta
 
 # Models
 from medicines.models import Medicine, Category
-from inventory.models import Inventory
+from inventory.models import Inventory, InventoryBatch
 from purchases.models import Purchase, PurchaseItem
 from sales.models import Sale, SaleItem
 from suppliers.models import Supplier

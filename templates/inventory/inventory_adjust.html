@@ -1,25 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Stock Adjustment: {{ inventory.batch_no }} | PharmaCare{% endblock %}
+{% block title %}Stock Adjustment: {{ inventory.medicine.name }} | PharmaCare{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-8">
         
         <div class="mb-3">
-            <a href="{% url 'inventory_list' %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
-                &larr; Back to Inventory
+            <a href="{% url 'inventory_detail' inventory.pk %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
+                &larr; Back to Inventory Detail
             </a>
         </div>
 
         <div class="card mb-4">
             <div class="card-header">
                 <h3 class="mb-0 text-dark">Manual Stock Adjustment</h3>
-                <p class="text-secondary mb-0 small">Adjust stock levels for specific batches. Stock level cannot become negative.</p>
+                <p class="text-secondary mb-0 small">Select a batch and adjust its stock level. Stock cannot become negative.</p>
             </div>
             <div class="card-body">
                 
-                <!-- Batch Info Banner -->
+                <!-- Medicine Info Banner -->
                 <div class="p-3 mb-4 rounded border" style="background: rgba(255, 255, 255, 0.03); border-color: var(--border-color);">
                     <div class="row">
                         <div class="col-sm-6 mb-2 mb-sm-0">
@@ -27,12 +27,12 @@
                             <strong class="text-white fs-5">{{ inventory.medicine.name }}</strong>
                         </div>
                         <div class="col-sm-3 mb-2 mb-sm-0">
-                            <span class="text-secondary d-block small">Batch No.</span>
-                            <strong class="text-white font-monospace">{{ inventory.batch_no }}</strong>
+                            <span class="text-secondary d-block small">Total Stock</span>
+                            <strong class="text-white font-monospace fs-5">{{ inventory.current_stock }}</strong>
                         </div>
                         <div class="col-sm-3">
-                            <span class="text-secondary d-block small">Current Stock</span>
-                            <strong class="text-white font-monospace fs-5">{{ inventory.quantity }}</strong>
+                            <span class="text-secondary d-block small">Min. Stock Level</span>
+                            <strong class="text-warning font-monospace fs-5">{{ inventory.medicine.minimum_stock_level }}</strong>
                         </div>
                     </div>
                 </div>
@@ -48,10 +48,20 @@
                         </div>
                     {% endif %}
 
-                    <!-- Inventory batch hidden/disabled select -->
-                    <div class="mb-3 d-none">
-                        <label for="{{ form.inventory.id_for_label }}" class="form-label text-secondary fw-semibold">{{ form.inventory.label }}</label>
+                    <!-- Batch Selection (visible, user must pick which batch to adjust) -->
+                    <div class="mb-3">
+                        <label for="{{ form.inventory.id_for_label }}" class="form-label text-secondary fw-semibold">
+                            {{ form.inventory.label }} <span class="text-danger">*</span>
+                        </label>
                         {{ form.inventory }}
+                        <div class="form-text text-secondary">Select which batch you want to adjust stock for.</div>
+                        {% if form.inventory.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.inventory.errors %}
+                                    ● {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <!-- Adjustment Type dropdown -->
@@ -102,7 +112,7 @@
                     </div>
 
                     <div class="text-end mt-4">
-                        <a href="{% url 'inventory_list' %}" class="btn btn-light me-2">Cancel</a>
+                        <a href="{% url 'inventory_detail' inventory.pk %}" class="btn btn-light me-2">Cancel</a>
                         <button type="submit" class="btn btn-primary">Apply Adjustment</button>
                     </div>
                 </form>

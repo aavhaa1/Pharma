@@ -9,6 +9,50 @@ User = get_user_model()
 
 class Inventory(models.Model):
     """
+    Model representing aggregated stock for a specific medicine.
+    """
+    medicine = models.OneToOneField(
+        Medicine,
+        on_delete=models.CASCADE,
+        related_name="inventory_record",
+        verbose_name="Medicine"
+    )
+    current_stock = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Current Stock"
+    )
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Inventory"
+        verbose_name_plural = "Inventories"
+
+    def __str__(self):
+        return f"{self.medicine.name} - Stock: {self.current_stock}"
+
+    @property
+    def status(self):
+        if self.current_stock == 0:
+            return "Out of Stock"
+        elif self.current_stock <= self.medicine.minimum_stock_level:
+            return "Low Stock"
+        else:
+            return "Normal"
+
+    def update_stock(self):
+        """
+        Recalculates current_stock based on unexpired InventoryBatch quantities.
+        """
+        today = timezone.now().date()
+        total = self.medicine.inventory_batches.filter(
+            expiry_date__gte=today
+        ).aggregate(total_qty=models.Sum('quantity'))['total_qty'] or 0
+        self.current_stock = total
+        self.save()
+
+
+class InventoryBatch(models.Model):
+    """
     Model representing specific stock batches of a medicine.
     """
     medicine = models.ForeignKey(
@@ -39,8 +83,8 @@ class Inventory(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Inventory"
-        verbose_name_plural = "Inventories"
+        verbose_name = "Inventory Batch"
+        verbose_name_plural = "Inventory Batches"
         ordering = ["expiry_date"]
 
     def __str__(self):
@@ -55,28 +99,6 @@ class Inventory(models.Model):
         today = timezone.now().date()
         return not self.is_expired and self.expiry_date <= today + timedelta(days=30)
 
-    @property
-    def is_low_stock(self):
-        return not self.is_expired and 0 < self.quantity < 50
-
-
-    @property
-    def is_out_of_stock(self):
-        return self.quantity == 0
-
-    @property
-    def status(self):
-        if self.is_out_of_stock:
-            return "Out of Stock"
-        elif self.is_expired:
-            return "Expired"
-        elif self.is_expiring_soon:
-            return "Expiring Soon"
-        elif self.is_low_stock:
-            return "Low Stock"
-        else:
-            return "Normal"
-
     def clean(self):
         super().clean()
         if self.quantity < 0:
@@ -89,7 +111,7 @@ class Inventory(models.Model):
         self.full_clean()
         super().save(*args, **kwargs)
 
-    def save_with_history(self, user, action, quantity_changed, reason, quantity_before=0):
+    def save_with_history(self, user, action, quantity_changed, reason, quantity_before=0, notes=None):
         """
         Helper method to save the inventory record and automatically log history.
         """
@@ -101,7 +123,8 @@ class Inventory(models.Model):
             quantity_before=quantity_before,
             quantity_after=self.quantity,
             quantity_changed=quantity_changed,
-            reason=reason
+            reason=reason,
+            notes=notes
         )
 
 
@@ -117,7 +140,7 @@ class InventoryHistory(models.Model):
     ]
 
     inventory = models.ForeignKey(
-        Inventory,
+        InventoryBatch,
         on_delete=models.CASCADE,
         related_name="history_logs",
         verbose_name="Inventory Batch"
@@ -139,6 +162,11 @@ class InventoryHistory(models.Model):
     reason = models.CharField(
         max_length=255,
         verbose_name="Reason"
+    )
+    notes = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Notes / Remarks"
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Logged At")
 

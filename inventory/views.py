@@ -10,7 +10,7 @@ from datetime import timedelta
 
 from accounts.utils import is_admin, is_pharmacist
 from medicines.models import Category, Medicine
-from .models import Inventory, InventoryHistory
+from .models import Inventory, InventoryBatch, InventoryHistory
 from .forms import InventoryForm, StockAdjustmentForm
 
 
@@ -39,12 +39,11 @@ class InventoryListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         
-        # 1. Search (Medicine Name, Batch Number)
+        # 1. Search (Medicine Name)
         q = self.request.GET.get("q", "").strip()
         if q:
             queryset = queryset.filter(
-                Q(medicine__name__icontains=q) |
-                Q(batch_no__icontains=q)
+                Q(medicine__name__icontains=q)
             )
             
         # 2. Category Filter
@@ -56,21 +55,22 @@ class InventoryListView(LoginRequiredMixin, ListView):
         status_filter = self.request.GET.get("status", "").strip().lower()
         today = timezone.now().date()
         if status_filter == "expired":
-            queryset = queryset.filter(expiry_date__lt=today)
+            queryset = queryset.filter(medicine__inventory_batches__expiry_date__lt=today).distinct()
         elif status_filter == "expiring_soon":
-            queryset = queryset.filter(expiry_date__gte=today, expiry_date__lte=today + timedelta(days=30))
+            queryset = queryset.filter(
+                medicine__inventory_batches__expiry_date__gte=today, 
+                medicine__inventory_batches__expiry_date__lte=today + timedelta(days=30)
+            ).distinct()
         elif status_filter == "low_stock":
             queryset = queryset.filter(
-                quantity__lt=50,
-                quantity__gt=0,
-                expiry_date__gte=today
+                current_stock__gt=0,
+                current_stock__lte=F('medicine__minimum_stock_level')
             )
         elif status_filter == "out_of_stock":
-            queryset = queryset.filter(quantity=0)
+            queryset = queryset.filter(current_stock=0)
         elif status_filter == "normal":
             queryset = queryset.filter(
-                expiry_date__gt=today + timedelta(days=30),
-                quantity__gte=50
+                current_stock__gt=F('medicine__minimum_stock_level')
             )
 
         return queryset.select_related("medicine", "medicine__category")
@@ -120,7 +120,7 @@ class InventoryCreateView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, Su
 
 class InventoryDetailView(LoginRequiredMixin, DetailView):
     """
-    Shows detail specs of a single batch, listing audit history underneath.
+    Shows aggregate stock for a single medicine, listing all its batches and audit history.
     """
     model = Inventory
     template_name = "inventory/inventory_detail.html"
@@ -128,14 +128,18 @@ class InventoryDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Fetch audit history for this inventory batch
-        context["history_logs"] = self.object.history_logs.all().select_related("user")
+        # All batches for this medicine
+        context["batches"] = self.object.medicine.inventory_batches.all().order_by("expiry_date")
+        # Fetch combined audit history across all batches for this medicine
+        context["history_logs"] = InventoryHistory.objects.filter(
+            inventory__medicine=self.object.medicine
+        ).select_related("user", "inventory").order_by("-created_at")[:50]
         return context
 
 
 class InventoryAdjustView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, FormView):
     """
-    Perform manual stock adjustments.
+    Perform manual stock adjustments on a specific batch belonging to a medicine's inventory.
     """
     form_class = StockAdjustmentForm
     template_name = "inventory/inventory_adjust.html"
@@ -156,32 +160,32 @@ class InventoryAdjustView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, Fo
         return context
 
     def form_valid(self, form):
-        inventory = self.inventory_obj
-        quantity_before = inventory.quantity
+        batch = form.cleaned_data.get("inventory")  # This is an InventoryBatch instance
+        quantity_before = batch.quantity
         adjustment_type = form.cleaned_data.get("adjustment_type")
         quantity_changed = form.cleaned_data.get("quantity_changed")
         reason = form.cleaned_data.get("reason")
 
         if adjustment_type == "Increase":
-            inventory.quantity += quantity_changed
-            action = "Adjusted"
+            batch.quantity += quantity_changed
             changed_val = quantity_changed
         else:
-            inventory.quantity -= quantity_changed
-            action = "Adjusted"
+            batch.quantity -= quantity_changed
             changed_val = -quantity_changed
 
-        # Save with history log creation
-        inventory.save_with_history(
+        # Save batch with history log
+        batch.save_with_history(
             user=self.request.user,
-            action=action,
+            action="Adjusted",
             quantity_changed=changed_val,
             reason=reason,
             quantity_before=quantity_before
         )
 
-        messages.success(self.request, "Stock adjusted successfully.")
-        messages.success(self.request, "Inventory updated successfully.")
+        # Update the aggregate inventory record
+        self.inventory_obj.update_stock()
+
+        messages.success(self.request, f"Stock adjusted successfully for batch {batch.batch_no}.")
         messages.success(self.request, "Inventory history recorded successfully.")
         return HttpResponseRedirect(self.get_success_url())
 

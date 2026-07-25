@@ -7,9 +7,10 @@ from django.db.models import Q, Sum, F
 from django.utils import timezone
 from decimal import Decimal
 from django.http import HttpResponse
+from django.conf import settings
 
 from medicines.models import Medicine
-from inventory.models import Inventory
+from inventory.models import Inventory, InventoryBatch
 from .models import Sale, SaleItem
 
 class SaleListView(LoginRequiredMixin, ListView):
@@ -49,13 +50,25 @@ class SaleCreateView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         # Search medicine to add to cart
         q = self.request.GET.get('q', '').strip()
+        today = timezone.now().date()
         medicines = Medicine.objects.filter(is_active=True)
         if q:
             medicines = medicines.filter(
                 Q(name__icontains=q) |
                 Q(brand__icontains=q)
             )
-        context['medicines'] = medicines[:10]
+        
+        medicines_list = []
+        for med in medicines[:20]:
+            available = InventoryBatch.objects.filter(
+                medicine=med,
+                expiry_date__gte=today,
+                quantity__gt=0
+            ).aggregate(total=Sum('quantity'))['total'] or 0
+            med.available_stock = available
+            medicines_list.append(med)
+
+        context['medicines'] = medicines_list
         context['cart'] = self.request.session.get('cart', {})
         return context
 
@@ -102,7 +115,7 @@ class CartView(LoginRequiredMixin, View):
             
             # Check unexpired stock
             today = timezone.now().date()
-            available_stock = Inventory.objects.filter(
+            available_stock = InventoryBatch.objects.filter(
                 medicine=medicine,
                 expiry_date__gte=today,
                 quantity__gt=0
@@ -128,7 +141,7 @@ class CartView(LoginRequiredMixin, View):
             else:
                 medicine = get_object_or_404(Medicine, pk=medicine_id, is_active=True)
                 today = timezone.now().date()
-                available_stock = Inventory.objects.filter(
+                available_stock = InventoryBatch.objects.filter(
                     medicine=medicine,
                     expiry_date__gte=today,
                     quantity__gt=0
@@ -207,7 +220,7 @@ class CheckoutView(LoginRequiredMixin, View):
                     qty_requested = item['quantity']
                     
                     # Unexpired batches for this medicine ordered by expiry date (FIFO)
-                    batches = Inventory.objects.filter(
+                    batches = InventoryBatch.objects.filter(
                         medicine=medicine,
                         expiry_date__gte=today,
                         quantity__gt=0
@@ -268,6 +281,13 @@ class CheckoutView(LoginRequiredMixin, View):
                         )
                         
                         remaining_qty -= deduct_qty
+                    
+                    # Update aggregate Inventory for this medicine
+                    try:
+                        inv_record = Inventory.objects.get(medicine=medicine)
+                        inv_record.update_stock()
+                    except Inventory.DoesNotExist:
+                        pass
                 
                 # Clear Cart
                 request.session['cart'] = {}
@@ -328,7 +348,8 @@ class InvoiceView(LoginRequiredMixin, View):
         
         # Pharmacy Header
         story.append(Paragraph("PharmaCare Pharmacy", title_style))
-        story.append(Paragraph("123 Health Street, Clinic District<br/>Phone: +1-555-0199 | Email: contact@pharmacare.com", meta_style))
+        address = getattr(settings, 'PHARMACY_ADDRESS', 'Chyasal, Lalitpur')
+        story.append(Paragraph(f"{address}<br/>Phone: +1-555-0199 | Email: contact@pharmacare.com", meta_style))
         story.append(Spacer(1, 20))
         
         # Invoice Meta Columns

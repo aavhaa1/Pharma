@@ -12,7 +12,7 @@ from accounts.utils import is_admin, is_pharmacist
 from medicines.views import AdminOrPharmacistRequiredMixin
 from .models import Purchase, PurchaseItem
 from .forms import PurchaseForm, PurchaseItemFormSet
-from inventory.models import Inventory
+from inventory.models import Inventory, InventoryBatch
 
 class PurchaseListView(LoginRequiredMixin, ListView):
     model = Purchase
@@ -146,7 +146,7 @@ class ReceivePurchaseView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, Vi
 
             for item in purchase.items.all():
                 # Get or create inventory batch based on medicine and batch number
-                inventory_batch, created = Inventory.objects.get_or_create(
+                inventory_batch, created = InventoryBatch.objects.get_or_create(
                     medicine=item.medicine,
                     batch_no=item.batch_no,
                     defaults={
@@ -169,6 +169,10 @@ class ReceivePurchaseView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, Vi
                     reason="New Stock",
                     quantity_before=quantity_before
                 )
+
+                # Update the aggregate Inventory record for this medicine
+                inv_record, _ = Inventory.objects.get_or_create(medicine=item.medicine)
+                inv_record.update_stock()
 
             messages.success(request, "Purchase received successfully.")
             

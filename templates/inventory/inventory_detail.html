@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Batch Detail: {{ inventory.batch_no }} | PharmaCare{% endblock %}
+{% block title %}Inventory: {{ inventory.medicine.name }} | PharmaCare{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -10,30 +10,28 @@
             <a href="{% url 'inventory_list' %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
                 &larr; Back to Inventory
             </a>
-            
             {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
-                <div>
-                    <a href="{% url 'inventory_adjust' inventory.pk %}" class="btn btn-warning btn-sm">Adjust Stock</a>
-                </div>
+                <a href="{% url 'inventory_adjust' inventory.pk %}" class="btn btn-warning btn-sm">Adjust Batch Stock</a>
             {% endif %}
         </div>
 
-        <!--  Batch Details Card -->
+        <!-- Aggregate Summary Card -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-start">
                 <div>
                     <h2 class="mb-0 text-dark">{{ inventory.medicine.name }}</h2>
                     <p class="text-secondary mb-0 small">
-                        Batch: <strong class="text-white font-monospace">{{ inventory.batch_no }}</strong>
+                        Category:
+                        {% if inventory.medicine.category %}
+                            {{ inventory.medicine.category.name }}
+                        {% else %}
+                            <span class="fst-italic opacity-50">Uncategorized</span>
+                        {% endif %}
                     </p>
                 </div>
                 <div class="text-end">
                     {% if inventory.status == 'Out of Stock' %}
                         <span class="badge border px-3 py-1.5" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; border-color: rgba(220, 53, 69, 0.2) !important; font-size: 0.85rem;">Out of Stock</span>
-                    {% elif inventory.status == 'Expired' %}
-                        <span class="badge border px-3 py-1.5" style="background: rgba(220, 53, 69, 0.25) !important; color: #ea868f !important; border-color: rgba(220, 53, 69, 0.4) !important; font-size: 0.85rem;">Expired</span>
-                    {% elif inventory.status == 'Expiring Soon' %}
-                        <span class="badge border px-3 py-1.5" style="background: rgba(253, 126, 20, 0.25) !important; color: #ffc107 !important; border-color: rgba(253, 126, 20, 0.4) !important; font-size: 0.85rem;">Expiring Soon</span>
                     {% elif inventory.status == 'Low Stock' %}
                         <span class="badge border px-3 py-1.5" style="background: rgba(255, 193, 7, 0.25) !important; color: #ffda6a !important; border-color: rgba(255, 193, 7, 0.4) !important; font-size: 0.85rem;">Low Stock</span>
                     {% else %}
@@ -43,99 +41,113 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <!-- Column 1: Core Specifications -->
-                    <div class="col-md-6 mb-4 mb-md-0">
-                        <h4 class="text-secondary mb-3 pb-2" style="border-bottom: 1px solid var(--border-color); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Batch Information</h4>
-                        
-                        <table class="table table-borderless bg-transparent" style="font-size: 0.95rem;">
-                            <tbody>
-                                <tr>
-                                    <td class="text-secondary ps-0" style="width: 140px;">Category:</td>
-                                    <td class="fw-semibold">
-                                        {% if inventory.medicine.category %}
-                                            {{ inventory.medicine.category.name }}
-                                        {% else %}
-                                            <span class="text-muted fst-italic">Uncategorized</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="text-secondary ps-0">Quantity in Stock:</td>
-                                    <td class="fw-semibold font-monospace">{{ inventory.quantity }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-secondary ps-0">Expiry Date:</td>
-                                    <td class="fw-semibold font-monospace text-warning">{{ inventory.expiry_date|date:"Y-m-d" }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-secondary ps-0">Physical Location:</td>
-                                    <td class="fw-semibold">
-                                        {% if inventory.location %}
-                                            {{ inventory.location }}
-                                        {% else %}
-                                            <span class="text-muted fst-italic">Not Specified</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded text-center" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);">
+                            <div class="fs-2 fw-bold font-monospace" style="color: var(--accent-color);">{{ inventory.current_stock }}</div>
+                            <div class="text-secondary small mt-1">Total Current Stock</div>
+                        </div>
                     </div>
-
-                    <!-- Column 2: Date Parameters -->
-                    <div class="col-md-6">
-                        <h4 class="text-secondary mb-3 pb-2" style="border-bottom: 1px solid var(--border-color); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em;">Timestamps</h4>
-                        <table class="table table-borderless bg-transparent" style="font-size: 0.95rem;">
-                            <tbody>
-                                <tr>
-                                    <td class="text-secondary ps-0" style="width: 140px;">Created Date:</td>
-                                    <td class="text-secondary font-monospace">{{ inventory.created_at|date:"Y-m-d H:i:s" }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-secondary ps-0">Last Updated:</td>
-                                    <td class="text-secondary font-monospace">{{ inventory.updated_at|date:"Y-m-d H:i:s" }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded text-center" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);">
+                            <div class="fs-2 fw-bold font-monospace text-warning">{{ inventory.medicine.minimum_stock_level }}</div>
+                            <div class="text-secondary small mt-1">Minimum Stock Level</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 rounded text-center" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);">
+                            <div class="fs-2 fw-bold font-monospace text-info">{{ batches.count }}</div>
+                            <div class="text-secondary small mt-1">Active Batches</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!--  Batch History Log -->
-        <div class="card">
+        <!-- Batches Table -->
+        <div class="card mb-4">
             <div class="card-header">
-                <h4 class="mb-0 text-dark" style="font-size: 1.15rem;">Recent Inventory History Log</h4>
-                <p class="text-secondary mb-0 small">Audit trail of additions, adjustments, and subtractions for this batch.</p>
+                <h4 class="mb-0 text-dark" style="font-size: 1.15rem;">Inventory Batches</h4>
+                <p class="text-secondary mb-0 small">All batches for this medicine, ordered by expiry date (FIFO).</p>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 bg-transparent">
                         <thead>
                             <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.8rem; text-transform: uppercase; width: 150px;">Date & Time</th>
-                                <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.8rem; text-transform: uppercase; width: 120px;">Action</th>
-                                <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.8rem; text-transform: uppercase; width: 120px;">Before</th>
-                                <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.8rem; text-transform: uppercase; width: 120px;">After</th>
-                                <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.8rem; text-transform: uppercase; width: 120px;">Change</th>
-                                <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.8rem; text-transform: uppercase;">Reason</th>
-                                <th class="py-3 px-4" style="color: var(--text-secondary); font-family: var(--font-heading); font-size: 0.8rem; text-transform: uppercase; width: 120px;">User</th>
+                                <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Batch No</th>
+                                <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Expiry Date</th>
+                                <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Quantity</th>
+                                <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Location</th>
+                                <th class="py-3 px-4 text-center" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for batch in batches %}
+                                <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle;">
+                                    <td class="py-3 px-4 font-monospace fw-semibold">{{ batch.batch_no }}</td>
+                                    <td class="py-3 px-4 text-center font-monospace text-secondary" style="font-size: 0.9rem;">{{ batch.expiry_date|date:"Y-m-d" }}</td>
+                                    <td class="py-3 px-4 text-end font-monospace fw-semibold">{{ batch.quantity }}</td>
+                                    <td class="py-3 px-4 text-secondary">
+                                        {% if batch.location %}{{ batch.location }}{% else %}<span class="fst-italic opacity-50">—</span>{% endif %}
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        {% if batch.is_expired %}
+                                            <span class="badge" style="background: rgba(220, 53, 69, 0.25); color: #ea868f;">Expired</span>
+                                        {% elif batch.is_expiring_soon %}
+                                            <span class="badge" style="background: rgba(253, 126, 20, 0.25); color: #ffc107;">Expiring Soon</span>
+                                        {% elif batch.quantity == 0 %}
+                                            <span class="badge" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">Out of Stock</span>
+                                        {% else %}
+                                            <span class="badge" style="background: rgba(40, 167, 69, 0.25); color: #75b798;">Active</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-secondary">No batches found for this medicine.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Log -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0 text-dark" style="font-size: 1.15rem;">Inventory History Log</h4>
+                <p class="text-secondary mb-0 small">Audit trail of stock additions, adjustments, and deductions across all batches.</p>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 bg-transparent">
+                        <thead>
+                            <tr style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; width: 150px;">Date & Time</th>
+                                <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Batch</th>
+                                <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; width: 120px;">Action</th>
+                                <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; width: 100px;">Before</th>
+                                <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; width: 100px;">After</th>
+                                <th class="py-3 px-4 text-end" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; width: 100px;">Change</th>
+                                <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">Reason</th>
+                                <th class="py-3 px-4" style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; width: 120px;">User</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for log in history_logs %}
                                 <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle;">
-                                    <td class="py-3 px-4 font-monospace text-secondary" style="font-size: 0.85rem;">
-                                        {{ log.created_at|date:"Y-m-d H:i" }}
-                                    </td>
+                                    <td class="py-3 px-4 font-monospace text-secondary" style="font-size: 0.85rem;">{{ log.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td class="py-3 px-4 font-monospace text-secondary" style="font-size: 0.85rem;">{{ log.inventory.batch_no }}</td>
                                     <td class="py-3 px-4">
                                         {% if log.action == 'Added' %}
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle" style="background: rgba(25, 135, 84, 0.1) !important; color: #198754 !important;">Added</span>
+                                            <span class="badge" style="background: rgba(25, 135, 84, 0.1); color: #198754;">Added</span>
                                         {% elif log.action == 'Removed' %}
-                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important;">Removed</span>
+                                            <span class="badge" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">Removed</span>
                                         {% elif log.action == 'Expired' %}
-                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="background: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important;">Expired</span>
+                                            <span class="badge" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">Expired</span>
                                         {% else %}
-                                            <span class="badge bg-info-subtle text-info border border-info-subtle" style="background: rgba(13, 202, 240, 0.1) !important; color: #0dcaf0 !important;">Adjusted</span>
+                                            <span class="badge" style="background: rgba(13, 202, 240, 0.1); color: #0dcaf0;">Adjusted</span>
                                         {% endif %}
                                     </td>
                                     <td class="py-3 px-4 text-end font-monospace text-secondary">{{ log.quantity_before }}</td>
@@ -148,9 +160,7 @@
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-secondary">
-                                        No history records available for this batch.
-                                    </td>
+                                    <td colspan="8" class="text-center py-4 text-secondary">No history records available.</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

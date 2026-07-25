@@ -7,7 +7,7 @@ from datetime import timedelta
 from decimal import Decimal
 import json
 
-from inventory.models import Inventory
+from inventory.models import Inventory, InventoryBatch
 from purchases.models import Purchase
 from suppliers.models import Supplier
 from medicines.models import Medicine, Category
@@ -35,10 +35,10 @@ def home(request):
     )['total']
     
     total_inventory_quantity = Inventory.objects.aggregate(
-        total=Coalesce(Sum('quantity'), 0)
+        total=Coalesce(Sum('current_stock'), 0)
     )['total']
     
-    inventory_value = Inventory.objects.aggregate(
+    inventory_value = InventoryBatch.objects.aggregate(
         total_val=Coalesce(Sum(F('quantity') * F('medicine__purchase_price')), Decimal('0.00'))
     )['total_val']
 
@@ -49,10 +49,9 @@ def home(request):
 
     # Stock alerts
     low_stock_medicines = Inventory.objects.select_related('medicine').filter(
-        quantity__lt=50,
-        quantity__gt=0,
-        expiry_date__gte=today
-    ).order_by('quantity')[:6]
+        current_stock__gt=0,
+        current_stock__lte=F('medicine__minimum_stock_level')
+    ).order_by('current_stock')[:6]
 
     out_of_stock_medicines = Medicine.objects.annotate(
         total_stock=Coalesce(
@@ -61,7 +60,7 @@ def home(request):
         )
     ).filter(total_stock=0, is_active=True)[:6]
 
-    expiring_soon_medicines = Inventory.objects.select_related('medicine').filter(
+    expiring_soon_medicines = InventoryBatch.objects.select_related('medicine').filter(
         expiry_date__gte=today,
         expiry_date__lte=today + timedelta(days=30),
         quantity__gt=0
@@ -93,15 +92,9 @@ def home(request):
         )
     ).filter(total_stock=0, is_active=True).count()
 
-    low_stock_cnt = Medicine.objects.annotate(
-        total_stock=Coalesce(
-            Sum('inventory_batches__quantity', filter=Q(inventory_batches__expiry_date__gte=today)),
-            0
-        )
-    ).filter(
-        total_stock__gt=0,
-        total_stock__lt=50,
-        is_active=True
+    low_stock_cnt = Inventory.objects.filter(
+        current_stock__gt=0,
+        current_stock__lte=F('medicine__minimum_stock_level')
     ).count()
 
     in_stock_cnt = max(0, total_medicines - out_of_stock_cnt - low_stock_cnt)
