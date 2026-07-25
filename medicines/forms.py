@@ -208,6 +208,20 @@ class MedicineForm(forms.ModelForm):
             )
         return price
 
+    def clean_units_per_package(self):
+        """Units per package must be at least 1."""
+        units = self.cleaned_data.get("units_per_package")
+        if units is not None and units <= 0:
+            raise forms.ValidationError("Units per package must be at least 1.")
+        return units
+
+    def clean_minimum_stock_level(self):
+        """Minimum stock level cannot be negative."""
+        level = self.cleaned_data.get("minimum_stock_level")
+        if level is not None and level < 0:
+            raise forms.ValidationError("Minimum stock level cannot be negative.")
+        return level
+
     # ── Cross-field validation ────────────────────────────────────────────
 
     def clean(self):

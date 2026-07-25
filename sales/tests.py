@@ -6,7 +6,7 @@ from django.utils import timezone
 from decimal import Decimal
 
 from medicines.models import Category, Medicine
-from inventory.models import Inventory, InventoryHistory
+from inventory.models import Inventory, InventoryBatch, InventoryHistory
 from sales.models import Sale, SaleItem
 
 User = get_user_model()
@@ -30,18 +30,20 @@ class SalesTestCase(TestCase):
         )
 
         # Create unexpired batches (FIFO: Batch A expires first, Batch B expires later)
-        self.batch_a = Inventory.objects.create(
+        self.batch_a = InventoryBatch.objects.create(
             medicine=self.medicine,
             batch_no="BATCH-A",
             expiry_date=timezone.now().date() + timezone.timedelta(days=10),
             quantity=30
         )
-        self.batch_b = Inventory.objects.create(
+        self.batch_b = InventoryBatch.objects.create(
             medicine=self.medicine,
             batch_no="BATCH-B",
             expiry_date=timezone.now().date() + timezone.timedelta(days=90),
             quantity=50
         )
+        self.inventory_record = Inventory.objects.create(medicine=self.medicine)
+        self.inventory_record.update_stock()
 
     def test_session_cart_addition_and_validation(self):
         self.client.login(username="cashier_user", password="password123")

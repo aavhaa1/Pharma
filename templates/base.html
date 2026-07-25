@@ -17,29 +17,27 @@
 
     {% if user.is_authenticated and not user.is_superuser and user.groups.all.0.name == "Pharmacist" %}
     <style>
-        /* ── Pharmacist Sidebar Layout ─────────────────────────────── */
+        /* ── Pharmacist Sidebar Layout (White Theme) ─────────────────────────────── */
         :root {
             --sidebar-width: 240px;
-            --sidebar-bg: rgba(9, 9, 11, 0.97);
-            --sidebar-border: rgba(255, 255, 255, 0.07);
-            --sidebar-active: rgba(255, 255, 255, 0.10);
-            --sidebar-hover: rgba(255, 255, 255, 0.05);
-            --pharmacist-accent: #3b82f6;
-            /* Blue for pharmacist role */
+            --sidebar-bg: #ffffff;
+            --sidebar-border: rgba(0, 0, 0, 0.08);
+            --sidebar-active: rgba(37, 99, 235, 0.08);
+            --sidebar-hover: rgba(37, 99, 235, 0.04);
+            --pharmacist-accent: #2563eb;
         }
 
         body {
             display: flex;
             min-height: 100vh;
             overflow-x: hidden;
-            background: #09090b;
-            /* Match global dark background */
+            background: #f1f5f9;
         }
 
         /* ── Sidebar ─────────────────────────────────────────────── */
         #pharmacist-sidebar {
             width: var(--sidebar-width);
-            min-height: 100vh;
+            height: 100vh;
             background: var(--sidebar-bg);
             border-right: 1px solid var(--sidebar-border);
             display: flex;
@@ -49,6 +47,7 @@
             left: 0;
             z-index: 1040;
             transition: transform 0.3s ease;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
         }
 
         #pharmacist-sidebar .sidebar-brand {
@@ -60,7 +59,7 @@
             font-family: var(--font-heading);
             font-size: 1.4rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            background: linear-gradient(135deg, #1e293b 0%, #2563eb 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.03em;
@@ -71,9 +70,9 @@
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.35);
-            color: #60a5fa;
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.25);
+            color: #2563eb;
             border-radius: 20px;
             padding: 0.2rem 0.75rem;
             font-size: 0.72rem;
@@ -91,7 +90,7 @@
 
         #pharmacist-sidebar .sidebar-user .user-name {
             font-weight: 600;
-            color: #fafafa;
+            color: #1e293b;
             font-size: 0.9rem;
             display: block;
             font-family: var(--font-heading);
@@ -99,7 +98,7 @@
 
         #pharmacist-sidebar .sidebar-user .user-email {
             font-size: 0.75rem;
-            color: #71717a;
+            color: #94a3b8;
             display: block;
             margin-top: 0.1rem;
         }
@@ -114,7 +113,7 @@
             padding: 0.5rem 1.25rem 0.25rem;
             font-size: 0.65rem;
             font-weight: 700;
-            color: #52525b;
+            color: #cbd5e1;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             font-family: var(--font-heading);
@@ -125,7 +124,7 @@
             align-items: center;
             gap: 0.65rem;
             padding: 0.65rem 1.25rem;
-            color: #a1a1aa;
+            color: #475569;
             text-decoration: none;
             font-size: 0.88rem;
             font-weight: 500;
@@ -137,13 +136,14 @@
 
         #pharmacist-sidebar .nav-item-link:hover {
             background: var(--sidebar-hover);
-            color: #fafafa;
+            color: #2563eb;
         }
 
         #pharmacist-sidebar .nav-item-link.active {
             background: var(--sidebar-active);
-            color: #ffffff;
+            color: #2563eb;
             border-left-color: var(--pharmacist-accent);
+            font-weight: 600;
         }
 
         #pharmacist-sidebar .nav-item-link .nav-icon {
@@ -164,7 +164,7 @@
             align-items: center;
             gap: 0.65rem;
             padding: 0.65rem 1.25rem;
-            color: #71717a;
+            color: #64748b;
             text-decoration: none;
             font-size: 0.88rem;
             font-weight: 500;
@@ -182,7 +182,7 @@
         }
 
         #pharmacist-sidebar .sidebar-footer a:hover {
-            color: #fafafa;
+            color: #2563eb;
         }
 
         /* ── Main Content Area ───────────────────────────────────── */
@@ -196,8 +196,7 @@
 
         /* Top bar in main area */
         #pharmacist-topbar {
-            background: rgba(9, 9, 11, 0.85);
-            backdrop-filter: blur(10px);
+            background: #ffffff;
             border-bottom: 1px solid var(--sidebar-border);
             padding: 0.75rem 1.5rem;
             display: flex;
@@ -206,13 +205,14 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
 
         #pharmacist-topbar .page-title {
             font-family: var(--font-heading);
             font-weight: 700;
             font-size: 1.1rem;
-            color: #fafafa;
+            color: #1e293b;
             margin: 0;
         }
 
@@ -254,7 +254,7 @@
                 display: none;
                 position: fixed;
                 inset: 0;
-                background: rgba(0, 0, 0, 0.5);
+                background: rgba(0, 0, 0, 0.3);
                 z-index: 1039;
             }
 
@@ -265,9 +265,240 @@
 
         /* ── Alerts ──────────────────────────────────────────────── */
         .messages-container .alert {
-            background: rgba(24, 24, 27, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fafafa;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #1e293b;
+        }
+    </style>
+    {% elif user.is_authenticated and user.is_superuser or user.is_authenticated and user.groups.all.0.name == "Admin" or user.is_authenticated and user.groups.all.1.name == "Admin" %}
+    <style>
+        /* ── Admin Sidebar Layout ─────────────────────────────── */
+        :root {
+            --admin-sidebar-width: 240px;
+            --admin-sidebar-bg: #ffffff;
+            --admin-sidebar-border: rgba(0, 0, 0, 0.08);
+            --admin-sidebar-active: rgba(37, 99, 235, 0.08);
+            --admin-sidebar-hover: rgba(37, 99, 235, 0.04);
+            --admin-accent: #2563eb;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: #f1f5f9;
+        }
+
+        /* ── Sidebar ─────────────────────────────────────────────── */
+        #admin-sidebar {
+            width: var(--admin-sidebar-width);
+            height: 100vh;
+            background: var(--admin-sidebar-bg);
+            border-right: 1px solid var(--admin-sidebar-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1040;
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
+        }
+
+        #admin-sidebar .sidebar-brand {
+            padding: 1.5rem 1.25rem 1rem;
+            border-bottom: 1px solid var(--admin-sidebar-border);
+        }
+
+        #admin-sidebar .sidebar-brand .brand-name {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b 0%, #2563eb 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+            display: block;
+        }
+
+        #admin-sidebar .sidebar-brand .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.25);
+            color: #2563eb;
+            border-radius: 20px;
+            padding: 0.2rem 0.75rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            font-family: var(--font-heading);
+            margin-top: 0.4rem;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        #admin-sidebar .sidebar-user {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--admin-sidebar-border);
+        }
+
+        #admin-sidebar .sidebar-user .user-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.9rem;
+            display: block;
+            font-family: var(--font-heading);
+        }
+
+        #admin-sidebar .sidebar-user .user-email {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            display: block;
+            margin-top: 0.1rem;
+        }
+
+        #admin-sidebar .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        #admin-sidebar .nav-section-label {
+            padding: 0.5rem 1.25rem 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-family: var(--font-heading);
+        }
+
+        #admin-sidebar .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.65rem 1.25rem;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            font-family: var(--font-heading);
+            border-radius: 0;
+            transition: background 0.2s ease, color 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        #admin-sidebar .nav-item-link:hover {
+            background: var(--admin-sidebar-hover);
+            color: #2563eb;
+        }
+
+        #admin-sidebar .nav-item-link.active {
+            background: var(--admin-sidebar-active);
+            color: #2563eb;
+            border-left-color: var(--admin-accent);
+            font-weight: 600;
+        }
+
+        #admin-sidebar .nav-item-link .nav-icon {
+            font-size: 1.05rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        #admin-sidebar .sidebar-footer {
+            border-top: 1px solid var(--admin-sidebar-border);
+            padding: 0.75rem 0;
+        }
+
+        #admin-sidebar .sidebar-footer form button,
+        #admin-sidebar .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.65rem 1.25rem;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            font-family: var(--font-heading);
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        #admin-sidebar .sidebar-footer form button:hover { color: #ef4444; }
+        #admin-sidebar .sidebar-footer a:hover { color: #2563eb; }
+
+        /* ── Main Content Area ───────────────────────────────────── */
+        #admin-main {
+            margin-left: var(--admin-sidebar-width);
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #admin-topbar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--admin-sidebar-border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        #admin-topbar .page-title {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        #admin-topbar .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        #admin-sidebar-toggle { display: none; }
+
+        #admin-content {
+            flex: 1;
+            padding: 1.75rem 1.75rem;
+        }
+
+        /* ── Responsive ──────────────────────────────────────────── */
+        @media (max-width: 991.98px) {
+            #admin-sidebar { transform: translateX(-100%); }
+            #admin-sidebar.show { transform: translateX(0); }
+            #admin-main { margin-left: 0; }
+            #admin-sidebar-toggle { display: inline-flex; }
+
+            #admin-sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: 1039;
+            }
+            #admin-sidebar-overlay.show { display: block; }
+        }
+
+        /* ── Alerts ──────────────────────────────────────────────── */
+        .messages-container .alert {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: #1e293b;
         }
     </style>
     {% endif %}
@@ -403,9 +634,149 @@
             </div>
             {% endif %}
 
+    {% elif user.is_authenticated and user.is_superuser or user.is_authenticated and user.groups.all.0.name == "Admin" or user.is_authenticated and user.groups.all.1.name == "Admin" %}
+    <!-- ───────────────────────────────────────────────────────────────── -->
+    <!-- ADMIN SIDEBAR LAYOUT -->
+    <!-- ───────────────────────────────────────────────────────────────── -->
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="admin-sidebar-overlay"></div>
+
+    <aside id="admin-sidebar">
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <span class="brand-name">PharmaCare</span>
+            <span class="role-badge">
+                {% if user.is_superuser %}<i class="bi bi-shield-fill-check"></i> Superuser{% else %}<i class="bi bi-person-gear"></i> Admin{% endif %}
+            </span>
+        </div>
+
+        <!-- User Info -->
+        <div class="sidebar-user">
+            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+            <span class="user-email">{{ request.user.email|default:"Administrator" }}</span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+
+            <a href="{% url 'home' %}"
+                class="nav-item-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <i class="bi bi-speedometer2 nav-icon"></i>
+                Dashboard
+            </a>
+
+            <div class="nav-section-label" style="margin-top: 0.5rem;">Catalogue</div>
+
+            <a href="{% url 'medicine_list' %}"
+                class="nav-item-link {% if 'medicine' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-capsule nav-icon"></i>
+                Medicines
+            </a>
+
+            <a href="{% url 'category_list' %}"
+                class="nav-item-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-diagram-2 nav-icon"></i>
+                Categories
+            </a>
+
+            <a href="{% url 'supplier_list' %}"
+                class="nav-item-link {% if 'supplier' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-truck nav-icon"></i>
+                Suppliers
+            </a>
+
+            <div class="nav-section-label" style="margin-top: 0.5rem;">Stock Control</div>
+
+            <a href="{% url 'inventory_list' %}"
+                class="nav-item-link {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-box-seam nav-icon"></i>
+                Inventory
+            </a>
+
+            <a href="{% url 'purchase_list' %}"
+                class="nav-item-link {% if 'purchase' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-cart3 nav-icon"></i>
+                Purchases
+            </a>
+
+            <div class="nav-section-label" style="margin-top: 0.5rem;">Sales &amp; Finance</div>
+
+            <a href="{% url 'sale_list' %}"
+                class="nav-item-link {% if 'sale' in request.resolver_match.url_name or 'cart' in request.resolver_match.url_name or 'checkout' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-bag-check nav-icon"></i>
+                Sales
+            </a>
+
+            <a href="{% url 'reports_home' %}"
+                class="nav-item-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-bar-chart-line nav-icon"></i>
+                Reports
+            </a>
+
+            <div class="nav-section-label" style="margin-top: 0.5rem;">Administration</div>
+
+            <a href="{% url 'user_list' %}"
+                class="nav-item-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-people nav-icon"></i>
+                Users
+            </a>
+
+        </nav>
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            <a href="{% url 'change_password' %}">
+                <i class="bi bi-key nav-icon"></i>
+                Change Password
+            </a>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">
+                    <i class="bi bi-box-arrow-left nav-icon"></i>
+                    Logout
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <div id="admin-main">
+        <!-- Top Bar -->
+        <div id="admin-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button id="admin-sidebar-toggle" class="btn btn-sm btn-outline-secondary p-1 lh-1">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <h6 class="page-title">Admin Portal</h6>
+            </div>
+            <div class="topbar-actions">
+                <span class="text-secondary small fw-semibold">{{ request.user.username }}</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div id="admin-content">
+            <!-- Django Messages -->
+            {% if messages %}
+            <div class="messages-container mb-4">
+                {% for message in messages %}
+                <div class="alert alert-dismissible fade show {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}"
+                    role="alert">
+                    {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill text-success me-2"></i>
+                    {% elif message.tags == 'error' %}<i class="bi bi-x-circle-fill text-danger me-2"></i>
+                    {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                    {% else %}<i class="bi bi-info-circle-fill text-info me-2"></i>{% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
     {% else %}
     <!-- ───────────────────────────────────────────────────────────────── -->
-    <!-- DEFAULT / ADMIN TOP-NAVBAR LAYOUT -->
+    <!-- CASHIER / DEFAULT TOP-NAVBAR LAYOUT -->
     <!-- ───────────────────────────────────────────────────────────────── -->
 
     {% if request.resolver_match.url_name == "home" %}
@@ -451,54 +822,18 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     {% if user.is_authenticated %}
-                    {# ── Medicines & Categories: Admin, Pharmacist ── #}
-                    {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name ==
-                    "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
-                    <li class="nav-item">
-                        <a class="nav-link px-2 {% if 'medicine' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'medicine_list' %}">Medicines</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link px-2 {% if 'category' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'category_list' %}">Categories</a>
-                    </li>
-                    {% endif %}
-
                     <li class="nav-item">
                         <a class="nav-link px-2 {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}"
                             href="{% url 'inventory_list' %}">Inventory</a>
                     </li>
-
-                    {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name ==
-                    "Pharmacist" or user.groups.all.1.name == "Admin" or user.groups.all.1.name == "Pharmacist" %}
-                    <li class="nav-item">
-                        <a class="nav-link px-2 {% if 'supplier' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'supplier_list' %}">Suppliers</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link px-2 {% if 'purchase' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'purchase_list' %}">Purchases</a>
-                    </li>
-                    {% endif %}
-
                     <li class="nav-item">
                         <a class="nav-link px-2 {% if 'report' in request.resolver_match.url_name %}active{% endif %}"
                             href="{% url 'reports_home' %}">Reports</a>
                     </li>
-
-                    {# ── Sales: Admin, Pharmacist, Cashier ── #}
                     <li class="nav-item">
                         <a class="nav-link px-2 {% if 'sale' in request.resolver_match.url_name or 'cart' in request.resolver_match.url_name or 'checkout' in request.resolver_match.url_name %}active{% endif %}"
                             href="{% url 'sale_list' %}">Sales</a>
                     </li>
-
-                    {# ── Users: Admin only ── #}
-                    {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.1.name == "Admin" %}
-                    <li class="nav-item">
-                        <a class="nav-link px-2 {% if 'user' in request.resolver_match.url_name %}active{% endif %}"
-                            href="{% url 'user_list' %}">Users</a>
-                    </li>
-                    {% endif %}
                     {% endif %}
                 </ul>
 
@@ -506,9 +841,6 @@
                     {% if user.is_authenticated %}
                     <span class="text-white me-3 small d-none d-lg-inline">
                         <strong>{{ user.username }}</strong>
-                        {% if user.is_superuser %}
-                        <span class="badge bg-warning text-dark ms-1">Superuser</span>
-                        {% endif %}
                         {% for group in user.groups.all %}
                         <span class="badge bg-warning text-dark ms-1">{{ group.name }}</span>
                         {% endfor %}
@@ -546,7 +878,7 @@
         </div>
         {% endif %}
 
-    {% endif %}{# ──────── end pharmacist / default layout chrome ──────── #}
+    {% endif %}{# ──────── end layout chrome ──────── #}
 
     {# ═══════════════════════════════════════════════════════════════════ #}
     {# Single {% block content %} — works for BOTH layout branches above  #}
@@ -560,7 +892,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Mobile sidebar toggle
+        // Mobile sidebar toggle - Pharmacist
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('pharmacist-sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -575,6 +907,31 @@
             overlay.addEventListener('click', () => {
                 sidebar.classList.remove('show');
                 overlay.classList.remove('show');
+            });
+        }
+    </script>
+
+    {% elif user.is_authenticated and user.is_superuser or user.is_authenticated and user.groups.all.0.name == "Admin" or user.is_authenticated and user.groups.all.1.name == "Admin" %}
+        </div>{# end #admin-content #}
+    </div>{# end #admin-main #}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mobile sidebar toggle - Admin
+        const adminToggle = document.getElementById('admin-sidebar-toggle');
+        const adminSidebar = document.getElementById('admin-sidebar');
+        const adminOverlay = document.getElementById('admin-sidebar-overlay');
+
+        if (adminToggle) {
+            adminToggle.addEventListener('click', () => {
+                adminSidebar.classList.toggle('show');
+                adminOverlay.classList.toggle('show');
+            });
+        }
+        if (adminOverlay) {
+            adminOverlay.addEventListener('click', () => {
+                adminSidebar.classList.remove('show');
+                adminOverlay.classList.remove('show');
             });
         }
     </script>

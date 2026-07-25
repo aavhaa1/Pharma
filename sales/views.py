@@ -102,7 +102,12 @@ class CartView(LoginRequiredMixin, View):
         cart = request.session.get('cart', {})
         
         if action == 'add':
-            qty = int(request.POST.get('quantity', 1))
+            try:
+                qty = int(request.POST.get('quantity', 1))
+            except (ValueError, TypeError):
+                messages.error(request, "Invalid quantity format.")
+                return redirect('sale_new')
+                
             if qty <= 0:
                 messages.error(request, "Quantity must be greater than zero.")
                 return redirect('sale_new')
@@ -135,7 +140,12 @@ class CartView(LoginRequiredMixin, View):
             messages.success(request, f"Item added to cart.")
             
         elif action == 'update':
-            qty = int(request.POST.get('quantity', 1))
+            try:
+                qty = int(request.POST.get('quantity', 1))
+            except (ValueError, TypeError):
+                messages.error(request, "Invalid quantity format.")
+                return redirect('cart_view')
+                
             if qty <= 0:
                 cart.pop(str(medicine_id), None)
             else:
@@ -178,8 +188,11 @@ class CheckoutView(LoginRequiredMixin, View):
             
         cart_items = []
         subtotal = Decimal('0.00')
+        has_prescription_items = False
         for med_id, item in cart.items():
             medicine = get_object_or_404(Medicine, pk=med_id)
+            if medicine.requires_prescription:
+                has_prescription_items = True
             total = Decimal(str(item['quantity'])) * medicine.selling_price
             subtotal += total
             cart_items.append({
@@ -190,7 +203,8 @@ class CheckoutView(LoginRequiredMixin, View):
             
         return render(request, 'sales/checkout.html', {
             'cart_items': cart_items,
-            'subtotal': subtotal
+            'subtotal': subtotal,
+            'has_prescription_items': has_prescription_items
         })
 
     def post(self, request, *args, **kwargs):
@@ -201,9 +215,44 @@ class CheckoutView(LoginRequiredMixin, View):
 
         customer_name = request.POST.get('customer_name', '').strip()
         payment_method = request.POST.get('payment_method', 'Cash')
-        discount = Decimal(request.POST.get('discount', '0.00') or '0.00')
-        tax = Decimal(request.POST.get('tax', '0.00') or '0.00')
         
+        valid_payment_methods = [choice[0] for choice in Sale.PAYMENT_METHODS]
+        if payment_method not in valid_payment_methods:
+            messages.error(request, "Invalid payment method selected.")
+            return redirect('checkout_view')
+
+        try:
+            discount = Decimal(request.POST.get('discount', '0.00') or '0.00')
+            if discount < 0:
+                messages.error(request, "Discount cannot be negative.")
+                return redirect('checkout_view')
+        except Exception:
+            messages.error(request, "Invalid discount value.")
+            return redirect('checkout_view')
+
+        try:
+            tax = Decimal(request.POST.get('tax', '0.00') or '0.00')
+            if tax < 0:
+                messages.error(request, "Tax cannot be negative.")
+                return redirect('checkout_view')
+        except Exception:
+            messages.error(request, "Invalid tax value.")
+            return redirect('checkout_view')
+
+        # Check if any item in cart requires prescription
+        has_prescription_items = False
+        for med_id in cart.keys():
+            medicine = get_object_or_404(Medicine, pk=med_id)
+            if medicine.requires_prescription:
+                has_prescription_items = True
+                break
+
+        if has_prescription_items:
+            prescription_verified = request.POST.get('prescription_verified') in ['on', 'true', '1']
+            if not prescription_verified:
+                messages.error(request, "Prescription verification is required for Rx medicines.")
+                return redirect('checkout_view')
+
         today = timezone.now().date()
         
         try:
@@ -233,7 +282,10 @@ class CheckoutView(LoginRequiredMixin, View):
                     subtotal += Decimal(str(qty_requested)) * medicine.selling_price
                     sale_items_data.append((medicine, qty_requested, batches))
                 
-                # 2. Create Sale
+                # 2. Validate discount against subtotal and Create Sale
+                if discount > subtotal:
+                    raise ValueError(f"Discount (Rs. {discount}) cannot be greater than the subtotal (Rs. {subtotal}).")
+
                 invoice_number = Sale.generate_next_invoice_number()
                 total_amount = subtotal - discount + tax
                 if total_amount < 0:

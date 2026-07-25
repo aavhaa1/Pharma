@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 from django.utils import timezone
+from datetime import timedelta
 from .models import Purchase, PurchaseItem
 from medicines.models import Medicine
 from suppliers.models import Supplier
@@ -20,6 +21,23 @@ class PurchaseForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Only list active suppliers
         self.fields['supplier'].queryset = Supplier.objects.filter(is_active=True)
+
+    def clean_purchase_date(self):
+        purchase_date = self.cleaned_data.get('purchase_date')
+        if purchase_date and purchase_date > timezone.now().date():
+            raise forms.ValidationError("Purchase date cannot be in the future.")
+        return purchase_date
+
+    def clean_invoice_number(self):
+        invoice_number = self.cleaned_data.get('invoice_number', '').strip()
+        if not invoice_number:
+            raise forms.ValidationError("Invoice number is required.")
+        qs = Purchase.objects.filter(invoice_number__iexact=invoice_number)
+        if self.instance and self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError(f"A purchase order with invoice number \"{invoice_number}\" already exists.")
+        return invoice_number
 
 
 class PurchaseItemForm(forms.ModelForm):
@@ -43,8 +61,13 @@ class PurchaseItemForm(forms.ModelForm):
 
     def clean_expiry_date(self):
         expiry_date = self.cleaned_data.get('expiry_date')
-        if expiry_date and expiry_date < timezone.now().date():
-            raise forms.ValidationError("Expiry date cannot be in the past.")
+        if expiry_date:
+            today = timezone.now().date()
+            if expiry_date <= today:
+                raise forms.ValidationError("Expiry date must be in the future.")
+            min_expiry = today + timedelta(days=30)
+            if expiry_date < min_expiry:
+                raise forms.ValidationError("Expiry date must be at least 30 days from today.")
         return expiry_date
 
     def clean_quantity(self):
@@ -64,6 +87,12 @@ class PurchaseItemForm(forms.ModelForm):
         if unit_cost is not None and unit_cost < 0:
             raise forms.ValidationError("Unit cost cannot be negative.")
         return unit_cost
+
+    def clean_batch_no(self):
+        batch_no = self.cleaned_data.get('batch_no', '').strip()
+        if not batch_no:
+            raise forms.ValidationError("Batch number is required.")
+        return batch_no
 
 
 PurchaseItemFormSet = inlineformset_factory(

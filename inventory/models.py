@@ -26,6 +26,7 @@ class Inventory(models.Model):
     class Meta:
         verbose_name = "Inventory"
         verbose_name_plural = "Inventories"
+        ordering = ["medicine__name"]
 
     def __str__(self):
         return f"{self.medicine.name} - Stock: {self.current_stock}"

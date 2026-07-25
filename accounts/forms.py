@@ -39,11 +39,27 @@ class UserCreateForm(forms.ModelForm):
         return email
 
     def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if username:
-            if User.objects.filter(username__iexact=username).exists():
-                raise ValidationError("A user with that username already exists.")
+        username = self.cleaned_data.get('username', '').strip()
+        if not username:
+            raise ValidationError("Username is required.")
+        import re
+        if not re.match(r'^[\w.@+-]+$', username):
+            raise ValidationError("Username may only contain letters, numbers, and @/./+/-/_ characters.")
+        if User.objects.filter(username__iexact=username).exists():
+            raise ValidationError("A user with that username already exists.")
         return username
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name', '').strip()
+        if first_name and len(first_name) > 150:
+            raise ValidationError("First name cannot exceed 150 characters.")
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name', '').strip()
+        if last_name and len(last_name) > 150:
+            raise ValidationError("Last name cannot exceed 150 characters.")
+        return last_name
 
     def clean(self):
         cleaned_data = super().clean()
@@ -109,11 +125,27 @@ class UserEditForm(forms.ModelForm):
         return email
 
     def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if username:
-            if User.objects.filter(username__iexact=username).exclude(pk=self.instance.pk).exists():
-                raise ValidationError("A user with that username already exists.")
+        username = self.cleaned_data.get('username', '').strip()
+        if not username:
+            raise ValidationError("Username is required.")
+        import re
+        if not re.match(r'^[\w.@+-]+$', username):
+            raise ValidationError("Username may only contain letters, numbers, and @/./+/-/_ characters.")
+        if User.objects.filter(username__iexact=username).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("A user with that username already exists.")
         return username
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name', '').strip()
+        if first_name and len(first_name) > 150:
+            raise ValidationError("First name cannot exceed 150 characters.")
+        return first_name
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name', '').strip()
+        if last_name and len(last_name) > 150:
+            raise ValidationError("Last name cannot exceed 150 characters.")
+        return last_name
 
     def save(self, commit=True):
         user = super().save(commit=False)

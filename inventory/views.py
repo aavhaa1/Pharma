@@ -113,6 +113,10 @@ class InventoryCreateView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, Su
             reason="New Stock",
             quantity_before=0
         )
+        # Update the aggregate Inventory record for this medicine
+        inv_record, _ = Inventory.objects.get_or_create(medicine=self.object.medicine)
+        inv_record.update_stock()
+
         messages.success(self.request, self.success_message)
         messages.success(self.request, "Inventory history recorded successfully.")
         return HttpResponseRedirect(self.get_success_url())

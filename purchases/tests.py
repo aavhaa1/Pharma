@@ -8,7 +8,7 @@ from decimal import Decimal
 from suppliers.models import Supplier
 from medicines.models import Category, Medicine
 from purchases.models import Purchase, PurchaseItem
-from inventory.models import Inventory, InventoryHistory
+from inventory.models import Inventory, InventoryBatch, InventoryHistory
 
 User = get_user_model()
 
@@ -113,7 +113,7 @@ class PurchaseModuleTestCase(TestCase):
         self.client.login(username="admin_user", password="password123")
         
         # Verify inventory and history is currently empty
-        self.assertEqual(Inventory.objects.filter(medicine=self.medicine, batch_no='BATCH-ABC').count(), 0)
+        self.assertEqual(InventoryBatch.objects.filter(medicine=self.medicine, batch_no='BATCH-ABC').count(), 0)
         self.assertEqual(InventoryHistory.objects.count(), 0)
 
         # Post to receive PO
@@ -125,15 +125,19 @@ class PurchaseModuleTestCase(TestCase):
         purchase.refresh_from_db()
         self.assertEqual(purchase.status, 'Received')
         
-        # Verify Inventory has been updated
-        inventory = Inventory.objects.get(medicine=self.medicine, batch_no='BATCH-ABC')
-        self.assertEqual(inventory.quantity, 100)
-        self.assertEqual(inventory.expiry_date, item.expiry_date)
+        # Verify InventoryBatch has been updated
+        batch = InventoryBatch.objects.get(medicine=self.medicine, batch_no='BATCH-ABC')
+        self.assertEqual(batch.quantity, 100)
+        self.assertEqual(batch.expiry_date, item.expiry_date)
         
+        # Verify aggregate Inventory has been updated
+        inv_record = Inventory.objects.get(medicine=self.medicine)
+        self.assertEqual(inv_record.current_stock, 100)
+
         # Verify History Log
         self.assertEqual(InventoryHistory.objects.count(), 1)
         log = InventoryHistory.objects.first()
-        self.assertEqual(log.inventory, inventory)
+        self.assertEqual(log.inventory, batch)
         self.assertEqual(log.action, 'Added')
         self.assertEqual(log.quantity_changed, 100)
         self.assertEqual(log.quantity_before, 0)
@@ -160,6 +164,7 @@ class PurchaseModuleTestCase(TestCase):
         self.assertEqual(purchase.status, 'Cancelled')
         
         # Verify no inventory was created
+        self.assertEqual(InventoryBatch.objects.count(), 0)
         self.assertEqual(Inventory.objects.count(), 0)
         self.assertEqual(InventoryHistory.objects.count(), 0)
 

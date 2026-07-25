@@ -80,8 +80,23 @@ class SupplierForm(forms.ModelForm):
         phone = self.cleaned_data.get("phone", "")
         if phone:
             phone = phone.strip()
+            if len(phone) > 20:
+                raise forms.ValidationError("Phone number cannot exceed 20 characters.")
             # Allow digits, spaces, hyphens, plus sign, and parentheses
             phone_pattern = r'^[+\d\s\-\(\)]+$'
             if not re.match(phone_pattern, phone):
                 raise forms.ValidationError("Phone number should only contain numbers, spaces, dashes, parentheses, and '+'.")
         return phone
+
+    def clean_email(self):
+        """Validate email format if provided."""
+        email = self.cleaned_data.get("email", "")
+        if email:
+            email = email.strip().lower()
+            # Check for duplicate email among active suppliers (excluding self on edit)
+            qs = Supplier.objects.filter(email__iexact=email)
+            if self.instance and self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError(f"A supplier with email \"{email}\" already exists.")
+        return email

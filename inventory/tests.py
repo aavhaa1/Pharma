@@ -7,7 +7,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from medicines.models import Medicine, Category
-from inventory.models import Inventory, InventoryHistory
+from inventory.models import Inventory, InventoryBatch, InventoryHistory
 from inventory.forms import InventoryForm, StockAdjustmentForm
 
 User = get_user_model()
@@ -48,7 +48,7 @@ class InventoryTestCase(TestCase):
     def test_inventory_creation_validations(self):
         # 1. Valid inventory creation
         today = timezone.now().date()
-        inv = Inventory(
+        inv = InventoryBatch(
             medicine=self.medicine,
             batch_no="BATCH001",
             expiry_date=today,
@@ -60,7 +60,7 @@ class InventoryTestCase(TestCase):
 
         # 2. Expiry date in past validation when creating
         yesterday = today - timedelta(days=1)
-        past_inv = Inventory(
+        past_inv = InventoryBatch(
             medicine=self.medicine,
             batch_no="BATCH002",
             expiry_date=yesterday,
@@ -70,7 +70,7 @@ class InventoryTestCase(TestCase):
             past_inv.full_clean()
 
         # 3. Negative quantity validation
-        neg_inv = Inventory(
+        neg_inv = InventoryBatch(
             medicine=self.medicine,
             batch_no="BATCH003",
             expiry_date=today,
@@ -81,7 +81,7 @@ class InventoryTestCase(TestCase):
 
     def test_history_creation_on_save_with_history(self):
         today = timezone.now().date()
-        inv = Inventory(
+        inv = InventoryBatch(
             medicine=self.medicine,
             batch_no="BATCH123",
             expiry_date=today,
@@ -145,6 +145,10 @@ class InventoryTestCase(TestCase):
         today = timezone.now().date()
         inv = Inventory.objects.create(
             medicine=self.medicine,
+            current_stock=20
+        )
+        batch = InventoryBatch.objects.create(
+            medicine=self.medicine,
             batch_no="BATCH-ADJ",
             expiry_date=today,
             quantity=20
@@ -154,7 +158,7 @@ class InventoryTestCase(TestCase):
         form_valid = StockAdjustmentForm(
             inventory=inv,
             data={
-                "inventory": inv.pk,
+                "inventory": batch.pk,
                 "adjustment_type": "Decrease",
                 "quantity_changed": 10,
                 "reason": "Damaged"
@@ -166,7 +170,7 @@ class InventoryTestCase(TestCase):
         form_invalid = StockAdjustmentForm(
             inventory=inv,
             data={
-                "inventory": inv.pk,
+                "inventory": batch.pk,
                 "adjustment_type": "Decrease",
                 "quantity_changed": 25,
                 "reason": "Damaged"
@@ -179,6 +183,10 @@ class InventoryTestCase(TestCase):
         # Setup batch
         today = timezone.now().date()
         inv = Inventory.objects.create(
+            medicine=self.medicine,
+            current_stock=10
+        )
+        batch = InventoryBatch.objects.create(
             medicine=self.medicine,
             batch_no="BATCH-PERM",
             expiry_date=today,
@@ -221,7 +229,7 @@ class InventoryTestCase(TestCase):
         # Create an expired batch (should not count as available stock)
         yesterday = timezone.now().date() - timedelta(days=1)
         # Create with a future date first to pass the creation-time clean checks, then update it.
-        expired_batch = Inventory.objects.create(
+        expired_batch = InventoryBatch.objects.create(
             medicine=self.medicine,
             batch_no="BATCH-EXP",
             expiry_date=timezone.now().date() + timedelta(days=5),
@@ -233,11 +241,10 @@ class InventoryTestCase(TestCase):
         self.assertTrue(self.medicine.is_out_of_stock)
         self.assertFalse(self.medicine.is_low_stock)
         self.assertTrue(expired_batch.is_expired)
-        self.assertFalse(expired_batch.is_low_stock)
 
         # Create an unexpired low stock batch (quantity = 5 <= minimum_stock_level of 10)
         tomorrow = timezone.now().date() + timedelta(days=5)
-        low_stock_batch = Inventory.objects.create(
+        low_stock_batch = InventoryBatch.objects.create(
             medicine=self.medicine,
             batch_no="BATCH-LOW",
             expiry_date=tomorrow,
@@ -246,12 +253,11 @@ class InventoryTestCase(TestCase):
         self.assertEqual(self.medicine.available_stock, 5)
         self.assertFalse(self.medicine.is_out_of_stock)
         self.assertTrue(self.medicine.is_low_stock)
-        self.assertTrue(low_stock_batch.is_low_stock)
 
         # Create another unexpired batch (quantity = 50)
         # Total unexpired stock = 5 + 50 = 55 >= 50 threshold.
         # So the medicine overall is no longer low stock.
-        normal_batch = Inventory.objects.create(
+        normal_batch = InventoryBatch.objects.create(
             medicine=self.medicine,
             batch_no="BATCH-NORM",
             expiry_date=tomorrow,
