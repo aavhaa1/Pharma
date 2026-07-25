@@ -1,5 +1,5 @@
-﻿/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 /* ──────────────────────────────────────────────────────────────
    CSS VARIABLES — Healthcare Professional Palette
@@ -28,10 +28,17 @@
     --accent-gradient:    linear-gradient(135deg, #10B981 0%, #059669 100%);
     --font-heading:       'Outfit', sans-serif;
     --font-body:          'Inter', sans-serif;
+    --font-brand:         'Plus Jakarta Sans', sans-serif;
     --shadow-card:        0 1px 3px 0 rgba(0,0,0,0.08), 0 1px 2px -1px rgba(0,0,0,0.06);
     --shadow-elevated:    0 4px 12px 0 rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
     --shadow-primary:     0 4px 14px rgba(37, 99, 235, 0.2);
     --transition-smooth:  all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.item-title, .medicine-name, .category-title, .brand-font {
+    font-family: var(--font-brand) !important;
+    font-weight: 600;
+    letter-spacing: -0.015em;
 }
 
 body {

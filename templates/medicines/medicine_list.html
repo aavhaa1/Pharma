@@ -85,21 +85,21 @@
                     {% for medicine in medicines %}
                         <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle; {% if not medicine.is_active %}opacity: 0.45; background: rgba(220, 53, 69, 0.02);{% endif %}">
                             <td class="py-3 px-3 fw-semibold">
-                                <a href="{% url 'medicine_detail' medicine.pk %}" class="text-dark fw-bold text-decoration-none hover-link" style="transition: var(--transition-smooth); {% if not medicine.is_active %}text-decoration: line-through;{% endif %}">
+                                <a href="{% url 'medicine_detail' medicine.pk %}" class="text-dark fw-bold text-decoration-none hover-link brand-font" style="transition: var(--transition-smooth); {% if not medicine.is_active %}text-decoration: line-through;{% endif %}">
                                     {{ medicine.name }}
                                 </a>
                                 {% if medicine.requires_prescription %}
                                     <span class="badge bg-danger text-white border border-danger-subtle ms-1" style="font-size: 0.7rem;">Rx</span>
                                 {% endif %}
                             </td>
-                            <td class="py-3 px-3 text-muted">
+                            <td class="py-3 px-3 text-muted brand-font">
                                 {% if medicine.brand %}
                                     {{ medicine.brand }}
                                 {% else %}
                                     <span class="fst-italic opacity-50">Generic</span>
                                 {% endif %}
                             </td>
-                            <td class="py-3 px-3 text-muted">
+                            <td class="py-3 px-3 text-muted brand-font">
                                 {% if medicine.category %}
                                     {{ medicine.category.name }}
                                 {% else %}

@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Categories | PharmaCare{% endblock %}
 
@@ -36,7 +36,7 @@
                 <tbody>
                     {% for category in categories %}
                         <tr style="border-bottom: 1px solid var(--border-color); vertical-align: middle;">
-                            <td class="py-3 px-4 fw-semibold">{{ category.name }}</td>
+                            <td class="py-3 px-4 fw-semibold brand-font text-dark">{{ category.name }}</td>
                             <td class="py-3 px-4 text-muted">
                                 {% if category.description %}
                                     {{ category.description }}
@@ -76,6 +76,28 @@
                 </tbody>
             </table>
         </div>
+        {% if is_paginated %}
+        <div class="card-footer bg-white py-3 border-top border-light-subtle">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-secondary small">Showing page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link">Prev</span></li>
+                        {% endif %}
+                        <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                        {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link">Next</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

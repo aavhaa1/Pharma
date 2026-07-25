@@ -45,6 +45,7 @@ class CategoryListView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, ListV
     model = Category
     template_name = "medicines/category_list.html"
     context_object_name = "categories"
+    paginate_by = 10
 
 
 class CategoryCreateView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, SuccessMessageMixin, CreateView):

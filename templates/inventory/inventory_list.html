@@ -113,12 +113,12 @@
                             </td>
                             
                             <td class="py-3 px-4 fw-semibold">
-                                <a href="{% url 'inventory_detail' item.pk %}" class="text-white text-decoration-none hover-link">
+                                <a href="{% url 'inventory_detail' item.pk %}" class="text-dark text-decoration-none hover-link brand-font">
                                     {{ item.medicine.name }}
                                 </a>
                             </td>
                             
-                            <td class="py-3 px-4 text-secondary">
+                            <td class="py-3 px-4 text-secondary brand-font">
                                 {% if item.medicine.category %}
                                     {{ item.medicine.category.name }}
                                 {% else %}

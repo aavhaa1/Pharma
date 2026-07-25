@@ -334,12 +334,8 @@ class CheckoutView(LoginRequiredMixin, View):
                         
                         remaining_qty -= deduct_qty
                     
-                    # Update aggregate Inventory for this medicine
-                    try:
-                        inv_record = Inventory.objects.get(medicine=medicine)
-                        inv_record.update_stock()
-                    except Inventory.DoesNotExist:
-                        pass
+                    inv_record, _ = Inventory.objects.get_or_create(medicine=medicine)
+                    inv_record.update_stock()
                 
                 # Clear Cart
                 request.session['cart'] = {}

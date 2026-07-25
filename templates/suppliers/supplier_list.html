@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Suppliers Directory | PharmaCare{% endblock %}
 
@@ -81,7 +81,7 @@
                                 {{ page_obj.start_index|add:forloop.counter0 }}
                             </td>
                             <td class="py-3 px-4 fw-semibold">
-                                <a href="{% url 'supplier_detail' supplier.pk %}" class="text-dark fw-bold text-decoration-none hover-link supplier-link {% if not supplier.is_active %}supplier-inactive-link{% endif %}">
+                                <a href="{% url 'supplier_detail' supplier.pk %}" class="text-dark fw-bold text-decoration-none hover-link supplier-link brand-font {% if not supplier.is_active %}supplier-inactive-link{% endif %}">
                                     {{ supplier.name }}
                                 </a>
                             </td>
