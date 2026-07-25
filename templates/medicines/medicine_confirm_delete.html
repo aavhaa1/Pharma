@@ -1,33 +1,65 @@
 {% extends "base.html" %}
 
-{% block title %}Deactivate Medicine | PharmaCare{% endblock %}
+{% block title %}{% if action == 'activate' %}Activate{% else %}Deactivate{% endif %} Medicine | PharmaCare{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center py-4">
     <div class="col-md-8 col-lg-6">
         
         <div class="mb-3">
-            <a href="{% url 'medicine_list' %}" class="text-secondary text-decoration-none" style="font-size: 0.9rem;">
-                &larr; Back to Medicines
+            <a href="{% url 'medicine_list' %}" class="btn btn-sm btn-link text-secondary text-decoration-none p-0">
+                <i class="bi bi-arrow-left me-1"></i> Back to Medicines
             </a>
         </div>
 
-        <div class="card border-danger-subtle" style="border: 1px solid rgba(220, 53, 69, 0.3);">
-            <div class="card-header" style="background: rgba(220, 53, 69, 0.03); border-bottom: 1px solid rgba(220, 53, 69, 0.2);">
-                <h3 class="mb-0 text-danger">Deactivate Medicine</h3>
+        <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 12px; background: #ffffff;">
+            <!-- Header Banner -->
+            <div class="p-4 d-flex align-items-center gap-3 border-bottom" style="{% if action == 'deactivate' %}background: #fef2f2; border-color: #fee2e2 !important;{% else %}background: #f0fdf4; border-color: #dcfce7 !important;{% endif %}">
+                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; {% if action == 'deactivate' %}background: #fee2e2; color: #ef4444;{% else %}background: #dcfce7; color: #16a34a;{% endif %}">
+                    {% if action == 'deactivate' %}
+                        <i class="bi bi-slash-circle fs-4"></i>
+                    {% else %}
+                        <i class="bi bi-check-circle fs-4"></i>
+                    {% endif %}
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold {% if action == 'deactivate' %}text-danger{% else %}text-success{% endif %}" style="font-family: var(--font-heading);">
+                        {% if action == 'activate' %}Reactivate{% else %}Deactivate{% endif %} Medicine
+                    </h5>
+                    <p class="mb-0 text-secondary small">Confirm status change for this catalog item</p>
+                </div>
             </div>
-            <div class="card-body">
-                <p>Are you sure you want to deactivate the medicine "<strong>{{ object.name }}</strong>"?</p>
-                
-                <div class="alert alert-warning" style="background: rgba(255, 193, 7, 0.05); border: 1px solid rgba(255, 193, 7, 0.15); color: #ffca2c; font-size: 0.9rem;">
-                    <strong>Notice:</strong> This is a soft delete. The medicine details and past transaction histories will remain in the database, but it will be hidden from new sales and restocking drop-downs.
+
+            <!-- Body Content -->
+            <div class="card-body p-4">
+                <div class="p-3 mb-4 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                    <div class="text-secondary small text-uppercase font-heading fw-semibold mb-1">Target Item</div>
+                    <div class="fs-5 fw-bold text-dark brand-font">{{ object.name }}</div>
+                    {% if object.brand %}
+                        <div class="text-muted small">Brand: {{ object.brand }}</div>
+                    {% endif %}
                 </div>
 
-                <form method="post" class="mt-4">
+                <div class="p-3 rounded-3 mb-4 border" style="{% if action == 'deactivate' %}background: #fffbebf5; border-color: #fef3c7 !important; color: #92400e;{% else %}background: #eff6ff; border-color: #dbeafe !important; color: #1e40af;{% endif %}">
+                    <div class="d-flex gap-2">
+                        <i class="bi {% if action == 'deactivate' %}bi-exclamation-triangle-fill text-warning{% else %}bi-info-circle-fill text-primary{% endif %} fs-5 lh-1"></i>
+                        <div class="small">
+                            {% if action == 'deactivate' %}
+                                <strong>Deactivation Impact:</strong> This is a soft-delete. Existing batch records, purchase logs, and past sales will remain intact. However, this medicine will be hidden from POS checkout and purchase order forms.
+                            {% else %}
+                                <strong>Reactivation Impact:</strong> This medicine will immediately become available in active stock searches, POS checkout, and restocking lists.
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" class="m-0">
                     {% csrf_token %}
-                    <div class="d-flex justify-content-end gap-2">
-                        <a href="{% url 'medicine_list' %}" class="btn btn-light">Cancel</a>
-                        <button type="submit" class="btn btn-danger">Yes, Deactivate</button>
+                    <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                        <a href="{% url 'medicine_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn {% if action == 'deactivate' %}btn-danger{% else %}btn-success{% endif %} px-4 fw-semibold">
+                            Yes, {% if action == 'activate' %}Activate{% else %}Deactivate{% endif %}
+                        </button>
                     </div>
                 </form>
             </div>

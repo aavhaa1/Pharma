@@ -52,14 +52,18 @@
                                 {% endif %}
                             </td>
                             <td class="py-3 px-4 text-end text-nowrap">
-                                <div class="btn-group btn-group-sm" role="group">
+                                <div class="d-inline-flex gap-1" role="group">
                                     {% if user.is_superuser or user.groups.all.0.name == "Admin" or user.groups.all.0.name == "Pharmacist" %}
-                                        <a href="{% url 'category_edit' category.pk %}" class="btn btn-outline-secondary" title="Edit">
+                                        <a href="{% url 'category_edit' category.pk %}" class="btn btn-sm btn-outline-secondary px-2 py-1" title="Edit">
                                             <i class="bi bi-pencil"></i> Edit
                                         </a>
                                         {% if category.is_active %}
-                                            <a href="{% url 'category_delete' category.pk %}" class="btn btn-outline-danger" title="Deactivate">
-                                                <i class="bi bi-slash-circle"></i> Deactivate
+                                            <a href="{% url 'category_delete' category.pk %}" class="btn btn-sm btn-outline-danger px-2 py-1" title="Deactivate">
+                                                <i class="bi bi-slash-circle"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'category_activate' category.pk %}" class="btn btn-sm btn-outline-success px-2 py-1" title="Activate">
+                                                <i class="bi bi-check-circle"></i>
                                             </a>
                                         {% endif %}
                                     {% endif %}

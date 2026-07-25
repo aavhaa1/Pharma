@@ -1,3 +1,5 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -75,12 +77,17 @@ class CategoryUpdateView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, Suc
 class CategorySoftDeleteView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, DeleteView):
     """
     Soft-deletes (deactivates) a category.
-    Instead of hard deleting from the DB, sets `is_active=False`.
+    Sets `is_active=False`.
     Accessible by: Admin, Pharmacist.
     """
     model = Category
     template_name = "medicines/category_confirm_delete.html"
     success_url = reverse_lazy("category_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action"] = "deactivate"
+        return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -92,6 +99,26 @@ class CategorySoftDeleteView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin,
             f"Category '{self.object.name}' has been successfully deactivated."
         )
         return HttpResponseRedirect(success_url)
+
+
+class CategoryActivateView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, View):
+    """
+    Reactivates a deactivated category.
+    Accessible by: Admin, Pharmacist.
+    """
+    def get(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        return render(request, "medicines/category_confirm_delete.html", {
+            "object": category,
+            "action": "activate"
+        })
+
+    def post(self, request, pk):
+        category = get_object_or_404(Category, pk=pk)
+        category.is_active = True
+        category.save()
+        messages.success(request, f"Category '{category.name}' has been successfully activated.")
+        return redirect("category_list")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -209,6 +236,11 @@ class MedicineSoftDeleteView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin,
     template_name = "medicines/medicine_confirm_delete.html"
     success_url = reverse_lazy("medicine_list")
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action"] = "deactivate"
+        return context
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_success_url()
@@ -219,3 +251,23 @@ class MedicineSoftDeleteView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin,
             f"Medicine '{self.object.name}' has been successfully deactivated."
         )
         return HttpResponseRedirect(success_url)
+
+
+class MedicineActivateView(LoginRequiredMixin, AdminOrPharmacistRequiredMixin, View):
+    """
+    Reactivates a deactivated medicine.
+    Accessible by: Admin, Pharmacist.
+    """
+    def get(self, request, pk):
+        medicine = get_object_or_404(Medicine, pk=pk)
+        return render(request, "medicines/medicine_confirm_delete.html", {
+            "object": medicine,
+            "action": "activate"
+        })
+
+    def post(self, request, pk):
+        medicine = get_object_or_404(Medicine, pk=pk)
+        medicine.is_active = True
+        medicine.save()
+        messages.success(request, f"Medicine '{medicine.name}' has been successfully activated.")
+        return redirect("medicine_list")

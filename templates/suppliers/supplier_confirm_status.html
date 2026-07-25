@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}{% if action == 'activate' %}Activate{% else %}Deactivate{% endif %} User Account | PharmaCare{% endblock %}
+{% block title %}{% if action == 'activate' %}Activate{% else %}Deactivate{% endif %} Supplier | PharmaCare{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center py-4">
     <div class="col-md-8 col-lg-6">
         
         <div class="mb-3">
-            <a href="{% url 'user_list' %}" class="btn btn-sm btn-link text-secondary text-decoration-none p-0">
-                <i class="bi bi-arrow-left me-1"></i> Back to Users
+            <a href="{% url 'supplier_list' %}" class="btn btn-sm btn-link text-secondary text-decoration-none p-0">
+                <i class="bi bi-arrow-left me-1"></i> Back to Suppliers
             </a>
         </div>
 
@@ -17,29 +17,26 @@
             <div class="p-4 d-flex align-items-center gap-3 border-bottom" style="{% if action == 'deactivate' %}background: #fef2f2; border-color: #fee2e2 !important;{% else %}background: #f0fdf4; border-color: #dcfce7 !important;{% endif %}">
                 <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; {% if action == 'deactivate' %}background: #fee2e2; color: #ef4444;{% else %}background: #dcfce7; color: #16a34a;{% endif %}">
                     {% if action == 'deactivate' %}
-                        <i class="bi bi-person-x fs-4"></i>
+                        <i class="bi bi-slash-circle fs-4"></i>
                     {% else %}
-                        <i class="bi bi-person-check fs-4"></i>
+                        <i class="bi bi-check-circle fs-4"></i>
                     {% endif %}
                 </div>
                 <div>
                     <h5 class="mb-0 fw-bold {% if action == 'deactivate' %}text-danger{% else %}text-success{% endif %}" style="font-family: var(--font-heading);">
-                        {% if action == 'activate' %}Reactivate{% else %}Deactivate{% endif %} User Account
+                        {% if action == 'activate' %}Reactivate{% else %}Deactivate{% endif %} Supplier
                     </h5>
-                    <p class="mb-0 text-secondary small">Confirm user access status modification</p>
+                    <p class="mb-0 text-secondary small">Confirm status change for this supplier</p>
                 </div>
             </div>
 
             <!-- Body Content -->
             <div class="card-body p-4">
                 <div class="p-3 mb-4 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
-                    <div class="text-secondary small text-uppercase font-heading fw-semibold mb-1">Target Account</div>
-                    <div class="fs-5 fw-bold text-dark brand-font">{{ target_user.username }}</div>
-                    {% if target_user.get_full_name %}
-                        <div class="text-muted small">Full Name: {{ target_user.get_full_name }}</div>
-                    {% endif %}
-                    {% if target_user.email %}
-                        <div class="text-muted small">Email: {{ target_user.email }}</div>
+                    <div class="text-secondary small text-uppercase font-heading fw-semibold mb-1">Supplier Name</div>
+                    <div class="fs-5 fw-bold text-dark brand-font">{{ supplier.name }}</div>
+                    {% if supplier.contact_person %}
+                        <div class="text-muted small">Contact Person: {{ supplier.contact_person }}</div>
                     {% endif %}
                 </div>
 
@@ -48,9 +45,9 @@
                         <i class="bi {% if action == 'deactivate' %}bi-exclamation-triangle-fill text-warning{% else %}bi-info-circle-fill text-primary{% endif %} fs-5 lh-1"></i>
                         <div class="small">
                             {% if action == 'deactivate' %}
-                                <strong>Deactivation Notice:</strong> Deactivating a user account blocks them from logging into PharmaCare immediately. Their historical activity, POS sales, and audit trails will remain preserved in the system.
+                                <strong>Deactivation Impact:</strong> Deactivating this supplier hides them from new purchase order creation lists. Past purchase orders associated with this supplier will remain unchanged.
                             {% else %}
-                                <strong>Reactivation Notice:</strong> Reactivating this user account restores their permission to log into the application immediately with their existing login credentials.
+                                <strong>Reactivation Impact:</strong> Reactivating this supplier restores them in active purchase order creation and restocking options.
                             {% endif %}
                         </div>
                     </div>
@@ -59,7 +56,7 @@
                 <form method="post" class="m-0">
                     {% csrf_token %}
                     <div class="d-flex justify-content-end gap-2 pt-2 border-top">
-                        <a href="{% url 'user_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <a href="{% url 'supplier_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
                         <button type="submit" class="btn {% if action == 'deactivate' %}btn-danger{% else %}btn-success{% endif %} px-4 fw-semibold">
                             Yes, {% if action == 'activate' %}Activate{% else %}Deactivate{% endif %}
                         </button>

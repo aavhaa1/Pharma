@@ -145,6 +145,10 @@
                                             <a href="{% url 'medicine_delete' medicine.pk %}" class="btn btn-sm btn-outline-danger px-2 py-1" title="Deactivate">
                                                 <i class="bi bi-slash-circle"></i>
                                             </a>
+                                        {% else %}
+                                            <a href="{% url 'medicine_activate' medicine.pk %}" class="btn btn-sm btn-outline-success px-2 py-1" title="Activate">
+                                                <i class="bi bi-check-circle"></i>
+                                            </a>
                                         {% endif %}
                                     {% endif %}
                                 </div>

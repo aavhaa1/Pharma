@@ -114,20 +114,20 @@
                                 {% endif %}
                             </td>
                             <td class="py-3 px-4 text-end text-nowrap">
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{% url 'supplier_detail' supplier.pk %}" class="btn btn-outline-primary" title="View Details">
+                                <div class="d-inline-flex gap-1" role="group">
+                                    <a href="{% url 'supplier_detail' supplier.pk %}" class="btn btn-sm btn-outline-primary px-2 py-1" title="View Details">
                                         <i class="bi bi-eye"></i> View
                                     </a>
-                                    <a href="{% url 'supplier_edit' supplier.pk %}" class="btn btn-outline-secondary" title="Edit">
+                                    <a href="{% url 'supplier_edit' supplier.pk %}" class="btn btn-sm btn-outline-secondary px-2 py-1" title="Edit">
                                         <i class="bi bi-pencil"></i> Edit
                                     </a>
                                     {% if supplier.is_active %}
-                                        <a href="{% url 'supplier_toggle_status' supplier.pk %}" class="btn btn-outline-danger" title="Deactivate">
-                                            <i class="bi bi-slash-circle"></i> Deactivate
+                                        <a href="{% url 'supplier_toggle_status' supplier.pk %}" class="btn btn-sm btn-outline-danger px-2 py-1" title="Deactivate">
+                                            <i class="bi bi-slash-circle"></i>
                                         </a>
                                     {% else %}
-                                        <a href="{% url 'supplier_toggle_status' supplier.pk %}" class="btn btn-outline-success" title="Reactivate">
-                                            <i class="bi bi-check-circle"></i> Reactivate
+                                        <a href="{% url 'supplier_toggle_status' supplier.pk %}" class="btn btn-sm btn-outline-success px-2 py-1" title="Activate">
+                                            <i class="bi bi-check-circle"></i>
                                         </a>
                                     {% endif %}
                                 </div>

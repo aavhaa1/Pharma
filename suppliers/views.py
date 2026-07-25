@@ -2,8 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import (
@@ -119,9 +118,17 @@ class SupplierUpdateView(LoginRequiredMixin, SupplierPermissionMixin, SuccessMes
 
 class ToggleSupplierStatusView(LoginRequiredMixin, SupplierPermissionMixin, View):
     """
-    Soft-deletes (deactivates) or reactivates a supplier.
+    Soft-deletes (deactivates) or reactivates a supplier with confirmation.
     """
     def get(self, request, pk, *args, **kwargs):
+        supplier = get_object_or_404(Supplier, pk=pk)
+        action = "deactivate" if supplier.is_active else "activate"
+        return render(request, "suppliers/supplier_confirm_status.html", {
+            "supplier": supplier,
+            "action": action
+        })
+
+    def post(self, request, pk, *args, **kwargs):
         supplier = get_object_or_404(Supplier, pk=pk)
         supplier.is_active = not supplier.is_active
         supplier.save()
@@ -132,6 +139,3 @@ class ToggleSupplierStatusView(LoginRequiredMixin, SupplierPermissionMixin, View
             messages.success(request, f"Supplier '{supplier.name}' was deactivated successfully.")
 
         return redirect("supplier_list")
-
-    def post(self, request, pk, *args, **kwargs):
-        return self.get(request, pk, *args, **kwargs)
