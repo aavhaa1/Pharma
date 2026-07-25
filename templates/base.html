@@ -517,7 +517,9 @@
     <aside id="pharmacist-sidebar">
         <!-- Brand -->
         <div class="sidebar-brand">
-            <span class="brand-name">PharmaCare</span>
+            <a href="{% url 'pharmacist:dashboard' %}" class="text-decoration-none">
+                <span class="brand-name">PharmaCare</span>
+            </a>
             <span class="role-badge">
                 <i class="bi bi-heart-pulse"></i> Pharmacist
             </span>
@@ -645,7 +647,9 @@
     <aside id="admin-sidebar">
         <!-- Brand -->
         <div class="sidebar-brand">
-            <span class="brand-name">PharmaCare</span>
+            <a href="{% url 'home' %}" class="text-decoration-none">
+                <span class="brand-name">PharmaCare</span>
+            </a>
             <span class="role-badge">
                 {% if user.is_superuser %}<i class="bi bi-shield-fill-check"></i> Superuser{% else %}<i class="bi bi-person-gear"></i> Admin{% endif %}
             </span>
