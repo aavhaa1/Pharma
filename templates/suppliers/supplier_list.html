@@ -122,13 +122,19 @@
                                         <i class="bi bi-pencil"></i> Edit
                                     </a>
                                     {% if supplier.is_active %}
-                                        <a href="{% url 'supplier_toggle_status' supplier.pk %}" class="btn btn-sm btn-outline-danger px-2 py-1" title="Deactivate">
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-danger px-2 py-1"
+                                            title="Deactivate"
+                                            onclick="showToastConfirm({ action: 'deactivate', targetName: '{{ supplier.name|escapejs }}', targetType: 'Supplier', actionUrl: '{% url 'supplier_toggle_status' supplier.pk %}' })">
                                             <i class="bi bi-slash-circle"></i>
-                                        </a>
+                                        </button>
                                     {% else %}
-                                        <a href="{% url 'supplier_toggle_status' supplier.pk %}" class="btn btn-sm btn-outline-success px-2 py-1" title="Activate">
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-success px-2 py-1"
+                                            title="Activate"
+                                            onclick="showToastConfirm({ action: 'activate', targetName: '{{ supplier.name|escapejs }}', targetType: 'Supplier', actionUrl: '{% url 'supplier_toggle_status' supplier.pk %}' })">
                                             <i class="bi bi-check-circle"></i>
-                                        </a>
+                                        </button>
                                     {% endif %}
                                 </div>
                             </td>

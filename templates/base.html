@@ -948,6 +948,158 @@
 
     {% block extra_scripts %}{% endblock %}
 
+    <!-- ── Global Toast Confirmation Component ─────────────────────────────── -->
+    <div id="toast-confirm-overlay" style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    ">
+        <div id="toast-confirm-box" style="
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08);
+            padding: 0;
+            max-width: 420px;
+            width: 90%;
+            overflow: hidden;
+            transform: scale(0.92);
+            opacity: 0;
+            transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), opacity 0.18s ease;
+        ">
+            <!-- Toast Header -->
+            <div id="toast-confirm-header" style="padding: 20px 24px 16px; display: flex; align-items: center; gap: 14px;">
+                <div id="toast-confirm-icon" style="width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;"></div>
+                <div>
+                    <div id="toast-confirm-title" style="font-weight: 700; font-size: 1rem; color: #0f172a; font-family: var(--font-heading, 'Plus Jakarta Sans', sans-serif);"></div>
+                    <div id="toast-confirm-subtitle" style="font-size: 0.8rem; color: #64748b; margin-top: 2px;"></div>
+                </div>
+            </div>
+
+            <!-- Target Item Pill -->
+            <div style="padding: 0 24px 16px;">
+                <div id="toast-confirm-target" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; font-size: 0.9rem; color: #334155; font-weight: 600;"></div>
+            </div>
+
+            <!-- Notice -->
+            <div style="padding: 0 24px 20px;">
+                <div id="toast-confirm-notice" style="border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; line-height: 1.5; border: 1px solid; display: flex; gap: 10px; align-items: flex-start;">
+                    <i id="toast-confirm-notice-icon" style="font-size: 1rem; flex-shrink:0; margin-top:1px;"></i>
+                    <span id="toast-confirm-notice-text"></span>
+                </div>
+            </div>
+
+            <!-- Divider + Buttons -->
+            <div style="border-top: 1px solid #f1f5f9; padding: 14px 24px; display: flex; justify-content: flex-end; gap: 10px; background: #fafafa;">
+                <button id="toast-confirm-cancel" onclick="closeToastConfirm()" style="padding: 8px 20px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.15s;">Cancel</button>
+                <form id="toast-confirm-form" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button id="toast-confirm-btn" type="submit" style="padding: 8px 22px; border-radius: 8px; border: none; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s;"></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showToastConfirm(options) {
+            /*
+             * options = {
+             *   action: 'deactivate' | 'activate',
+             *   targetName: 'Medicine Name',
+             *   targetType: 'Medicine' | 'Category' | 'Supplier' | 'User',
+             *   actionUrl: '/path/to/post/',
+             * }
+             */
+            const isDeactivate = options.action === 'deactivate';
+            const overlay = document.getElementById('toast-confirm-overlay');
+            const box = document.getElementById('toast-confirm-box');
+
+            // Header band color
+            const header = document.getElementById('toast-confirm-header');
+            header.style.background = isDeactivate ? '#fef2f2' : '#f0fdf4';
+            header.style.borderBottom = isDeactivate ? '1px solid #fee2e2' : '1px solid #dcfce7';
+
+            // Icon
+            const icon = document.getElementById('toast-confirm-icon');
+            icon.style.background = isDeactivate ? '#fee2e2' : '#dcfce7';
+            icon.style.color = isDeactivate ? '#ef4444' : '#16a34a';
+            icon.innerHTML = isDeactivate
+                ? '<i class="bi bi-slash-circle"></i>'
+                : '<i class="bi bi-check-circle"></i>';
+
+            // Title
+            document.getElementById('toast-confirm-title').textContent =
+                (isDeactivate ? 'Deactivate' : 'Reactivate') + ' ' + options.targetType;
+            document.getElementById('toast-confirm-subtitle').textContent =
+                'Confirm status change for this ' + options.targetType.toLowerCase();
+
+            // Target pill
+            document.getElementById('toast-confirm-target').textContent = options.targetName;
+
+            // Notice
+            const notice = document.getElementById('toast-confirm-notice');
+            const noticeIcon = document.getElementById('toast-confirm-notice-icon');
+            const noticeText = document.getElementById('toast-confirm-notice-text');
+
+            if (isDeactivate) {
+                notice.style.background = '#fffbeb';
+                notice.style.borderColor = '#fef3c7';
+                notice.style.color = '#92400e';
+                noticeIcon.className = 'bi bi-exclamation-triangle-fill';
+                noticeIcon.style.color = '#f59e0b';
+                noticeText.textContent = 'This item will be hidden from active forms and lists. All historical records remain preserved.';
+            } else {
+                notice.style.background = '#eff6ff';
+                notice.style.borderColor = '#dbeafe';
+                notice.style.color = '#1e40af';
+                noticeIcon.className = 'bi bi-info-circle-fill';
+                noticeIcon.style.color = '#3b82f6';
+                noticeText.textContent = 'This item will immediately become available in all active forms and lists.';
+            }
+
+            // Action button
+            const btn = document.getElementById('toast-confirm-btn');
+            btn.textContent = isDeactivate ? 'Yes, Deactivate' : 'Yes, Activate';
+            btn.style.background = isDeactivate ? '#ef4444' : '#16a34a';
+            btn.style.color = '#fff';
+
+            // Form URL
+            document.getElementById('toast-confirm-form').action = options.actionUrl;
+
+            // Show overlay
+            overlay.style.display = 'flex';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    box.style.transform = 'scale(1)';
+                    box.style.opacity = '1';
+                });
+            });
+        }
+
+        function closeToastConfirm() {
+            const overlay = document.getElementById('toast-confirm-overlay');
+            const box = document.getElementById('toast-confirm-box');
+            box.style.transform = 'scale(0.92)';
+            box.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 200);
+        }
+
+        // Close on backdrop click
+        document.getElementById('toast-confirm-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeToastConfirm();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeToastConfirm();
+        });
+    </script>
+
 </body>
 
-</html>
+</html>
