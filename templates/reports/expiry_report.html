@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Expiry Report | PharmaCare{% endblock %}
 {% block content %}
 <div class="row mb-4 align-items-center">
@@ -16,7 +16,7 @@
 
 {% if inventory_items %}
 <div class="alert" style="background: rgba(220,53,69,0.1); border: 1px solid rgba(220,53,69,0.4); color: #f8d7da;" role="alert">
-     <strong>{{ page_obj.paginator.count }} inventory batch(es)</strong> are expired or expiring within 30 days. Immediate attention required.
+     <strong>{% if is_paginated %}{{ paginator.count }}{% else %}{{ inventory_items|length }}{% endif %} inventory batch(es)</strong> are expired or expiring within 30 days. Immediate attention required.
 </div>
 {% endif %}
 
@@ -43,7 +43,7 @@
                     <td class="py-3 px-4 font-monospace small text-secondary">{{ item.batch_no }}</td>
                     <td class="py-3 px-4 text-center text-secondary small">{{ item.expiry_date|date:"Y-m-d" }}</td>
                     <td class="py-3 px-4 text-center fw-bold {% if item.days_remaining < 0 %}text-danger{% elif item.days_remaining <= 30 %}text-warning{% else %}text-success{% endif %}">
-                        {% if item.days_remaining < 0 %}Expired ({{ item.days_remaining|abs }} days ago)
+                        {% if item.days_remaining < 0 %}Expired ({{ item.days_remaining_abs }} days ago)
                         {% else %}{{ item.days_remaining }} days{% endif %}
                     </td>
                     <td class="py-3 px-4 text-end text-dark">{{ item.quantity }}</td>

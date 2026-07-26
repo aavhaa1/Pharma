@@ -244,6 +244,7 @@ class ExpiryReportView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, ListView)
         for item in context['inventory_items']:
             days = (item.expiry_date - today).days
             item.days_remaining = days
+            item.days_remaining_abs = abs(days)
             # Fetch supplier
             last_item = PurchaseItem.objects.filter(medicine=item.medicine, batch_no=item.batch_no, purchase__status='Received').first()
             item.supplier_name = last_item.purchase.supplier.name if last_item else 'N/A'

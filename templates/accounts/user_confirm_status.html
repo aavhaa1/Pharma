@@ -14,8 +14,8 @@
 
         <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 12px; background: #ffffff;">
             <!-- Header Banner -->
-            <div class="p-4 d-flex align-items-center gap-3 border-bottom" style="{% if action == 'deactivate' %}background: #fef2f2; border-color: #fee2e2 !important;{% else %}background: #f0fdf4; border-color: #dcfce7 !important;{% endif %}">
-                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; {% if action == 'deactivate' %}background: #fee2e2; color: #ef4444;{% else %}background: #dcfce7; color: #16a34a;{% endif %}">
+            <div class="p-4 d-flex align-items-center gap-3 border-bottom {% if action == 'deactivate' %}status-banner-deactivate{% else %}status-banner-activate{% endif %}">
+                <div class="rounded-circle d-flex align-items-center justify-content-center {% if action == 'deactivate' %}status-icon-deactivate{% else %}status-icon-activate{% endif %}" style="width: 48px; height: 48px;">
                     {% if action == 'deactivate' %}
                         <i class="bi bi-person-x fs-4"></i>
                     {% else %}
@@ -43,7 +43,7 @@
                     {% endif %}
                 </div>
 
-                <div class="p-3 rounded-3 mb-4 border" style="{% if action == 'deactivate' %}background: #fffbebf5; border-color: #fef3c7 !important; color: #92400e;{% else %}background: #eff6ff; border-color: #dbeafe !important; color: #1e40af;{% endif %}">
+                <div class="p-3 rounded-3 mb-4 border {% if action == 'deactivate' %}notice-box-deactivate{% else %}notice-box-activate{% endif %}">
                     <div class="d-flex gap-2">
                         <i class="bi {% if action == 'deactivate' %}bi-exclamation-triangle-fill text-warning{% else %}bi-info-circle-fill text-primary{% endif %} fs-5 lh-1"></i>
                         <div class="small">
@@ -70,4 +70,13 @@
 
     </div>
 </div>
+
+<style>
+.status-banner-deactivate { background: #fef2f2; border-color: #fee2e2 !important; }
+.status-banner-activate   { background: #f0fdf4; border-color: #dcfce7 !important; }
+.status-icon-deactivate   { background: #fee2e2; color: #ef4444; }
+.status-icon-activate     { background: #dcfce7; color: #16a34a; }
+.notice-box-deactivate    { background: #fffbebf5; border-color: #fef3c7 !important; color: #92400e; }
+.notice-box-activate      { background: #eff6ff; border-color: #dbeafe !important; color: #1e40af; }
+</style>
 {% endblock %}

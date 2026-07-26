@@ -25,7 +25,7 @@
 <!--  Search and Filters Bar -->
 <div class="card mb-4">
     <div class="card-body py-3">
-        <form method="get" class="row g-2 align-items-end">
+        <form method="get" class="row g-2 align-items-end" data-live-search>
             <!-- Search Text -->
             <div class="col-lg-4 col-md-4">
                 <label for="search-input" class="form-label mb-1 text-secondary" style="font-size: 0.8rem; font-weight: 500;">Search Medicine</label>
@@ -53,9 +53,8 @@
                 </select>
             </div>
 
-            <!-- Action Buttons -->
+            <!-- Reset Button -->
             <div class="col-lg-2 col-md-2 d-flex gap-1 mt-3 mt-md-0">
-                <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Filter</button>
                 <a href="{% url 'medicine_list' %}" class="btn btn-light btn-sm flex-grow-1 text-center">Reset</a>
             </div>
         </form>

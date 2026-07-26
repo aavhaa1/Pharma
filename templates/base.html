@@ -946,6 +946,50 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     {% endif %}{# ── end close-wrapper block ───────────────────────────── #}
 
+    <!-- ── Live Search: Auto-submit filter forms as user types ─────────────── -->
+    <script>
+        (function () {
+            var debounceTimers = new WeakMap();
+
+            function setupLiveSearch(form) {
+                var textInputs = form.querySelectorAll('input[type="text"], input[type="search"]');
+                var dateInputs = form.querySelectorAll('input[type="date"]');
+                var selects = form.querySelectorAll('select');
+
+                function submit() {
+                    // Reset to page 1 on new filter
+                    var pageInput = form.querySelector('input[name="page"]');
+                    if (pageInput) pageInput.remove();
+                    form.submit();
+                }
+
+                function debounced(delay) {
+                    return function () {
+                        var timer = debounceTimers.get(form);
+                        if (timer) clearTimeout(timer);
+                        debounceTimers.set(form, setTimeout(submit, delay));
+                    };
+                }
+
+                inputs.forEach(function (el) {
+                    el.addEventListener('input', debounced(350));
+                });
+
+                selects.forEach(function (el) {
+                    el.addEventListener('change', function () {
+                        var timer = debounceTimers.get(form);
+                        if (timer) clearTimeout(timer);
+                        submit();  // Selects fire immediately
+                    });
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('form[data-live-search]').forEach(setupLiveSearch);
+            });
+        })();
+    </script>
+
     {% block extra_scripts %}{% endblock %}
 
     <!-- ── Global Toast Confirmation Component ─────────────────────────────── -->
