@@ -169,15 +169,23 @@ class MedicineReportView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, ListVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         qs = self.get_queryset()
+        today = timezone.now().date()
         
         context['total_medicines'] = qs.count()
-        # total stock across matching medicines
-        context['total_stock'] = Inventory.objects.filter(medicine__in=qs).aggregate(total=Sum('quantity'))['total'] or 0
+        # Total stock across all matching medicines (unexpired batches only)
+        context['total_stock'] = InventoryBatch.objects.filter(
+            medicine__in=qs,
+            expiry_date__gte=today
+        ).aggregate(total=Sum('quantity'))['total'] or 0
         
-        # Add supplier context to each medicine row (last supplier)
+        # Attach last_supplier and total_stock to each medicine row
         for med in context['medicines']:
             last_item = med.purchase_items.filter(purchase__status='Received').order_by('-purchase__purchase_date').first()
             med.last_supplier = last_item.purchase.supplier.name if last_item else 'N/A'
+            med.total_stock = InventoryBatch.objects.filter(
+                medicine=med,
+                expiry_date__gte=today
+            ).aggregate(total=Sum('quantity'))['total'] or 0
             
         context['categories'] = Category.objects.filter(is_active=True)
         context['suppliers'] = Supplier.objects.filter(is_active=True)
