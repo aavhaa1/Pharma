@@ -134,7 +134,7 @@ class PurchaseReportView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, ListVie
 
 
 class InventoryReportView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, ListView):
-    model = Inventory
+    model = InventoryBatch
     template_name = 'reports/inventory_report.html'
     context_object_name = 'inventory_items'
     paginate_by = 20

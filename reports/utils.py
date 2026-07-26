@@ -72,7 +72,7 @@ def get_filtered_data(report_type, params):
         return queryset
 
     elif report_type == 'inventory':
-        queryset = Inventory.objects.select_related('medicine', 'medicine__category').all()
+        queryset = InventoryBatch.objects.select_related('medicine', 'medicine__category').all()
         # Medicine search
         med = params.get('medicine', '').strip()
         if med:

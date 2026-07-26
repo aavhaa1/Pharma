@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Medicine Report | PharmaCare{% endblock %}
 {% block content %}
 <div class="row mb-4 align-items-center">
@@ -89,11 +89,7 @@
                     <td class="py-3 px-4 text-secondary small">{{ m.last_supplier|default:"N/A" }}</td>
                     <td class="py-3 px-4 text-end text-success fw-semibold">Nrs. {{ m.selling_price }}</td>
                     <td class="py-3 px-4 text-end text-secondary small">Nrs. {{ m.purchase_price }}</td>
-                    <td class="py-3 px-4 text-end text-dark">
-                        {% with stock=m.inventory_batches.all|length %}
-                        {{ m.inventory_batches.count }}
-                        {% endwith %}
-                    </td>
+                    <td class="py-3 px-4 text-end text-dark">{{ m.total_stock }}</td>
                 </tr>
                 {% empty %}
                     <tr><td colspan="7" class="text-center py-5 text-muted">No medicines match the selected filters.</td></tr>
