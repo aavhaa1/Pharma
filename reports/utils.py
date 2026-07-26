@@ -130,7 +130,7 @@ def get_filtered_data(report_type, params):
     elif report_type == 'expiry':
         # Show expired and expiring soon (within 30 days)
         limit_date = today + timedelta(days=30)
-        queryset = Inventory.objects.select_related('medicine', 'medicine__category').filter(
+        queryset = InventoryBatch.objects.select_related('medicine', 'medicine__category').filter(
             expiry_date__lte=limit_date
         )
         return queryset

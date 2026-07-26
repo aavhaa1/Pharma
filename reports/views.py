@@ -228,7 +228,7 @@ class LowStockReportView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, ListVie
 
 
 class ExpiryReportView(LoginRequiredMixin, AdminOrPharmacistOnlyMixin, ListView):
-    model = Inventory
+    model = InventoryBatch
     template_name = 'reports/expiry_report.html'
     context_object_name = 'inventory_items'
     paginate_by = 20
