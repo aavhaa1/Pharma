@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# SQLite Database
+db.sqlite3
+db.sqlite3-journal
+
+# Django
+*.log
+local_settings.py
+media/
+
+# Static files (if collected)
+staticfiles/
+
+# Environment Variables
+.env
+.env.*
+
+# IDEs
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Migrations (optional)
+# Do NOT ignore migrations in a team project.
+# Keep this commented out.
+# */migrations/
+# !*/migrations/__init__.py
+
+# Node (if using Tailwind/Vite)
+node_modules/
+
+# Misc
+*.swp
+*.swo
