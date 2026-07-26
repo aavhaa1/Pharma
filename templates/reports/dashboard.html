@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Reports Dashboard | PharmaCare{% endblock %}
 
@@ -131,7 +131,6 @@
             </div>
         </a>
     </div>
-
     <!-- Low Stock Count -->
     <div class="col-md-3 col-sm-6">
         <a href="{% url 'reports_low_stock' %}" class="text-decoration-none">
@@ -142,7 +141,7 @@
                             <p class="text-secondary small fw-semibold mb-1">Low Stock Medicines</p>
                             <h3 class="text-warning fw-bold mb-0">{{ low_stock_medicines_count }}</h3>
                         </div>
-                        <span style="font-size: 2rem;"> ï¸</span>
+                        <span style="font-size: 1.5rem;"><i class="bi bi-exclamation-triangle text-warning"></i></span>
                     </div>
                 </div>
             </div>
@@ -199,7 +198,7 @@
             <div class="col-md-3"><a href="{{ url_inventory }}" class="btn btn-outline-success w-100 py-2"> Inventory Report</a></div>
             <div class="col-md-3"><a href="{{ url_medicines }}" class="btn btn-outline-info w-100 py-2"> Medicine Report</a></div>
             <div class="col-md-3"><a href="{{ url_suppliers }}" class="btn btn-outline-secondary w-100 py-2"> Supplier Report</a></div>
-            <div class="col-md-3"><a href="{{ url_low_stock }}" class="btn btn-outline-warning w-100 py-2"> ï¸ Low Stock Report</a></div>
+            <div class="col-md-3"><a href="{{ url_low_stock }}" class="btn btn-outline-warning w-100 py-2"><i class="bi bi-exclamation-triangle me-1"></i> Low Stock Report</a></div>
             <div class="col-md-3"><a href="{{ url_expiry }}" class="btn btn-outline-danger w-100 py-2"> Expiry Report</a></div>
             <div class="col-md-3"><a href="{{ url_revenue }}" class="btn btn-outline-light w-100 py-2"> Revenue Report</a></div>
         </div>
