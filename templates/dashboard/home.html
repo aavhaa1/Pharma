@@ -473,6 +473,12 @@
     Chart.defaults.color = '#64748B';
     Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
+    const monthlyLabels = JSON.parse('{{ monthly_labels_json|escapejs }}');
+    const monthlySalesData = JSON.parse('{{ monthly_sales_json|escapejs }}');
+    const stockStatusData = JSON.parse('{{ stock_status_data_json|escapejs }}');
+    const catLabels = JSON.parse('{{ cat_labels_json|escapejs }}');
+    const catData = JSON.parse('{{ cat_data_json|escapejs }}');
+
     // 1. Sales Trend Line Chart
     const salesCtx = document.getElementById('salesTrendChart').getContext('2d');
     const gradient = salesCtx.createLinearGradient(0, 0, 0, 280);
@@ -482,10 +488,10 @@
     new Chart(salesCtx, {
         type: 'line',
         data: {
-            labels: {{ monthly_labels_json|safe }},
+            labels: monthlyLabels,
             datasets: [{
                 label: 'Monthly Revenue (Nrs.)',
-                data: {{ monthly_sales_json|safe }},
+                data: monthlySalesData,
                 borderColor: '#2563EB',
                 backgroundColor: gradient,
                 borderWidth: 2.5,
@@ -536,7 +542,7 @@
         data: {
             labels: ['In Stock', 'Low Stock', 'Out of Stock'],
             datasets: [{
-                data: {{ stock_status_data_json|safe }},
+                data: stockStatusData,
                 backgroundColor: ['#22C55E', '#F59E0B', '#EF4444'],
                 borderColor: ['#16a34a', '#d97706', '#dc2626'],
                 borderWidth: 1,
@@ -568,10 +574,10 @@
     new Chart(catCtx, {
         type: 'bar',
         data: {
-            labels: {{ cat_labels_json|safe }},
+            labels: catLabels,
             datasets: [{
                 label: 'Stock Quantity',
-                data: {{ cat_data_json|safe }},
+                data: catData,
                 backgroundColor: 'rgba(16, 185, 129, 0.65)',
                 borderColor: '#10B981',
                 borderWidth: 1,
